@@ -19,10 +19,32 @@ const startServer = async () => {
     await connectDB();
 
     // Check if seeding is needed
+    // Check if seeding is needed
     const productCount = await Product.countDocuments();
     if (productCount === 0) {
-        console.log('📦 Database empty, seeding initial data...');
+        console.log('📦 Products missing, seeding initial catalog...');
         await seedDB(false);
+    } else {
+        // Ensure admin and settings still exist if products are already present
+        const User = (await import('./models/User.js')).default;
+        const Settings = (await import('./models/Settings.js')).default;
+
+        const admin = await User.findOne({ role: 'admin' });
+        if (!admin) {
+            await User.create({
+                name: 'Admin',
+                email: 'admin@aesthetic.com',
+                password: 'admin123',
+                role: 'admin'
+            });
+            console.log('✅ Admin user restored: admin@aesthetic.com');
+        }
+
+        const settings = await Settings.findOne();
+        if (!settings) {
+            await Settings.create({});
+            console.log('✅ Default settings restored');
+        }
     }
 };
 
@@ -61,6 +83,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
 });

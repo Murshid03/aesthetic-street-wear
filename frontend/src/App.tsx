@@ -238,6 +238,12 @@ export default function App() {
   const loadUser = useAuth((state) => state.loadUser);
 
   useEffect(() => {
+    // Check if the app has been initialized in this session
+    const isInitialized = sessionStorage.getItem("asw_session_init");
+    if (!isInitialized) {
+      localStorage.removeItem("asw_user");
+      sessionStorage.setItem("asw_session_init", "true");
+    }
     loadUser();
   }, [loadUser]);
 

@@ -16,6 +16,8 @@ import {
   ShoppingCart,
   User,
   X,
+  Shield,
+  LogIn,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -30,13 +32,13 @@ const NAV_LINKS = [
 export function Header() {
   const { itemCount: cartCount } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
-  const { isAuthenticated, principal, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const isAdmin = isAuthenticated; // any logged-in user can access admin panel (real role check TBD)
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -72,10 +74,10 @@ export function Header() {
             className="shrink-0 mr-2"
             aria-label="Aesthetic Street Wear home"
           >
-            <span className="font-display font-bold text-lg sm:text-xl tracking-tight text-foreground leading-tight">
+            <span className="font-display font-bold text-lg sm:text-xl tracking-tight text-foreground leading-tight text-primary italic uppercase">
               Aesthetic
               <br className="hidden sm:block" />
-              <span className="hidden sm:inline"> Street Wear</span>
+              <span className="hidden sm:inline lowercase text-foreground not-italic font-black"> street wear</span>
               <span className="sm:hidden"> SW</span>
             </span>
           </Link>
@@ -108,58 +110,77 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 aria-label="Account"
-                onClick={() => {
-                  if (!isAuthenticated) {
-                    navigate({ to: "/login" });
-                  } else {
-                    setUserMenuOpen((v) => !v);
-                  }
-                }}
+                onClick={() => setUserMenuOpen((v) => !v)}
                 data-ocid="user-menu-btn"
                 className="relative"
               >
                 <User className="w-5 h-5" />
               </Button>
-              {isAuthenticated && userMenuOpen && (
-                <div className="absolute right-0 top-full mt-1 w-52 bg-card border border-border rounded-lg shadow-elevated z-50 py-1 animate-fade-in">
-                  <div className="px-3 py-2 border-b border-border">
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      Signed in
-                    </p>
-                    <p className="text-xs text-foreground truncate max-w-[180px]">
-                      {principal}
-                    </p>
-                  </div>
-                  <Link
-                    to="/account"
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <Package className="w-4 h-4" />
-                    My Orders
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors text-primary"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      Admin Panel
-                    </Link>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-1 w-52 bg-card border border-border rounded-lg shadow-elevated z-50 py-1 animate-fade-in overflow-hidden">
+                  {!isAuthenticated ? (
+                    <>
+                      <div className="px-3 py-2 border-b border-border bg-muted/10">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Guest Terminal</p>
+                      </div>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted font-bold transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <LogIn className="w-4 h-4 text-primary" />
+                        Login
+                      </Link>
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted font-bold transition-colors group"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Shield className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                        Admin Panel
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-3 py-2 border-b border-border bg-muted/10">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Authorized User</p>
+                        <p className="text-xs font-bold text-foreground truncate max-w-[180px]">
+                          {user?.name || user?.email}
+                        </p>
+                      </div>
+                      <Link
+                        to="/account"
+                        className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors font-medium"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Package className="w-4 h-4" />
+                        Order History
+                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors text-primary font-bold"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Settings className="w-4 h-4" />
+                          Control Center
+                        </Link>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          logout();
+                          setUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors text-destructive font-bold"
+                        data-ocid="logout-btn"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Deauthorize
+                      </button>
+                    </>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      logout();
-                      setUserMenuOpen(false);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors text-destructive"
-                    data-ocid="logout-btn"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
                 </div>
               )}
             </div>

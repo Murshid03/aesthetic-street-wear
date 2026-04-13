@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
+import api from "@/lib/api";
 
-const API = "/api/auth";
+const AUTH_API = "/auth";
 
 interface User {
   _id: string;
@@ -31,17 +32,23 @@ export const useAuth = create<AuthState>((set) => ({
   loadUser: () => {
     const stored = localStorage.getItem("asw_user");
     if (stored) {
-      const user = JSON.parse(stored);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
-      set({ user, isAuthenticated: true });
+      try {
+        const user = JSON.parse(stored);
+        if (user && typeof user === 'object' && user.token) {
+          set({ user, isAuthenticated: true });
+        } else {
+          localStorage.removeItem("asw_user");
+        }
+      } catch (e) {
+        localStorage.removeItem("asw_user");
+      }
     }
   },
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await axios.post(`${API}/login`, { email, password });
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+      const { data } = await api.post(`${AUTH_API}/login`, { email, password });
       localStorage.setItem("asw_user", JSON.stringify(data));
       set({ user: data, isAuthenticated: true, isLoading: false });
     } catch (err: any) {
@@ -53,8 +60,7 @@ export const useAuth = create<AuthState>((set) => ({
   register: async (name, email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await axios.post(`${API}/register`, { name, email, password });
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+      const { data } = await api.post(`${AUTH_API}/register`, { name, email, password });
       localStorage.setItem("asw_user", JSON.stringify(data));
       set({ user: data, isAuthenticated: true, isLoading: false });
     } catch (err: any) {

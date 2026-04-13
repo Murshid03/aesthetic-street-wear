@@ -27,7 +27,8 @@ export function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} />;
+    const search = adminOnly ? { admin: "true" } : undefined;
+    return <Navigate to="/login" search={search} />;
   }
 
   if (adminOnly && user?.role !== "admin") {
