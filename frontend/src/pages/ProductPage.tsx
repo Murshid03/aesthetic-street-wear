@@ -15,6 +15,8 @@ import {
   Plus,
   ShoppingCart,
   Loader2,
+  Zap,
+  RefreshCw,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -232,7 +234,11 @@ export default function ProductPage() {
                     className={`w-5 h-5 transition-colors ${wished ? "fill-primary text-primary" : "text-muted-foreground"}`}
                   />
                 </button>
-                {product.stockQuantity <= 5 && (
+                {product.isSoldOut ? (
+                  <Badge className="absolute top-4 left-4 bg-rose-600 text-white font-bold px-3 py-1">
+                    Sold Out
+                  </Badge>
+                ) : product.stockQuantity <= 5 && (
                   <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground">
                     Only {product.stockQuantity} left
                   </Badge>
@@ -290,17 +296,18 @@ export default function ProductPage() {
                     <button
                       type="button"
                       key={size}
+                      disabled={product.isSoldOut}
                       onClick={() => setSelectedSize(size)}
                       className={`min-w-[48px] px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${activeSize === size
-                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                          : "border-border hover:border-primary/60 bg-card"
-                        }`}
+                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                        : "border-border hover:border-primary/60 bg-card"
+                        } ${product.isSoldOut ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {size}
                     </button>
                   ))}
                 </div>
-                {!activeSize && (
+                {!activeSize && !product.isSoldOut && (
                   <p className="text-xs text-muted-foreground mt-2">
                     Please select a size to proceed
                   </p>
@@ -315,18 +322,20 @@ export default function ProductPage() {
                 >
                   <button
                     type="button"
-                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors"
+                    disabled={product.isSoldOut}
+                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Decrease quantity"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-12 text-center text-sm font-bold">
+                  <span className={`w-12 text-center text-sm font-bold ${product.isSoldOut ? "opacity-30" : ""}`}>
                     {quantity}
                   </span>
                   <button
                     type="button"
-                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors"
+                    disabled={product.isSoldOut}
+                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30"
                     onClick={() => setQuantity((q) => q + 1)}
                     aria-label="Increase quantity"
                   >
@@ -337,15 +346,31 @@ export default function ProductPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  className="btn-primary flex-1 h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleAddToCart}
-                  disabled={!activeSize}
-                  title={!activeSize ? "Select a size first" : "Add to cart"}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  {activeSize ? "Add to Cart" : "Select a Size First"}
-                </Button>
+                {product.isSoldOut ? (
+                  <Button
+                    className="flex-1 h-12 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl px-8"
+                    onClick={() => {
+                      api.post(`/products/${product._id}/notify-me`)
+                        .then(() => toast.success("We'll notify you!", {
+                          description: `You'll be alerted when ${product.name} returns to our collection.`
+                        }))
+                        .catch(() => toast.error("Please sign in to get restock alerts"));
+                    }}
+                  >
+                    <Zap className="w-5 h-5 mr-2" />
+                    Notify Me When Restocked
+                  </Button>
+                ) : (
+                  <Button
+                    className="btn-primary flex-1 h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleAddToCart}
+                    disabled={!activeSize}
+                    title={!activeSize ? "Select a size first" : "Add to cart"}
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    {activeSize ? "Add to Cart" : "Select a Size First"}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   className="flex-1 h-12 border-2"

@@ -52,7 +52,9 @@ import {
   Image as ImageIcon,
   Check,
   ChevronRight,
-  Filter
+  Filter,
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -151,6 +153,22 @@ function AdminProductsContent() {
       setDeleteId(null);
     },
     onError: (err: any) => toast.error(err.response?.data?.error || "Failed to delete product"),
+  });
+
+  const toggleSoldOutMutation = useMutation({
+    mutationFn: (id: string) => api.put(`/products/${id}/toggle-sold-out`),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["admin_products"] });
+      const p = res.data;
+      if (p.isSoldOut) {
+        toast.warning(`${p.name} is now Sold Out`);
+      } else {
+        toast.success(`${p.name} has been Restocked`, {
+          description: "All interested users have been notified."
+        });
+      }
+    },
+    onError: () => toast.error("Failed to update status"),
   });
 
   const filtered = useMemo(() => {
@@ -347,9 +365,14 @@ function AdminProductsContent() {
                           Draft
                         </Badge>
                       )}
-                      {p.stockQuantity <= 5 && p.isActive && (
+                      {p.stockQuantity <= 5 && p.isActive && !p.isSoldOut && (
                         <Badge variant="destructive" className="text-[9px] font-black uppercase tracking-wider h-5 rounded-md">
                           Low Stock
+                        </Badge>
+                      )}
+                      {p.isSoldOut && (
+                        <Badge variant="destructive" className="text-[9px] font-black uppercase tracking-wider h-5 rounded-md bg-rose-600">
+                          Sold Out
                         </Badge>
                       )}
                     </div>
@@ -362,7 +385,7 @@ function AdminProductsContent() {
                       </span>
                       <span className="w-1 h-1 rounded-full bg-border shrink-0" />
                       <span className="text-[10px] font-bold text-muted-foreground">
-                        Inventory: <span className={p.stockQuantity === 0 ? "text-destructive" : "text-foreground"}>{p.stockQuantity} Pcs</span>
+                        Inventory: <span className={p.stockQuantity === 0 || p.isSoldOut ? "text-destructive" : "text-foreground"}>{p.stockQuantity} Pcs</span>
                       </span>
                     </div>
                   </div>
@@ -381,6 +404,22 @@ function AdminProductsContent() {
                         className="h-10 w-10 rounded-2xl hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                       >
                         <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleSoldOutMutation.mutate(p._id!)}
+                        disabled={toggleSoldOutMutation.isPending}
+                        className={`h-10 w-10 rounded-2xl transition-all active:scale-90 ${p.isSoldOut ? "hover:bg-emerald-100 hover:text-emerald-600" : "hover:bg-amber-100 hover:text-amber-600"}`}
+                        title={p.isSoldOut ? "Restock Product" : "Mark as Sold Out"}
+                      >
+                        {toggleSoldOutMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : p.isSoldOut ? (
+                          <RefreshCw className="w-4 h-4" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4" />
+                        )}
                       </Button>
                       <Button
                         variant="ghost"
@@ -520,6 +559,20 @@ function AdminProductsContent() {
                         <Switch
                           checked={form.isActive ?? true}
                           onCheckedChange={(v) => setForm(f => ({ ...f, isActive: v }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold">Availability</Label>
+                      <div className="flex items-center h-12 px-4 bg-background/50 rounded-2xl border border-border/50 justify-between">
+                        <span className={`text-sm font-medium ${form.isSoldOut ? "text-destructive" : "text-emerald-600"}`}>
+                          {form.isSoldOut ? "Sold Out" : "In Stock"}
+                        </span>
+                        <Switch
+                          checked={!(form.isSoldOut ?? false)}
+                          className="data-[state=unchecked]:bg-destructive"
+                          onCheckedChange={(v) => setForm(f => ({ ...f, isSoldOut: !v }))}
                         />
                       </div>
                     </div>

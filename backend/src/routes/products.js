@@ -2,6 +2,8 @@ import express from 'express';
 import Product from '../models/Product.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
+import Notification from '../models/Notification.js';
+import RestockRequest from '../models/RestockRequest.js';
 
 const router = express.Router();
 
@@ -85,13 +87,88 @@ router.put('/:id', protect, adminOnly, upload.single('image'), async (req, res) 
         if (productData.price) productData.price = Number(productData.price);
         if (productData.stockQuantity) productData.stockQuantity = Number(productData.stockQuantity);
         if (productData.isActive !== undefined) productData.isActive = String(productData.isActive) === 'true';
+        if (productData.isSoldOut !== undefined) productData.isSoldOut = String(productData.isSoldOut) === 'true';
+
+        const oldProduct = await Product.findById(req.params.id);
+        if (!oldProduct) return res.status(404).json({ error: 'Product not found' });
 
         const product = await Product.findByIdAndUpdate(req.params.id, productData, {
             new: true,
             runValidators: true,
         });
-        if (!product) return res.status(404).json({ error: 'Product not found' });
+
+        // NOTIFICATION LOGIC: If product was sold out and now is NOT sold out, notify users
+        if (oldProduct.isSoldOut && !product.isSoldOut) {
+            const requests = await RestockRequest.find({ product: product._id });
+            if (requests.length > 0) {
+                const notifications = requests.map(req => ({
+                    user: req.user,
+                    title: '🎉 Product Restocked!',
+                    message: `Great news! "${product.name}" is back in stock and ready to order.`,
+                    type: 'restock_alert',
+                    relatedId: product._id.toString()
+                }));
+                await Notification.insertMany(notifications);
+                // Clear requests after notifying
+                await RestockRequest.deleteMany({ product: product._id });
+            }
+        }
+
         res.json(product);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// PUT /api/products/:id/toggle-sold-out — Admin only
+router.put('/:id/toggle-sold-out', protect, adminOnly, async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+
+        const wasSoldOut = product.isSoldOut;
+        product.isSoldOut = !product.isSoldOut;
+        // If restocking, maybe reset stock to something if it was 0? 
+        // For now, just toggle the flag as requested.
+        await product.save();
+
+        // If it was restocked (wasSoldOut true -> false)
+        if (wasSoldOut && !product.isSoldOut) {
+            const requests = await RestockRequest.find({ product: product._id });
+            if (requests.length > 0) {
+                const notifications = requests.map(r => ({
+                    user: r.user,
+                    title: '🎉 Product Restocked!',
+                    message: `Great news! "${product.name}" is back in stock and ready to order.`,
+                    type: 'restock_alert',
+                    relatedId: product._id.toString()
+                }));
+                await Notification.insertMany(notifications);
+                await RestockRequest.deleteMany({ product: product._id });
+            }
+        }
+
+        res.json(product);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// POST /api/products/:id/notify-me — Logged in users
+router.post('/:id/notify-me', protect, async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        if (!product.isSoldOut) return res.status(400).json({ error: 'Product is already in stock' });
+
+        // Create notification request
+        await RestockRequest.findOneAndUpdate(
+            { user: req.user._id, product: product._id },
+            { user: req.user._id, product: product._id },
+            { upsert: true, new: true }
+        );
+
+        res.json({ message: 'We will notify you once this product is back in stock!' });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }

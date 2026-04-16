@@ -1,6 +1,7 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
@@ -81,6 +82,16 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
         ).populate('user', 'name email');
 
         if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        // CREATE NOTIFICATION for user
+        await Notification.create({
+            user: order.user._id,
+            title: `📦 Order ${status}`,
+            message: `Your order #...${order._id.toString().slice(-6).toUpperCase()} has been ${status.toLowerCase()}.${adminNotes ? ` Note: ${adminNotes}` : ''}`,
+            type: 'order_status',
+            relatedId: order._id.toString()
+        });
+
         res.json(order);
     } catch (err) {
         res.status(400).json({ error: err.message });

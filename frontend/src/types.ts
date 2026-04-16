@@ -12,9 +12,20 @@ export interface Product {
   image: string;
   stockQuantity: number;
   sizes: string[];
+  isSoldOut: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Notification {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'order_status' | 'restock_alert' | 'general';
+  relatedId?: string;
+  isRead: boolean;
+  createdAt: string;
 }
 
 export interface CartItem {
@@ -36,22 +47,13 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  userId: string;
   user?: {
     _id: string;
     name: string;
     email: string;
-    role: string;
   } | string;
   customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  shippingAddress: {
-    street: string;
-    city: string;
-    state: string;
-    pincode: string;
-  };
+  deliveryAddress: string;
   items: OrderItem[];
   totalAmount: number;
   status: OrderStatus;
@@ -59,7 +61,6 @@ export interface Order {
   updatedAt: string;
   adminNotes: string;
   paymentMethod: string;
-  paymentStatus: string;
 }
 
 export interface SiteSettings {

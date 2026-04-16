@@ -107,28 +107,50 @@ function ProductCard({ product }: { product: Product }) {
         </button>
 
         {/* Badges */}
-        {product.stockQuantity <= 5 && product.stockQuantity > 0 && (
+        {product.isSoldOut ? (
+          <Badge className="absolute top-3 left-3 bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg">
+            Sold Out
+          </Badge>
+        ) : product.stockQuantity <= 5 && product.stockQuantity > 0 && (
           <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[9px] font-bold px-2 py-0.5 rounded-full">
             Low Stock
           </Badge>
         )}
-        {product.stockQuantity === 0 && (
-          <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
-            <span className="bg-white text-foreground text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
+
+        {product.isSoldOut && (
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center p-4">
+            <div className="bg-white/95 text-foreground text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-2xl shadow-xl border border-border/50">
+              Out of Collection
+            </div>
           </div>
         )}
 
-        {/* Quick add overlay */}
+        {/* Quick actions overlay */}
         <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button
-            onClick={handleAddToCart}
-            disabled={adding || product.stockQuantity === 0}
-            className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-60"
-            data-ocid={`quick-add-${pid}`}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            {adding ? "Added!" : "Add to Cart"}
-          </button>
+          {product.isSoldOut ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                api.post(`/products/${pid}/notify-me`)
+                  .then(() => toast.success("We'll notify you!", { description: `You'll be alerted when ${product.name} returns.` }))
+                  .catch(() => toast.error("Please sign in to get restock alerts"));
+              }}
+              className="w-full bg-foreground text-background text-[10px] font-black uppercase tracking-widest py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-foreground/90 transition-colors"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Notify Me
+            </button>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={adding}
+              className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-60"
+              data-ocid={`quick-add-${pid}`}
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+              {adding ? "Added!" : "Add to Cart"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -148,14 +170,16 @@ function ProductCard({ product }: { product: Product }) {
           <span className="font-bold text-base text-foreground">
             ₹{product.price.toLocaleString("en-IN")}
           </span>
-          <button
-            onClick={handleAddToCart}
-            disabled={adding}
-            className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-95 shrink-0 sm:hidden"
-            aria-label="Add to Cart"
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-          </button>
+          {!product.isSoldOut && (
+            <button
+              onClick={handleAddToCart}
+              disabled={adding}
+              className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-95 shrink-0 sm:hidden"
+              aria-label="Add to Cart"
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
     </div>

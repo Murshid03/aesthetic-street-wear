@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import api from "@/lib/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
-import type { CartItem, Settings } from "@/types";
+import type { CartItem } from "@/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -173,14 +173,8 @@ function CheckoutContent() {
   const [orderId, setOrderId] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
-  // Fetch settings for WhatsApp number
-  const { data: settings } = useQuery<Settings>({
-    queryKey: ["settings"],
-    queryFn: async () => {
-      const { data } = await api.get("/settings");
-      return data;
-    },
-  });
+
+  const WHATSAPP_NUMBER = "917540096446";
 
   const orderMutation = useMutation({
     mutationFn: async (orderData: any) => {
@@ -188,22 +182,47 @@ function CheckoutContent() {
       return data;
     },
     onSuccess: (newOrder) => {
-      const waNumber = settings?.whatsappNumber || "911234567890";
-      const lineItems = items.map(
-        (i) => `• ${i.product.name} | Size: ${i.size} | Qty: ${i.quantity} | ₹${(i.product.price * i.quantity).toLocaleString()}`
+      const orderRef = newOrder._id.slice(-8).toUpperCase();
+      const now = new Date().toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
+      // ── Build itemized list ──
+      const lineItems = items.map((i, idx) =>
+        [
+          `  ${idx + 1}. *${i.product.name}*`,
+          `     • Size: ${i.size}`,
+          `     • Qty: ${i.quantity}`,
+          `     • Price: ₹${i.product.price.toLocaleString("en-IN")} each`,
+          `     • Subtotal: ₹${(i.product.price * i.quantity).toLocaleString("en-IN")}`,
+        ].join("\n")
       );
+
       const message = [
-        "👋 New order from Aesthetic Street Wear:",
-        "",
+        `👋 *ORDER INQUIRY — Aesthetic Street Wear*`,
+        `Hi Team, I've just placed an order on your site and I'm really excited about these products! Could you please confirm this for me?`,
+        `━━━━━━━━━━━━━━━━━━━━━`,
+        `📋 *Order Tracking ID:* #${orderRef}`,
+        `📅 *Order Date:* ${now}`,
+        ``,
+        `👤 *My Details:*`,
+        `   Name: ${customerName}`,
+        `   Delivery Address: ${deliveryAddress}`,
+        ``,
+        `🛒 *Products I've Selected:*`,
+        `─────────────────────`,
         ...lineItems,
-        "",
-        `Total: ₹${total.toLocaleString()}`,
-        `Order ID: ${newOrder._id.toUpperCase()}`,
-        ...(customerName ? [`\nCustomer: ${customerName}`] : []),
-        ...(deliveryAddress ? [`Address: ${deliveryAddress}`] : []),
+        `─────────────────────`,
+        `💰 *Grand Total:* ₹${total.toLocaleString("en-IN")}`,
+        `💳 *Payment Method:* Cash on Delivery`,
+        ``,
+        `━━━━━━━━━━━━━━━━━━━━━`,
+        `Please let me know once you've confirmed this so I can look forward to the delivery! Thank you! 🙏`,
       ].join("\n");
 
-      const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank");
 
       setOrderId(newOrder._id);

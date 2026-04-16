@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema(
         image: { type: String, default: '' },
         stockQuantity: { type: Number, required: true, default: 0, min: 0 },
         sizes: [{ type: String }],
+        isSoldOut: { type: Boolean, default: false },
         isActive: { type: Boolean, default: true },
     },
     { timestamps: true }

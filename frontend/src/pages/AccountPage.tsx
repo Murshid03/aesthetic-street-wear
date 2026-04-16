@@ -20,6 +20,8 @@ import {
   Truck,
   User as UserIcon,
   Loader2,
+  XCircle,
+  Eye,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -60,7 +62,7 @@ const STATUS_CONFIG: Record<
   Cancelled: {
     label: "Cancelled",
     badgeCls: "bg-rose-100 text-rose-700 border-rose-200",
-    icon: Circle,
+    icon: XCircle,
   },
 };
 
@@ -124,46 +126,47 @@ function OrderCard({ order }: { order: Order }) {
       className="card-elevated overflow-hidden"
     >
       {/* Card header — always visible */}
-      <button
-        type="button"
-        className="w-full px-5 py-4 text-left hover:bg-muted/30 transition-smooth"
-        onClick={() => setExpanded((v) => !v)}
-        aria-expanded={expanded}
+      <div
+        className="w-full px-5 py-5 flex items-start justify-between gap-4"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-display font-bold text-sm sm:text-base">
-                Order #{order._id?.slice(-6).toUpperCase()}
-              </span>
-              <Badge
-                className={`text-[10px] px-2 py-0.5 font-semibold border ${cfg.badgeCls}`}
-              >
-                {cfg.label}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {new Date(order.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-              {" · "}
-              {itemCount} item{itemCount !== 1 ? "s" : ""}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <span className="font-display font-bold text-base sm:text-lg">
-              ₹{total}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="font-display font-bold text-base sm:text-lg tracking-tight">
+              Order #{order._id?.slice(-8).toUpperCase()}
             </span>
-            {expanded ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
+            <Badge
+              className={`text-[10px] px-2.5 py-0.5 font-bold border transform transition-all hover:scale-105 active:scale-95 ${cfg.badgeCls}`}
+            >
+              {cfg.label}
+            </Badge>
           </div>
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground/30" />
+            {new Date(order.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+            <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground/30" />
+            {itemCount} item{itemCount !== 1 ? "s" : ""}
+          </p>
         </div>
-      </button>
+
+        <div className="flex flex-col items-end gap-2.5">
+          <span className="font-display font-bold text-xl text-primary">
+            ₹{total.toLocaleString()}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setExpanded((v) => !v)}
+            className={`h-8 px-3 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${expanded ? "bg-muted border-primary/20 text-primary" : "bg-background border-border"}`}
+          >
+            {expanded ? "Hide Details" : "View Items"}
+            <Eye className="w-3.5 h-3.5 ml-1.5" />
+          </Button>
+        </div>
+      </div>
 
       {/* Expandable content */}
       <AnimatePresence initial={false}>
@@ -177,57 +180,110 @@ function OrderCard({ order }: { order: Order }) {
             className="overflow-hidden"
           >
             <Separator />
-            <div className="px-5 py-4 space-y-4">
-              {/* Items list */}
+            <div className="px-5 py-5 space-y-6">
+              {/* Items list with Images */}
               <div>
-                <p className="text-xs font-semibold text-label text-muted-foreground mb-2">
-                  Items
-                </p>
-                <div className="space-y-2">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Package className="w-3.5 h-3.5" /> Order Items
+                  </p>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {order.items.length} Product{order.items.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="grid gap-3">
                   {order.items.map((item, idx) => (
                     <div
                       key={`${item.productId}-${item.size}-${idx}`}
-                      className="flex items-center justify-between text-sm"
+                      className="flex items-center gap-4 p-3 rounded-2xl bg-secondary/50 border border-border/50 group"
                     >
-                      <div className="min-w-0">
-                        <span className="font-medium text-foreground truncate">
-                          {idx + 1}. Item #{item.productId.slice(-6).toUpperCase()}
-                        </span>
-                        <span className="text-muted-foreground ml-1.5">
-                          · Size {item.size} · Qty {item.quantity}
-                        </span>
+                      {/* Product Image */}
+                      <div className="w-14 h-16 rounded-xl overflow-hidden bg-muted shrink-0 border border-border/50">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ShoppingBag className="w-5 h-5 text-muted-foreground/30" />
+                          </div>
+                        )}
                       </div>
-                      <span className="font-semibold ml-4 shrink-0">
-                        ₹{item.price * item.quantity}
-                      </span>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-foreground truncate">
+                          {item.name || "Aesthetic Collection"}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 border-primary/20 bg-primary/5 text-primary">
+                            Size {item.size}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            Qty: {item.quantity}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold text-foreground">
+                          ₹{(item.price * item.quantity).toLocaleString()}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          ₹{item.price.toLocaleString()} each
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
-                <Separator className="mt-3 mb-2" />
-                <div className="flex justify-between font-display font-bold text-sm">
-                  <span>Total</span>
-                  <span>₹{total}</span>
+
+                <div className="mt-4 pt-4 border-t border-dashed border-border flex justify-between items-center px-1">
+                  <span className="text-sm font-medium text-muted-foreground">Subtotal</span>
+                  <span className="text-sm font-bold text-foreground">₹{total.toLocaleString()}</span>
                 </div>
               </div>
 
-              {/* Status timeline */}
-              <div>
-                <p className="text-xs font-semibold text-label text-muted-foreground mb-1">
-                  Order Status
-                </p>
-                <StatusTimeline status={order.status} />
-              </div>
-
-              {/* Admin notes */}
-              {order.adminNotes && (
-                <div className="bg-primary/5 border border-primary/15 rounded-xl px-4 py-3">
-                  <p className="text-xs font-semibold text-primary mb-1">
-                    Update from us
-                  </p>
-                  <p className="text-xs text-foreground leading-relaxed">
-                    {order.adminNotes}
-                  </p>
+              {/* Enhanced Cancelled UI */}
+              {order.status === "Cancelled" ? (
+                <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 text-rose-700 mb-2">
+                    <XCircle className="w-4.5 h-4.5 shrink-0" />
+                    <p className="text-sm font-bold">Order Cancelled</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs text-rose-600/80 font-medium uppercase tracking-wider">Cancellation Reason:</p>
+                    <p className="text-sm text-rose-800 leading-relaxed italic">
+                      "{order.adminNotes || "No specific reason provided by the admin. Please contact support via WhatsApp if you have questions."}"
+                    </p>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  {/* Status timeline */}
+                  <div className="bg-background rounded-2xl p-4 border border-border/50">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
+                      Tracking Status
+                    </p>
+                    <StatusTimeline status={order.status} />
+                  </div>
+
+                  {/* Admin notes for active orders */}
+                  {order.adminNotes && (
+                    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4">
+                      <div className="flex items-center gap-2 text-primary mb-1.5">
+                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        <p className="text-xs font-bold uppercase tracking-wider">Note from Aesthetic Street Wear</p>
+                      </div>
+                      <p className="text-sm text-foreground/80 leading-relaxed font-medium">
+                        {order.adminNotes}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </motion.div>

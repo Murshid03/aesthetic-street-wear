@@ -8,6 +8,7 @@ import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import authRoutes from './routes/auth.js';
 import settingsRoutes from './routes/settings.js';
+import notificationRoutes from './routes/notifications.js';
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

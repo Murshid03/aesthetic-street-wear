@@ -18,7 +18,9 @@ import {
   Shield,
   LogIn,
   Sparkles,
+  Bell,
 } from "lucide-react";
+import { NotificationCenter } from "./NotificationCenter";
 import { useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
@@ -92,8 +94,8 @@ export function Header() {
     <>
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-            ? "bg-white/95 backdrop-blur-xl shadow-md border-b border-border"
-            : "bg-white border-b border-border"
+          ? "bg-white/95 backdrop-blur-xl shadow-md border-b border-border"
+          : "bg-white border-b border-border"
           }`}
         data-ocid="header"
       >
@@ -150,6 +152,9 @@ export function Header() {
               >
                 <Search className="w-4.5 h-4.5" />
               </button>
+
+              {/* Notifications */}
+              {isAuthenticated && <NotificationCenter />}
 
               {/* Wishlist */}
               <Link
