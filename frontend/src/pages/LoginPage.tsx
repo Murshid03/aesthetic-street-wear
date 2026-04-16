@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import api from "@/lib/api";
 import { useNavigate, Link, useSearch } from "@tanstack/react-router";
 import { Lock, Mail, User, LogIn, ArrowLeft, Shield, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -62,10 +63,11 @@ export default function LoginPage() {
   };
 
   const handleForgotPassword = async () => {
-    if (!form.email) return toast.error("Universal ID required");
+    const email = form.email.trim().toLowerCase();
+    if (!email) return toast.error("Universal ID required");
     setResetLoading(true);
     try {
-      await api.post("/auth/forgot-password", { email: form.email });
+      await api.post("/auth/forgot-password", { email });
       toast.success("Recovery Code Sent", { description: "Check your neural-link (email) for the OTP." });
       setMode("otp");
     } catch (err: any) {
@@ -77,9 +79,10 @@ export default function LoginPage() {
 
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) return toast.error("Invalid Code Format");
+    const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
-      await api.post("/auth/verify-otp", { email: form.email, otp });
+      await api.post("/auth/verify-otp", { email, otp });
       toast.success("Code Authenticated", { description: "You may now override your secret key." });
       setMode("reset");
     } catch (err: any) {
@@ -91,9 +94,10 @@ export default function LoginPage() {
 
   const handleResetPassword = async () => {
     if (newPassword.length < 6) return toast.error("Key too weak", { description: "Minimum 6 characters required." });
+    const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
-      await api.post("/auth/reset-password", { email: form.email, otp, newPassword });
+      await api.post("/auth/reset-password", { email, otp, newPassword });
       toast.success("Key Overridden", { description: "Your new identity credentials are active." });
       setMode("login");
       setOtp("");
@@ -141,7 +145,11 @@ export default function LoginPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            {isAdminLogin ? "Admin Auth" : (mode === "login" ? "Identity" : "Enlist")} <span className="text-primary not-italic lowercase">.</span>
+            {isAdminLogin ? "Admin Auth" :
+              mode === "login" ? "Identity" :
+                mode === "register" ? "Enlist" :
+                  mode === "forgot" ? "Recover" :
+                    mode === "otp" ? "Verify" : "Override"} <span className="text-primary not-italic lowercase">.</span>
           </motion.h1>
           <motion.p
             className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] mt-4"

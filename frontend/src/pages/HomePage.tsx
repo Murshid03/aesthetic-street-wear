@@ -15,50 +15,53 @@ import {
   Star,
   Truck,
   Loader2,
+  Zap,
+  Package,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 
-// ─── Category Config ───────────────────────────────────────────────────────────
+// ─── Category Config ────────────────────────────────────────────────────────────
 const CATEGORIES = [
   {
     label: "Shirts",
     to: "/shirts" as const,
-    image: "/assets/generated/shirt-white.dim_600x800.jpg",
+    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600",
     sub: "Premium cuts & fabrics",
-    category: "Shirts",
+    color: "from-blue-900/60",
   },
   {
     label: "T-Shirts",
     to: "/tshirts" as const,
-    image: "/assets/generated/sweater-camel.dim_600x800.jpg",
+    image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600",
     sub: "Everyday essentials",
-    category: "T-Shirts",
+    color: "from-purple-900/60",
   },
   {
     label: "Pants",
     to: "/pants" as const,
-    image: "/assets/generated/pants-khaki.dim_600x800.jpg",
+    image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600",
     sub: "Tailored precision fits",
-    category: "Pants",
+    color: "from-slate-900/60",
   },
   {
     label: "Accessories",
     to: "/accessories" as const,
-    image: "/assets/generated/watch-leather.dim_600x800.jpg",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
     sub: "Finishing touches",
-    category: "Accessories",
+    color: "from-amber-900/60",
   },
 ];
 
-// ─── Trust Badges ──────────────────────────────────────────────────────────────
+// ─── Trust Badges ────────────────────────────────────────────────────────────────
 const TRUST_BADGES = [
-  { icon: Truck, label: "Fast Delivery", desc: "Delivered to your door" },
+  { icon: Truck, label: "Free Delivery", desc: "On orders above ₹999" },
   { icon: Shield, label: "100% Authentic", desc: "Quality guaranteed" },
   { icon: Star, label: "Premium Quality", desc: "Handpicked collections" },
+  { icon: Zap, label: "Quick Dispatch", desc: "Ships within 24 hours" },
 ];
 
-// ─── ProductCard Component ─────────────────────────────────────────────────────
+// ─── ProductCard Component ────────────────────────────────────────────────────────
 function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -69,21 +72,21 @@ function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = () => {
     setAdding(true);
     addToCart(product, product.sizes[0] ?? "One Size");
-    setTimeout(() => setAdding(false), 800);
+    setTimeout(() => setAdding(false), 900);
   };
 
   return (
     <div
-      className="card-elevated group overflow-hidden flex flex-col transition-smooth hover:shadow-md hover:-translate-y-0.5"
+      className="card-base card-hover group overflow-hidden flex flex-col"
       data-ocid={`product-card-${pid}`}
     >
       {/* Image */}
-      <div className="relative overflow-hidden bg-muted aspect-[3/4]">
+      <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
         <Link to="/product/$id" params={{ id: String(pid) }}>
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-107"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
                 "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
@@ -95,59 +98,88 @@ function ProductCard({ product }: { product: Product }) {
         <button
           type="button"
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-smooth hover:bg-card shadow-sm hover:scale-110"
-          onClick={() =>
-            wished ? removeFromWishlist(pid) : addToWishlist(product)
-          }
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm
+            ${wished ? "bg-primary text-primary-foreground scale-110" : "bg-white/95 text-muted-foreground hover:bg-white hover:scale-110"}`}
+          onClick={() => wished ? removeFromWishlist(pid) : addToWishlist(product)}
           data-ocid={`wishlist-toggle-${pid}`}
         >
-          <Heart
-            className={`w-4 h-4 transition-colors ${wished ? "fill-primary text-primary" : "text-muted-foreground"
-              }`}
-          />
+          <Heart className={`w-3.5 h-3.5 ${wished ? "fill-current" : ""}`} />
         </button>
 
         {/* Badges */}
-        {product.stockQuantity <= 5 && (
-          <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px] font-semibold">
+        {product.stockQuantity <= 5 && product.stockQuantity > 0 && (
+          <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[9px] font-bold px-2 py-0.5 rounded-full">
             Low Stock
           </Badge>
         )}
+        {product.stockQuantity === 0 && (
+          <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
+            <span className="bg-white text-foreground text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
+          </div>
+        )}
+
+        {/* Quick add overlay */}
+        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <button
+            onClick={handleAddToCart}
+            disabled={adding || product.stockQuantity === 0}
+            className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-60"
+            data-ocid={`quick-add-${pid}`}
+          >
+            <ShoppingCart className="w-3.5 h-3.5" />
+            {adding ? "Added!" : "Add to Cart"}
+          </button>
+        </div>
       </div>
 
       {/* Info */}
-      <div className="p-4 flex flex-col flex-1 gap-3">
+      <div className="p-3.5 flex flex-col flex-1 gap-2.5">
         <div className="flex-1">
           <Link to="/product/$id" params={{ id: String(pid) }}>
             <h3 className="font-semibold text-sm text-foreground leading-snug hover:text-primary transition-colors line-clamp-2">
               {product.name}
             </h3>
           </Link>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+          <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
             {product.sizes.join(" · ")}
           </p>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className="font-display font-bold text-lg text-foreground">
-            ₹{product.price}
+          <span className="font-bold text-base text-foreground">
+            ₹{product.price.toLocaleString("en-IN")}
           </span>
-          <Button
-            size="sm"
-            className="btn-primary text-xs h-8 px-3 shrink-0"
+          <button
             onClick={handleAddToCart}
             disabled={adding}
-            data-ocid={`add-to-cart-${pid}`}
+            className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-95 shrink-0 sm:hidden"
+            aria-label="Add to Cart"
           >
-            <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
-            {adding ? "Added!" : "Add to Cart"}
-          </Button>
+            <ShoppingCart className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// ─── Skeleton Card ────────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="card-base overflow-hidden">
+      <div className="skeleton aspect-[3/4]" />
+      <div className="p-3.5 space-y-2.5">
+        <div className="skeleton h-4 rounded-lg w-3/4" />
+        <div className="skeleton h-3 rounded-lg w-1/2" />
+        <div className="flex justify-between items-center">
+          <div className="skeleton h-5 rounded-lg w-16" />
+          <div className="skeleton h-8 w-8 rounded-xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ["products"],
@@ -161,55 +193,51 @@ export default function HomePage() {
 
   return (
     <Layout>
-      {/* ── Announcement Banner ─────────────────────────────────── */}
-      <div
-        className="bg-primary text-primary-foreground text-center py-2.5 px-4 text-xs sm:text-sm font-medium tracking-wide"
-        data-ocid="announcement-banner"
-      >
-        <span>✦ New Collection Available — Shop the latest drops now</span>
-        <Link
-          to="/shirts"
-          className="inline-flex items-center gap-1 ml-3 font-bold underline underline-offset-2 hover:no-underline"
-        >
-          Shop Now <ArrowRight className="w-3 h-3" />
-        </Link>
-      </div>
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="relative bg-foreground text-background overflow-hidden" aria-label="Hero">
+        {/* Background pattern */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[hsl(262,40%,15%)] via-[hsl(270,20%,10%)] to-[hsl(270,20%,8%)]" />
+          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/20 blur-[120px]" />
+          <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
+          {/* Grid */}
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: "linear-gradient(hsl(262,83%,58%) 1px, transparent 1px), linear-gradient(90deg, hsl(262,83%,58%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+        </div>
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <section
-        className="relative overflow-hidden bg-foreground text-background"
-        aria-label="Hero"
-      >
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/10 to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/15 to-transparent pointer-events-none" />
-
-        <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-28 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+        <div className="container mx-auto container-px relative z-10">
+          <div className="py-16 sm:py-20 lg:py-28 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             {/* Text */}
             <motion.div
-              className="flex-1 text-center lg:text-left max-w-xl"
-              initial={{ opacity: 0, x: -32 }}
-              animate={{ opacity: 1, x: 0 }}
+              className="flex-1 text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <Badge className="mb-5 bg-primary/20 text-primary border-primary/30 font-semibold tracking-widest uppercase text-[11px] px-4 py-1">
+              <div className="inline-flex items-center gap-2 bg-primary/20 border border-primary/30 text-primary rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase mb-6">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
                 New Collection 2026
-              </Badge>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.75rem] font-bold tracking-tight leading-[1.08] mb-5">
-                Aesthetic
+              </div>
+
+              <h1 className="text-hero text-background mb-6">
+                Style That{" "}
+                <span className="relative">
+                  <span className="gradient-text" style={{ background: "linear-gradient(135deg, hsl(262,83%,70%), hsl(280,70%,75%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    Speaks
+                  </span>
+                </span>
                 <br />
-                <span className="text-primary">Street Wear</span>
+                For Itself
               </h1>
-              <p className="text-base sm:text-lg opacity-75 max-w-md mx-auto lg:mx-0 mb-8 leading-relaxed">
-                Premium mens wear for those who move through the world with
-                purpose. Curated essentials, modern silhouettes, uncompromising
-                quality.
+
+              <p className="text-background/65 text-base sm:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 mb-8">
+                Premium men's streetwear crafted for those who move through the world with purpose. Curated essentials, modern silhouettes — uncompromising quality.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10">
                 <Button
                   asChild
-                  className="btn-primary text-base h-12 px-8 shadow-lg hover:shadow-primary/30"
+                  className="btn-primary h-12 px-8 text-sm shadow-lg shadow-primary/30"
                   data-ocid="hero-cta-primary"
                 >
                   <Link to="/shirts">
@@ -219,65 +247,56 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   asChild
-                  className="h-12 px-8 border-background/25 text-background hover:bg-background/10 hover:border-background/40"
+                  className="h-12 px-8 text-sm border-white/20 text-background hover:bg-white/10 hover:border-white/30"
                   data-ocid="hero-cta-secondary"
                 >
                   <Link to="/accessories">View Accessories</Link>
                 </Button>
               </div>
 
-              {/* Social proof */}
-              <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start">
-                <div className="text-center">
-                  <p className="font-display font-bold text-2xl text-background">
-                    500+
-                  </p>
-                  <p className="text-xs text-background/60 mt-0.5">Products</p>
-                </div>
-                <div className="w-px h-10 bg-background/20" />
-                <div className="text-center">
-                  <p className="font-display font-bold text-2xl text-background">
-                    10K+
-                  </p>
-                  <p className="text-xs text-background/60 mt-0.5">
-                    Happy Customers
-                  </p>
-                </div>
-                <div className="w-px h-10 bg-background/20" />
-                <div className="text-center">
-                  <p className="font-display font-bold text-2xl text-background">
-                    4.9★
-                  </p>
-                  <p className="text-xs text-background/60 mt-0.5">Rating</p>
-                </div>
+              {/* Stats */}
+              <div className="flex items-center gap-8 justify-center lg:justify-start">
+                {[
+                  { val: "500+", label: "Products" },
+                  { val: "10K+", label: "Customers" },
+                  { val: "4.9★", label: "Rating" },
+                ].map((s, i) => (
+                  <div key={i} className="text-center">
+                    <p className="text-2xl font-bold text-background" style={{ fontFamily: "Syne, sans-serif" }}>{s.val}</p>
+                    <p className="text-xs text-background/50 mt-0.5">{s.label}</p>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
-            {/* Hero image */}
+            {/* Hero Image */}
             <motion.div
-              className="flex-1 flex justify-center lg:justify-end"
-              initial={{ opacity: 0, x: 32 }}
-              animate={{ opacity: 1, x: 0 }}
+              className="flex-1 flex justify-center lg:justify-end w-full max-w-sm lg:max-w-none"
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
             >
               <div className="relative">
-                {/* Decorative ring */}
-                <div className="absolute -inset-4 rounded-3xl border border-primary/20 pointer-events-none" />
-                <div className="w-64 h-[360px] sm:w-80 sm:h-[440px] lg:w-[380px] lg:h-[520px] rounded-2xl overflow-hidden shadow-2xl bg-muted">
+                <div className="absolute -inset-4 rounded-3xl border border-primary/20" />
+                <div className="w-56 h-[320px] sm:w-72 sm:h-[420px] lg:w-80 lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl shadow-primary/20">
                   <img
                     src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800"
-                    alt="Aesthetic Street Wear — premium mens fashion"
+                    alt="Aesthetic Street Wear"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800";
+                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800";
                     }}
                   />
                 </div>
-                {/* Floating badge */}
-                <div className="absolute -bottom-4 -left-6 bg-card text-card-foreground rounded-xl px-4 py-3 shadow-lg border border-border">
-                  <p className="text-xs text-muted-foreground">New Drop</p>
-                  <p className="font-display font-bold text-sm">Summer 2026</p>
+                {/* Floating card */}
+                <div className="absolute -bottom-4 -left-4 sm:-bottom-5 sm:-left-6 glass rounded-2xl px-4 py-3 shadow-xl border border-white/40">
+                  <p className="text-[10px] text-muted-foreground font-semibold">New Drop</p>
+                  <p className="font-bold text-sm text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Summer 2026</p>
+                </div>
+                {/* Second floating card */}
+                <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-5 bg-primary text-primary-foreground rounded-2xl px-3.5 py-2.5 shadow-lg">
+                  <p className="text-[10px] font-semibold opacity-80">Starting from</p>
+                  <p className="font-bold text-sm">₹599 only</p>
                 </div>
               </div>
             </motion.div>
@@ -285,21 +304,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Trust Badges ────────────────────────────────────────── */}
-      <section className="bg-muted/40 border-y border-border">
-        <div className="container mx-auto px-4 py-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
+      {/* ── Trust Badges ─────────────────────────────────────────────── */}
+      <section className="bg-secondary border-b border-border">
+        <div className="container mx-auto container-px py-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-border">
             {TRUST_BADGES.map((badge) => (
-              <div
-                key={badge.label}
-                className="flex items-center gap-3 py-4 sm:py-3 px-4 sm:px-6 justify-center sm:justify-start"
-              >
-                <badge.icon className="w-5 h-5 text-primary shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {badge.label}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{badge.desc}</p>
+              <div key={badge.label} className="flex items-center gap-3 py-3.5 px-4 justify-center">
+                <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                  <badge.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-xs font-bold text-foreground leading-tight">{badge.label}</p>
+                  <p className="text-[11px] text-muted-foreground">{badge.desc}</p>
+                </div>
+                <div className="sm:hidden">
+                  <p className="text-xs font-bold text-foreground">{badge.label}</p>
                 </div>
               </div>
             ))}
@@ -307,22 +326,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── New Arrivals ─────────────────────────────────────────── */}
-      <section
-        className="py-14 lg:py-20 bg-background"
-        aria-label="New Arrivals"
-      >
-        <div className="container mx-auto px-4">
+      {/* ── New Arrivals ───────────────────────────────────────────────── */}
+      <section className="section-py bg-background" aria-label="New Arrivals">
+        <div className="container mx-auto container-px">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
             <div>
-              <p className="text-label text-primary mb-1">Just Dropped</p>
-              <h2 className="font-display text-3xl lg:text-4xl font-bold">
-                New Arrivals
-              </h2>
+              <p className="text-label text-primary mb-2">Just Dropped</p>
+              <h2 className="text-heading">New Arrivals</h2>
             </div>
             <Link
               to="/shirts"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline underline-offset-2 self-start sm:self-auto"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors self-start sm:self-auto"
               data-ocid="new-arrivals-view-all"
             >
               View All <ArrowRight className="w-4 h-4" />
@@ -330,19 +344,18 @@ export default function HomePage() {
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="w-10 h-10 text-primary animate-spin" />
-              <p className="text-muted-foreground animate-pulse">Loading collection…</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : newArrivals.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {newArrivals.map((product, i) => (
                 <motion.div
                   key={product._id}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  transition={{ duration: 0.4, delay: i * 0.07 }}
                 >
                   <ProductCard product={product} />
                 </motion.div>
@@ -350,56 +363,49 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl bg-muted/20">
-              <p className="text-muted-foreground">No products found. Start by adding some in the admin panel.</p>
+              <Package className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-muted-foreground font-medium">No products yet. Check back soon!</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Category Grid ─────────────────────────────────────────── */}
-      <section className="py-14 lg:py-20 bg-muted/30" aria-label="Categories">
-        <div className="container mx-auto px-4">
+      {/* ── Category Grid ─────────────────────────────────────────────── */}
+      <section className="section-py bg-secondary" aria-label="Categories">
+        <div className="container mx-auto container-px">
           <div className="text-center mb-10">
-            <p className="text-label text-primary mb-1">Browse by Category</p>
-            <h2 className="font-display text-3xl lg:text-4xl font-bold">
-              Shop the Range
-            </h2>
+            <p className="text-label text-primary mb-2">Explore Collections</p>
+            <h2 className="text-heading">Shop by Category</h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {CATEGORIES.map((cat, i) => (
               <motion.div
                 key={cat.label}
-                initial={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
               >
                 <Link
                   to={cat.to}
-                  className="group relative rounded-2xl overflow-hidden block aspect-[3/4] bg-muted shadow-sm hover:shadow-md transition-smooth"
+                  className="group relative rounded-2xl overflow-hidden block aspect-[3/4] bg-muted shadow-sm hover:shadow-lg transition-all duration-300"
                   data-ocid={`category-${cat.label.toLowerCase().replace(/\s+/, "-")}`}
                 >
                   <img
                     src={cat.image}
                     alt={cat.label}
-                    className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-108"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600";
+                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600";
                     }}
                   />
-                  {/* Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent" />
-                  {/* Content */}
+                  <div className={`absolute inset-0 bg-gradient-to-t ${cat.color} via-transparent to-transparent`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/10 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                    <p className="font-display font-bold text-background text-lg sm:text-xl leading-tight">
-                      {cat.label}
-                    </p>
-                    <p className="text-xs text-background/65 mt-0.5">
-                      {cat.sub}
-                    </p>
-                    <div className="mt-2 inline-flex items-center gap-1 text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-smooth translate-y-1 group-hover:translate-y-0">
-                      View Collection <ArrowRight className="w-3 h-3" />
+                    <p className="font-bold text-white text-base sm:text-lg leading-tight" style={{ fontFamily: "Syne, sans-serif" }}>{cat.label}</p>
+                    <p className="text-[11px] text-white/65 mt-0.5 hidden sm:block">{cat.sub}</p>
+                    <div className="mt-2.5 inline-flex items-center gap-1 text-[11px] text-primary font-semibold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                      Shop Now <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>
                 </Link>
@@ -409,191 +415,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Brand Story / About ───────────────────────────────────── */}
-      <section
-        className="py-14 lg:py-20 bg-background"
-        aria-label="About Aesthetic Street Wear"
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55, ease: "easeOut" }}
-              className="relative"
-            >
-              <div className="rounded-2xl overflow-hidden aspect-[4/3] shadow-lg bg-muted">
-                <img
-                  src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"
-                  alt="Aesthetic Street Wear brand story"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800";
-                  }}
-                />
-              </div>
-              {/* Accent card */}
-              <div className="absolute -bottom-5 -right-4 bg-primary text-primary-foreground rounded-xl p-4 shadow-lg hidden sm:block">
-                <p className="font-display font-bold text-2xl">2026</p>
-                <p className="text-xs opacity-80">Relaunched</p>
-              </div>
-            </motion.div>
-
-            {/* Text */}
-            <motion.div
-              initial={{ opacity: 0, x: 24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
-            >
-              <p className="text-label text-primary mb-3">Our Story</p>
-              <h2 className="font-display text-3xl lg:text-4xl font-bold mb-5">
-                Born on the Streets,
-                <br />
-                Built for Excellence
-              </h2>
-              <div className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  Aesthetic Street Wear was founded with a single vision: to
-                  bring premium quality men's fashion to those who demand both
-                  style and substance. We believe that what you wear tells a
-                  story — and we're here to help you make it a great one.
-                </p>
-                <p>
-                  Every piece in our collection is handpicked for its
-                  craftsmanship, fit, and versatility. From sharp Oxford shirts
-                  to street-ready cargo pants, each item bridges the gap between
-                  elevated fashion and everyday wearability.
-                </p>
-                <p>
-                  Now rebuilt with modern technology to provide you the fastest, most
-                  seamless shopping experience possible.
-                </p>
-              </div>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <Button
-                  asChild
-                  className="btn-primary h-11 px-7"
-                  data-ocid="about-shop-cta"
-                >
-                  <Link to="/shirts">Explore Collection</Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="h-11 px-7"
-                  data-ocid="about-accessories-cta"
-                >
-                  <Link to="/accessories">View Accessories</Link>
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Featured Collection Banner ────────────────────────────── */}
-      <section
-        className="bg-muted/40 py-14 lg:py-20"
-        aria-label="Featured Collection"
-      >
-        <div className="container mx-auto px-4">
-          <div className="rounded-2xl overflow-hidden bg-foreground text-background relative">
-            {/* BG gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-transparent to-transparent pointer-events-none" />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 relative">
-              {/* Text */}
-              <div className="p-8 sm:p-12 flex flex-col justify-center">
-                <Badge className="w-fit mb-4 bg-primary/20 text-primary border-primary/30 font-semibold tracking-wider text-[11px] uppercase">
-                  Featured Collection
-                </Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4 text-background">
-                  Urban Explorer
-                </h2>
-                <p className="text-background/70 leading-relaxed mb-8 max-w-md">
-                  Designed for the man who navigates city streets with purpose.
-                  Versatile pieces that transition effortlessly from morning
-                  meetings to evening gatherings — without missing a beat.
-                </p>
-                <Button
-                  asChild
-                  className="btn-primary w-fit h-12 px-8"
-                  data-ocid="featured-collection-cta"
-                >
-                  <Link to="/shirts">
-                    Explore the Edit <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Image grid */}
-              <div className="grid grid-cols-2 gap-0.5 aspect-[4/3] lg:aspect-auto bg-muted/10">
-                {products.slice(0, 4).map((product) => (
-                  <Link
-                    key={product._id}
-                    to="/product/$id"
-                    params={{ id: String(product._id) }}
-                    className="overflow-hidden group"
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600";
-                      }}
-                    />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── All Products ──────────────────────────────────────────── */}
-      <section
-        className="py-14 lg:py-20 bg-background"
-        aria-label="All Products"
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
+      {/* ── All Products ───────────────────────────────────────────────── */}
+      <section className="section-py bg-background" aria-label="All Products">
+        <div className="container mx-auto container-px">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
             <div>
-              <p className="text-label text-primary mb-1">Full Range</p>
-              <h2 className="font-display text-3xl lg:text-4xl font-bold">
-                All Products
-              </h2>
+              <p className="text-label text-primary mb-2">Full Range</p>
+              <h2 className="text-heading">All Products</h2>
             </div>
           </div>
 
-          {/* Quick filter tabs */}
-          <div className="flex flex-wrap gap-2 mb-8" role="tablist">
+          {/* Category filter pills */}
+          <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-none pb-1">
             {[
               { label: "Shirts", to: "/shirts" as const },
               { label: "T-Shirts", to: "/tshirts" as const },
               { label: "Pants", to: "/pants" as const },
               { label: "Accessories", to: "/accessories" as const },
             ].map((cat) => (
-              <Button
+              <Link
                 key={cat.label}
-                variant="outline"
-                size="sm"
-                className="rounded-full text-xs border-border hover:border-primary hover:text-primary transition-smooth"
-                asChild
+                to={cat.to}
+                className="shrink-0 px-4 py-2 rounded-full text-xs font-semibold border border-border text-muted-foreground bg-white hover:border-primary hover:text-primary hover:bg-accent transition-all duration-200"
                 data-ocid={`filter-${cat.label.toLowerCase()}`}
               >
-                <Link to={cat.to}>{cat.label}</Link>
-              </Button>
+                {cat.label}
+              </Link>
             ))}
           </div>
 
-          {!isLoading && products.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product, i) => (
                 <motion.div
                   key={product._id}
@@ -606,21 +462,112 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
-          ) : !isLoading && (
-            <div className="text-center py-10">
+          ) : (
+            <div className="text-center py-16">
               <p className="text-muted-foreground">No products available yet.</p>
             </div>
           )}
 
           <div className="text-center mt-10">
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 px-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth"
+            <Link
+              to="/shirts"
+              className="inline-flex items-center gap-2 px-8 h-11 border border-primary text-primary font-semibold text-sm rounded-xl hover:bg-primary hover:text-primary-foreground transition-all duration-200"
               data-ocid="view-all-products-cta"
             >
-              <Link to="/shirts">Browse Full Collection</Link>
-            </Button>
+              Browse Full Collection <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Brand Story  ────────────────────────────────────────────── */}
+      <section className="section-py bg-secondary" aria-label="About Aesthetic Street Wear">
+        <div className="container mx-auto container-px">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="relative order-last lg:order-first"
+            >
+              <div className="rounded-3xl overflow-hidden aspect-[4/3] shadow-lg bg-muted">
+                <img
+                  src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"
+                  alt="Aesthetic Street Wear brand story"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800";
+                  }}
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 gradient-primary rounded-2xl p-4 shadow-lg hidden sm:block text-white">
+                <p className="font-bold text-2xl" style={{ fontFamily: "Syne, sans-serif" }}>2026</p>
+                <p className="text-xs opacity-80">Collection</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
+            >
+              <p className="text-label text-primary mb-3">Our Story</p>
+              <h2 className="text-heading mb-5">
+                Born on the Streets,<br />Built for Excellence
+              </h2>
+              <div className="space-y-4 text-muted-foreground leading-relaxed text-sm sm:text-base">
+                <p>
+                  Aesthetic Street Wear was founded with a single vision: to bring premium quality men's fashion to those who demand both style and substance.
+                </p>
+                <p>
+                  Every piece is handpicked for its craftsmanship, fit, and versatility — from sharp Oxford shirts to street-ready cargo pants.
+                </p>
+              </div>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/shirts"
+                  className="btn-primary h-11 px-7 flex items-center justify-center gap-2"
+                  data-ocid="about-shop-cta"
+                >
+                  Explore Collection
+                </Link>
+                <Link
+                  to="/accessories"
+                  className="btn-secondary h-11 px-7 flex items-center justify-center gap-2"
+                  data-ocid="about-accessories-cta"
+                >
+                  View Accessories
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ────────────────────────────────────────────────── */}
+      <section className="section-py bg-background" aria-label="Call to Action">
+        <div className="container mx-auto container-px">
+          <div className="relative rounded-3xl overflow-hidden gradient-primary text-white p-8 sm:p-12 text-center">
+            <div className="absolute inset-0 opacity-10"
+              style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+            <div className="relative z-10">
+              <p className="text-label text-white/70 mb-3">Limited Time</p>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
+                Your Style, Your Rules
+              </h2>
+              <p className="text-white/75 max-w-md mx-auto mb-8 text-sm sm:text-base leading-relaxed">
+                Shop the latest drops and get free delivery over ₹999. New arrivals every week — don't miss out.
+              </p>
+              <Link
+                to="/shirts"
+                className="inline-flex items-center gap-2 bg-white text-primary font-bold px-8 py-3.5 rounded-xl hover:bg-white/90 transition-colors shadow-lg"
+                data-ocid="cta-banner-btn"
+              >
+                Shop All Collections <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
