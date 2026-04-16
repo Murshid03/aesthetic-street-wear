@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import api from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Order, OrderStatus } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -251,8 +251,10 @@ function AccountContent() {
     },
   });
 
+  const queryClient = useQueryClient();
   const handleLogout = () => {
     logout();
+    queryClient.clear();
     navigate({ to: "/" });
   };
 

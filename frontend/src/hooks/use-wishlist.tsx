@@ -5,7 +5,11 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
+import { useAuth } from "./use-auth";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 interface WishlistContextValue {
   items: WishlistItem[];
@@ -17,29 +21,47 @@ interface WishlistContextValue {
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
-const WISHLIST_KEY = "asw_wishlist";
-
-function loadWishlist(): WishlistItem[] {
-  try {
-    const raw = localStorage.getItem(WISHLIST_KEY);
-    return raw ? (JSON.parse(raw) as WishlistItem[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveWishlist(items: WishlistItem[]) {
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
-}
-
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistItem[]>(() => loadWishlist());
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
+  // Use a user-specific key for the wishlist
+  const WISHLIST_KEY = useMemo(() => {
+    return user?._id ? `asw_wishlist_${user._id}` : null;
+  }, [user?._id]);
+
+  const [items, setItems] = useState<WishlistItem[]>([]);
+
+  // Load wishlist when user changes
   useEffect(() => {
-    saveWishlist(items);
-  }, [items]);
+    if (WISHLIST_KEY) {
+      try {
+        const raw = localStorage.getItem(WISHLIST_KEY);
+        setItems(raw ? (JSON.parse(raw) as WishlistItem[]) : []);
+      } catch {
+        setItems([]);
+      }
+    } else {
+      setItems([]);
+    }
+  }, [WISHLIST_KEY]);
+
+  // Save wishlist whenever items change
+  useEffect(() => {
+    if (WISHLIST_KEY && items.length >= 0) {
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
+    }
+  }, [items, WISHLIST_KEY]);
 
   const addToWishlist = (product: Product) => {
+    if (!isAuthenticated) {
+      toast.error("Authentication Required", {
+        description: "Please login to manage your wishlist."
+      });
+      navigate({ to: "/login" });
+      return;
+    }
+
     const pid = product._id || (product as any).id;
     setItems((prev) => {
       if (prev.find((i) => i.productId === pid)) return prev;
@@ -76,3 +98,4 @@ export function useWishlist(): WishlistContextValue {
   if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
   return ctx;
 }
+

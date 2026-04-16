@@ -5,7 +5,11 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
+import { useAuth } from "./use-auth";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 interface CartContextValue {
   items: CartItem[];
@@ -19,29 +23,48 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const CART_KEY = "asw_cart";
-
-function loadCart(): CartItem[] {
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    return raw ? (JSON.parse(raw) as CartItem[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-}
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => loadCart());
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
+  // Use a user-specific key for the cart
+  const CART_KEY = useMemo(() => {
+    return user?._id ? `asw_cart_${user._id}` : null;
+  }, [user?._id]);
+
+  const [items, setItems] = useState<CartItem[]>([]);
+
+  // Load cart when user changes
   useEffect(() => {
-    saveCart(items);
-  }, [items]);
+    if (CART_KEY) {
+      try {
+        const raw = localStorage.getItem(CART_KEY);
+        setItems(raw ? (JSON.parse(raw) as CartItem[]) : []);
+      } catch {
+        setItems([]);
+      }
+    } else {
+      // Clear cart items if no user is logged in
+      setItems([]);
+    }
+  }, [CART_KEY]);
+
+  // Save cart whenever items change
+  useEffect(() => {
+    if (CART_KEY && items.length >= 0) {
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
+    }
+  }, [items, CART_KEY]);
 
   const addToCart = (product: Product, size: string, quantity = 1) => {
+    if (!isAuthenticated) {
+      toast.error("Authentication Required", {
+        description: "Please login to add items to your cart."
+      });
+      navigate({ to: "/login" });
+      return;
+    }
+
     const pid = product._id || (product as any).id;
     setItems((prev) => {
       const existing = prev.find(
@@ -107,3 +130,4 @@ export function useCart(): CartContextValue {
   if (!ctx) throw new Error("useCart must be used within CartProvider");
   return ctx;
 }
+

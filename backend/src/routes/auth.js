@@ -2,6 +2,8 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { protect } from '../middleware/auth.js';
+import { sendEmail } from '../utils/email.js';
+import crypto from 'crypto';
 
 const router = express.Router();
 
@@ -57,6 +59,86 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', protect, (req, res) => {
     res.json(req.user);
+});
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log(`[AUTH] Forgot password request for: ${email}`);
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.log(`[AUTH] User not found: ${email}`);
+            return res.status(404).json({ error: 'User not found with this email' });
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.resetPasswordOTP = otp;
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save();
+        console.log(`[AUTH] OTP generated for ${email}: ${otp}`);
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset OTP - Aesthetic Street Wear',
+                message: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`,
+            });
+            console.log(`[AUTH] Email attempt finished for ${email}`);
+        } catch (emailErr) {
+            console.error(`[AUTH] Email sending failed:`, emailErr);
+            // We don't necessarily want to fail the whole request if email fail 
+            // but for security we should probably inform the user or log it.
+            return res.status(500).json({ error: 'Failed to send recovery email. Please try again later.' });
+        }
+
+        res.json({ message: 'OTP sent to email' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/auth/verify-otp
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({
+            email,
+            resetPasswordOTP: otp,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+        res.json({ message: 'OTP verified successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await User.findOne({
+            email,
+            resetPasswordOTP: otp,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+        user.password = newPassword;
+        user.resetPasswordOTP = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.json({ message: 'Password reset successful' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // POST /api/auth/seed-admin — creates admin if not exists

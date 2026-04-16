@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ChevronDown,
   Heart,
@@ -53,6 +54,7 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const queryClient = useQueryClient();
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -171,7 +173,9 @@ export function Header() {
                         type="button"
                         onClick={() => {
                           logout();
+                          queryClient.clear();
                           setUserMenuOpen(false);
+                          navigate({ to: "/" });
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-muted transition-colors text-destructive font-bold"
                         data-ocid="logout-btn"

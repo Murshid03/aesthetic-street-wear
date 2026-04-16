@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-type Mode = "login" | "register";
+type Mode = "login" | "register" | "forgot" | "otp" | "reset";
 
 export default function LoginPage() {
   const { isAuthenticated, isLoading, login, register } = useAuth();
@@ -17,6 +17,9 @@ export default function LoginPage() {
 
   const [mode, setMode] = useState<Mode>("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   useEffect(() => {
     if (isAdminLogin) {
@@ -50,6 +53,55 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Authentication Failed");
+      if (mode === "login" && !isAdminLogin) {
+        toast.info("Forgotten credentials?", {
+          description: "Click 'Recover' or contact sys-admin."
+        });
+      }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!form.email) return toast.error("Universal ID required");
+    setResetLoading(true);
+    try {
+      await api.post("/auth/forgot-password", { email: form.email });
+      toast.success("Recovery Code Sent", { description: "Check your neural-link (email) for the OTP." });
+      setMode("otp");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Recovery Protocol Failed");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) return toast.error("Invalid Code Format");
+    setResetLoading(true);
+    try {
+      await api.post("/auth/verify-otp", { email: form.email, otp });
+      toast.success("Code Authenticated", { description: "You may now override your secret key." });
+      setMode("reset");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Invalid or Expired Code");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (newPassword.length < 6) return toast.error("Key too weak", { description: "Minimum 6 characters required." });
+    setResetLoading(true);
+    try {
+      await api.post("/auth/reset-password", { email: form.email, otp, newPassword });
+      toast.success("Key Overridden", { description: "Your new identity credentials are active." });
+      setMode("login");
+      setOtp("");
+      setNewPassword("");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Override Protocol Failed");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -108,6 +160,7 @@ export default function LoginPage() {
             <AnimatePresence mode="wait">
               {mode === "register" && !isAdminLogin && (
                 <motion.div
+                  key="register-name"
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -127,55 +180,113 @@ export default function LoginPage() {
                   </div>
                 </motion.div>
               )}
+
+              {/* Forgot Password Flow */}
+              {(mode === "login" || mode === "register" || mode === "forgot") && (
+                <motion.div key="email-field" className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">
+                    {isAdminLogin ? 'Admin Identification' : 'Universal ID'}
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                    <input
+                      type="email"
+                      required
+                      placeholder={isAdminLogin ? "admin@aesthetic.com" : "your@system.com"}
+                      value={form.email}
+                      disabled={mode === "otp" || mode === "reset"}
+                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                      className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30 disabled:opacity-50"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {(mode === "login" || mode === "register") && (
+                <motion.div key="password-field" className="space-y-2">
+                  <div className="flex justify-between items-center ml-1">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary">Secret Key</Label>
+                    {mode === "login" && !isAdminLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setMode("forgot")}
+                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        Recover
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={form.password}
+                      onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                      className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {mode === "otp" && (
+                <motion.div key="otp-field" className="space-y-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Security Code (OTP)</Label>
+                  <div className="relative">
+                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      placeholder="ENTER 6-DIGIT OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm tracking-[0.5em] font-black focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30 placeholder:tracking-normal"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {mode === "reset" && (
+                <motion.div key="new-password-field" className="space-y-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">New Secret Key</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                    <input
+                      type="password"
+                      required
+                      placeholder="NEVER-FORGET-THIS-ONE"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                    />
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">{isAdminLogin ? 'Admin Identification' : 'Universal ID'}</Label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                <input
-                  type="email"
-                  required
-                  placeholder={isAdminLogin ? "admin@aesthetic.com" : "your@system.com"}
-                  value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary">Secret Key</Label>
-                {mode === "login" && !isAdminLogin && (
-                  <button type="button" className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Recover</button>
-                )}
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full h-14 pl-12 pr-4 bg-muted/20 border border-border/40 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
-                />
-              </div>
-            </div>
-
             <Button
-              type="submit"
+              type={mode === "login" || mode === "register" ? "submit" : "button"}
+              onClick={() => {
+                if (mode === "forgot") handleForgotPassword();
+                else if (mode === "otp") handleVerifyOtp();
+                else if (mode === "reset") handleResetPassword();
+              }}
               className="w-full h-16 text-[10px] font-black uppercase tracking-[0.2em] bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-xl shadow-primary/20 active:scale-[0.98] transition-all group overflow-hidden relative"
-              disabled={isLoading}
+              disabled={isLoading || resetLoading}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              {isLoading ? (
+              {isLoading || resetLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <span className="flex items-center gap-2">
                   <LogIn className="w-4 h-4" />
-                  {isAdminLogin ? "Verify Authority" : (mode === "login" ? "Verify Identity" : "Authorize Access")}
+                  {mode === "login" ? (isAdminLogin ? "Verify Authority" : "Verify Identity")
+                    : mode === "register" ? "Authorize Access"
+                      : mode === "forgot" ? "Send Recovery Code"
+                        : mode === "otp" ? "Authenticate Code"
+                          : "Override Password"}
                 </span>
               )}
             </Button>
@@ -190,10 +301,25 @@ export default function LoginPage() {
               </div>
 
               <button
-                onClick={() => setMode(mode === "login" ? "register" : "login")}
+                onClick={() => {
+                  setMode(mode === "login" ? "register" : "login");
+                  setOtp("");
+                  setNewPassword("");
+                }}
                 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
               >
                 {mode === "login" ? "Switch to Enrollment" : "Revert to Identity Verification"}
+              </button>
+            </div>
+          )}
+
+          {mode !== "login" && mode !== "register" && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setMode("login")}
+                className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline hover:underline-offset-4"
+              >
+                Return to Base Identity
               </button>
             </div>
           )}
