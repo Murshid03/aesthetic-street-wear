@@ -59,7 +59,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "./AdminPage";
 import { motion, AnimatePresence } from "motion/react";
 
-const CATEGORIES: Category[] = ["Shirts", "TShirts", "Pants", "Accessories"];
+const CATEGORIES: Category[] = ["Shirts", "T-Shirts", "Pants", "Accessories"];
 
 const ALL_SIZES = [
   "XS", "S", "M", "L", "XL", "XXL",
@@ -107,6 +107,7 @@ function AdminProductsContent() {
   const [activeTab, setActiveTab] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [form, setForm] = useState<Partial<Product>>({});
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ["admin_products"],
@@ -170,12 +171,14 @@ function AdminProductsContent() {
       price: 0,
       image: ""
     });
+    setSelectedFile(null);
     setIsOpen(true);
   };
 
   const openEdit = (p: Product) => {
     setEditing(p);
     setForm({ ...p });
+    setSelectedFile(null);
     setIsOpen(true);
   };
 
@@ -189,10 +192,26 @@ function AdminProductsContent() {
       return;
     }
 
+    const formData = new FormData();
+    Object.keys(form).forEach((key) => {
+      const value = (form as any)[key];
+      if (key === "sizes") {
+        formData.append(key, JSON.stringify(value));
+      } else if (key === "image" && selectedFile) {
+        // Skip adding the image string preview if we're uploading a new file
+      } else if (value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    }
+
     if (editing) {
-      updateMutation.mutate({ id: editing._id!, data: form });
+      updateMutation.mutate({ id: editing._id!, data: formData });
     } else {
-      createMutation.mutate(form);
+      createMutation.mutate(formData);
     }
   };
 
@@ -259,11 +278,11 @@ function AdminProductsContent() {
                 key={cat}
                 onClick={() => setActiveTab(cat)}
                 className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === cat
-                    ? "bg-background text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                  ? "bg-background text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
-                {cat === "TShirts" ? "T-Shirts" : cat}
+                {cat === "T-Shirts" ? "T-Shirts" : cat}
               </button>
             ))}
           </div>
@@ -416,16 +435,57 @@ function AdminProductsContent() {
                       )}
                     </div>
                     <div className="flex-1 space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-xs font-bold" htmlFor="imgUrl">Image URL</Label>
-                        <Input
-                          id="imgUrl"
-                          placeholder="https://images.unsplash.com/..."
-                          className="h-12 bg-background/50 rounded-2xl border-border/50 focus-visible:ring-primary/20"
-                          value={form.image ?? ""}
-                          onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))}
-                        />
-                        <p className="text-[10px] text-muted-foreground italic">Preferred: High-res portrait orientation images</p>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold" htmlFor="imgFile">Upload Local Image</Label>
+                          <Input
+                            id="imgFile"
+                            type="file"
+                            accept="image/*"
+                            className="h-12 bg-background/50 rounded-2xl border-border/50 focus-visible:ring-primary/20 pt-2 cursor-pointer"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setSelectedFile(file);
+                                const previewUrl = URL.createObjectURL(file);
+                                setForm(f => ({ ...f, image: previewUrl }));
+                              }
+                            }}
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-border/30" />
+                          </div>
+                          <div className="relative flex justify-center text-[10px] uppercase font-bold text-muted-foreground bg-transparent px-2">
+                            <span className="bg-card px-2">Or Image URL</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Input
+                            id="imgUrl"
+                            placeholder="https://images.unsplash.com/..."
+                            className="h-12 bg-background/50 rounded-2xl border-border/50 focus-visible:ring-primary/20"
+                            value={selectedFile ? "" : (form.image ?? "")}
+                            disabled={!!selectedFile}
+                            onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))}
+                          />
+                          {selectedFile && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-[10px] h-6 px-2 text-primary"
+                              onClick={() => {
+                                setSelectedFile(null);
+                                setForm(f => ({ ...f, image: editing?.image ?? "" }));
+                              }}
+                            >
+                              Clear selected file to use URL
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -446,7 +506,7 @@ function AdminProductsContent() {
                         <SelectContent className="rounded-2xl border-border/50 bg-background/95 backdrop-blur-xl">
                           {CATEGORIES.map(c => (
                             <SelectItem key={c} value={c} className="rounded-xl">
-                              {c === "TShirts" ? "T-Shirts" : c}
+                              {c === "T-Shirts" ? "T-Shirts" : c}
                             </SelectItem>
                           ))}
                         </SelectContent>

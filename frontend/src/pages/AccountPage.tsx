@@ -57,6 +57,11 @@ const STATUS_CONFIG: Record<
     badgeCls: "bg-emerald-100 text-emerald-700 border-emerald-200",
     icon: MapPin,
   },
+  Cancelled: {
+    label: "Cancelled",
+    badgeCls: "bg-rose-100 text-rose-700 border-rose-200",
+    icon: Circle,
+  },
 };
 
 // ─── Status Timeline ──────────────────────────────────────────────────────────
@@ -75,8 +80,8 @@ function StatusTimeline({ status }: { status: OrderStatus }) {
             <div className="flex flex-col items-center gap-1 shrink-0">
               <div
                 className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-smooth ${done
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : "bg-background border-border text-muted-foreground"
+                  ? "bg-primary border-primary text-primary-foreground"
+                  : "bg-background border-border text-muted-foreground"
                   }`}
               >
                 {done ? (

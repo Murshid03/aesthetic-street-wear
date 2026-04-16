@@ -1,4 +1,4 @@
-export type Category = "Shirts" | "TShirts" | "Pants" | "Accessories";
+export type Category = "Shirts" | "T-Shirts" | "Pants" | "Accessories";
 
 export type OrderStatus = "Pending" | "Confirmed" | "Shipped" | "Delivered" | "Cancelled";
 
@@ -37,6 +37,12 @@ export interface OrderItem {
 export interface Order {
   _id: string;
   userId: string;
+  user?: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+  } | string;
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
@@ -64,6 +70,8 @@ export interface SiteSettings {
   email: string;
   address?: string;
 }
+
+export type Settings = SiteSettings;
 
 export interface WishlistItem {
   productId: string;

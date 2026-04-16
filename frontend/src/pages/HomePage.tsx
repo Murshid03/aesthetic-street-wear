@@ -33,7 +33,7 @@ const CATEGORIES = [
     to: "/tshirts" as const,
     image: "/assets/generated/sweater-camel.dim_600x800.jpg",
     sub: "Everyday essentials",
-    category: "TShirts",
+    category: "T-Shirts",
   },
   {
     label: "Pants",

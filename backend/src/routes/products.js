@@ -1,6 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { upload } from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -30,9 +31,32 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products — Admin only
-router.post('/', protect, adminOnly, async (req, res) => {
+router.post('/', protect, adminOnly, upload.single('image'), async (req, res) => {
     try {
-        const product = await Product.create(req.body);
+        console.log('--- Product POST request ---');
+        console.log('Body:', req.body);
+        console.log('File:', req.file);
+        const productData = { ...req.body };
+
+        // Handle sizes if sent as a string (common in multipart/form-data)
+        if (typeof productData.sizes === 'string') {
+            try {
+                productData.sizes = JSON.parse(productData.sizes);
+            } catch (e) {
+                productData.sizes = productData.sizes.split(',').map(s => s.trim());
+            }
+        }
+
+        if (req.file) {
+            productData.image = `/uploads/${req.file.filename}`;
+        }
+
+        // Explicit Type Conversion for FormData strings
+        if (productData.price) productData.price = Number(productData.price);
+        if (productData.stockQuantity) productData.stockQuantity = Number(productData.stockQuantity);
+        if (productData.isActive !== undefined) productData.isActive = String(productData.isActive) === 'true';
+
+        const product = await Product.create(productData);
         res.status(201).json(product);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -40,9 +64,29 @@ router.post('/', protect, adminOnly, async (req, res) => {
 });
 
 // PUT /api/products/:id — Admin only
-router.put('/:id', protect, adminOnly, async (req, res) => {
+router.put('/:id', protect, adminOnly, upload.single('image'), async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        const productData = { ...req.body };
+
+        // Handle sizes if sent as a string
+        if (typeof productData.sizes === 'string') {
+            try {
+                productData.sizes = JSON.parse(productData.sizes);
+            } catch (e) {
+                productData.sizes = productData.sizes.split(',').map(s => s.trim());
+            }
+        }
+
+        if (req.file) {
+            productData.image = `/uploads/${req.file.filename}`;
+        }
+
+        // Explicit Type Conversion for FormData strings
+        if (productData.price) productData.price = Number(productData.price);
+        if (productData.stockQuantity) productData.stockQuantity = Number(productData.stockQuantity);
+        if (productData.isActive !== undefined) productData.isActive = String(productData.isActive) === 'true';
+
+        const product = await Product.findByIdAndUpdate(req.params.id, productData, {
             new: true,
             runValidators: true,
         });
@@ -71,10 +115,10 @@ router.post('/seed/sample', async (req, res) => {
         if (count > 0) return res.json({ message: `Already have ${count} products` });
 
         const samples = [
-            { name: 'Oversized Purple Hoodie', category: 'TShirts', description: 'Premium cotton blend oversized hoodie with vibrant purple finish.', price: 1299, image: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=500', stockQuantity: 50, sizes: ['S', 'M', 'L', 'XL', 'XXL'] },
+            { name: 'Oversized Purple Hoodie', category: 'T-Shirts', description: 'Premium cotton blend oversized hoodie with vibrant purple finish.', price: 1299, image: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=500', stockQuantity: 50, sizes: ['S', 'M', 'L', 'XL', 'XXL'] },
             { name: 'Oxford Button-Down Shirt', category: 'Shirts', description: 'Classic Oxford weave button-down shirt perfect for any occasion.', price: 1599, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500', stockQuantity: 40, sizes: ['S', 'M', 'L', 'XL'] },
             { name: 'Slim Fit Chinos', category: 'Pants', description: 'Modern slim-fit chinos that blend style and comfort seamlessly.', price: 1899, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500', stockQuantity: 30, sizes: ['28', '30', '32', '34', '36'] },
-            { name: 'Graphic Tee - Urban Print', category: 'TShirts', description: 'Bold urban graphic tee made from 100% organic cotton.', price: 799, image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=500', stockQuantity: 60, sizes: ['S', 'M', 'L', 'XL'] },
+            { name: 'Graphic Tee - Urban Print', category: 'T-Shirts', description: 'Bold urban graphic tee made from 100% organic cotton.', price: 799, image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=500', stockQuantity: 60, sizes: ['S', 'M', 'L', 'XL'] },
             { name: 'Leather Belt - Black', category: 'Accessories', description: 'Genuine leather belt with minimalist silver buckle.', price: 599, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', stockQuantity: 80, sizes: ['Free Size'] },
             { name: 'Vintage Denim Jacket', category: 'Shirts', description: 'Distressed vintage denim jacket for that effortlessly cool look.', price: 2999, image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500', stockQuantity: 20, sizes: ['S', 'M', 'L', 'XL'] },
             { name: 'Cargo Pants - Olive', category: 'Pants', description: 'Functional cargo pants with multiple pockets and relaxed fit.', price: 2199, image: 'https://images.unsplash.com/photo-1617952237689-fb17f7044f6e?w=500', stockQuantity: 35, sizes: ['28', '30', '32', '34', '36'] },

@@ -115,7 +115,7 @@ export default function TShirtsPage() {
   });
 
   const tshirtsList = useMemo(() => {
-    let filtered = allProducts.filter((p) => p.category === "TShirts");
+    let filtered = allProducts.filter((p) => p.category === "T-Shirts");
     if (sizeFilter !== "all") {
       filtered = filtered.filter((p) => p.sizes.includes(sizeFilter));
     }

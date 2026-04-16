@@ -30,9 +30,10 @@ import {
   ExternalLink,
   User as UserIcon,
   Calendar,
-  Image as ImageIcon
+  Image as ImageIcon,
+  AlertCircle
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminPage";
 import { motion, AnimatePresence } from "motion/react";
@@ -43,11 +44,12 @@ const STATUS_OPTIONS: OrderStatus[] = [
   "Confirmed",
   "Shipped",
   "Delivered",
+  "Cancelled",
 ];
 
 const STATUS_META: Record<
   OrderStatus,
-  { color: string; icon: typeof Clock; label: string; bg: string }
+  { color: string; icon: React.ElementType; label: string; bg: string }
 > = {
   Pending: {
     color: "text-amber-700 border-amber-200",
@@ -72,6 +74,12 @@ const STATUS_META: Record<
     bg: "bg-emerald-50",
     icon: Star,
     label: "Delivered",
+  },
+  Cancelled: {
+    color: "text-rose-700 border-rose-200",
+    bg: "bg-rose-50",
+    icon: AlertCircle,
+    label: "Cancelled",
   },
 };
 
@@ -459,20 +467,6 @@ export default function AdminOrdersPage() {
     <Layout>
       <ProtectedRoute adminOnly>
         <div className="bg-background min-h-[calc(100vh-4rem)]">
-          <AdminLayout>
-            <AdminOrdersContent />
-          </AdminLayout>
-        </div>
-      </ProtectedRoute>
-    </Layout>
-  );
-}
-
-export default function AdminOrdersPage() {
-  return (
-    <Layout>
-      <ProtectedRoute adminOnly>
-        <div className="bg-muted/30 min-h-[calc(100vh-4rem)]">
           <AdminLayout>
             <AdminOrdersContent />
           </AdminLayout>
