@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     name: { type: String, required: true },
     size: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
@@ -11,16 +11,9 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
     {
-        userId: { type: String, required: true },
-        customerName: { type: String, required: true },
-        customerEmail: { type: String, required: true },
-        customerPhone: { type: String },
-        shippingAddress: {
-            street: String,
-            city: String,
-            state: String,
-            pincode: String,
-        },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        customerName: { type: String, default: '' },
+        deliveryAddress: { type: String, default: '' },
         items: [orderItemSchema],
         totalAmount: { type: Number, required: true },
         status: {
@@ -29,8 +22,7 @@ const orderSchema = new mongoose.Schema(
             default: 'Pending',
         },
         adminNotes: { type: String, default: '' },
-        paymentMethod: { type: String, default: 'COD' },
-        paymentStatus: { type: String, enum: ['Pending', 'Paid', 'Failed'], default: 'Pending' },
+        paymentMethod: { type: String, default: 'WhatsApp COD' },
     },
     { timestamps: true }
 );

@@ -240,6 +240,8 @@ function CheckoutContent() {
     }
 
     const orderData = {
+      customerName: customerName.trim(),
+      deliveryAddress: deliveryAddress.trim(),
       items: items.map(i => ({
         productId: i.productId,
         name: i.product.name,

@@ -3,8 +3,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import api from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -12,101 +10,37 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
-  SheetFooter
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import type { Order, OrderStatus } from "@/types";
 import {
   CheckCircle2,
-  ChevronRight,
-  ClipboardList,
+  XCircle,
   Clock,
   Package,
-  Star,
   Truck,
+  Star,
   Loader2,
   Search,
-  ExternalLink,
   User as UserIcon,
-  Calendar,
+  MapPin,
+  AlertCircle,
+  ChevronRight,
+  MessageCircle,
   Image as ImageIcon,
-  AlertCircle
 } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { AdminLayout } from "./AdminPage";
+import { AdminLayout, STATUS_META, STATUS_OPTIONS, formatDate, formatTime } from "./AdminPage";
 import { motion, AnimatePresence } from "motion/react";
-import { Input } from "@/components/ui/input";
-
-const STATUS_OPTIONS: OrderStatus[] = [
-  "Pending",
-  "Confirmed",
-  "Shipped",
-  "Delivered",
-  "Cancelled",
-];
-
-const STATUS_META: Record<
-  OrderStatus,
-  { color: string; icon: React.ElementType; label: string; bg: string }
-> = {
-  Pending: {
-    color: "text-amber-700 border-amber-200",
-    bg: "bg-amber-50",
-    icon: Clock,
-    label: "Pending Receipt",
-  },
-  Confirmed: {
-    color: "text-primary border-primary/30",
-    bg: "bg-primary/10",
-    icon: CheckCircle2,
-    label: "Order Confirmed",
-  },
-  Shipped: {
-    color: "text-blue-700 border-blue-200",
-    bg: "bg-blue-50",
-    icon: Truck,
-    label: "In Transit",
-  },
-  Delivered: {
-    color: "text-emerald-700 border-emerald-200",
-    bg: "bg-emerald-50",
-    icon: Star,
-    label: "Delivered",
-  },
-  Cancelled: {
-    color: "text-rose-700 border-rose-200",
-    bg: "bg-rose-50",
-    icon: AlertCircle,
-    label: "Cancelled",
-  },
-};
 
 const FILTER_TABS = [
-  { label: "All Records", value: "all" },
+  { label: "All", value: "all" },
   ...STATUS_OPTIONS.map((s) => ({ label: s, value: s })),
 ];
 
-function formatDate(ts: any) {
-  const date = new Date(ts);
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function formatTime(ts: any) {
-  const date = new Date(ts);
-  return date.toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true
-  });
-}
-
-function OrderDrawerContent({
+// ─── Order Detail Sheet ───────────────────────────────────────────────────────────
+function OrderDetailSheet({
   order,
   onSave,
   onClose,
@@ -120,156 +54,248 @@ function OrderDrawerContent({
   const [editStatus, setEditStatus] = useState<OrderStatus>(order.status);
   const [editNotes, setEditNotes] = useState(order.adminNotes || "");
   const total = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const userName = typeof order.user === "object" ? (order.user as any).name || "Customer" : "Customer";
+  const userEmail = typeof order.user === "object" ? (order.user as any).email : "";
+
+  const isPending = order.status === "Pending";
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="h-1.5 bg-primary w-full"></div>
+    <div className="flex flex-col h-full bg-white">
+      {/* Top accent */}
+      <div className="h-1 gradient-primary w-full" />
+
       <ScrollArea className="flex-1">
-        <div className="p-8 space-y-10">
-          <SheetHeader className="text-left space-y-4">
-            <div className="flex items-center gap-3">
-              <Badge className={`rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest ${STATUS_META[order.status].bg} ${STATUS_META[order.status].color}`}>
+        <div className="p-6 space-y-6">
+          <SheetHeader className="text-left space-y-1">
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border ${STATUS_META[order.status].badge}`}>
                 {order.status}
-              </Badge>
-              <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
-                Order Logged
               </span>
             </div>
-            <SheetTitle className="font-display text-4xl font-black italic tracking-tighter">
-              Order Details <span className="text-primary tracking-normal not-italic">.</span>
+            <SheetTitle className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
+              Order #{order._id?.slice(-8).toUpperCase()}
             </SheetTitle>
-            <SheetDescription className="text-muted-foreground text-xs font-medium uppercase tracking-[0.2em] pt-1">
-              Ref ID: {order._id}
-            </SheetDescription>
+            <p className="text-xs text-muted-foreground">
+              Placed {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
+            </p>
           </SheetHeader>
 
-          {/* Customer Intel */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
-              <UserIcon className="w-3 h-3" /> Customer Intel
-            </div>
-            <div className="bg-muted/30 rounded-3xl p-6 border border-border/50">
-              <p className="text-sm font-bold text-foreground mb-1">
-                {typeof order.user === 'object' ? (order.user as any).name : 'Registered Client'}
+          {/* WhatsApp Confirm/Cancel buttons — only for Pending */}
+          {isPending && (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-amber-700" />
+                <p className="text-sm font-semibold text-amber-900">Awaiting WhatsApp Confirmation</p>
+              </div>
+              <p className="text-xs text-amber-700 leading-relaxed">
+                After confirming the order with the customer on WhatsApp, update the status below.
               </p>
-              <p className="text-xs text-muted-foreground font-mono">
-                {typeof order.user === 'object' ? (order.user as any).email : order.user}
-              </p>
-              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border/50">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Placement Date</span>
-                  <span className="text-xs font-bold">{formatDate(order.createdAt)}</span>
-                </div>
-                <span className="w-1 h-1 rounded-full bg-border" />
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Timestamp</span>
-                  <span className="text-xs font-bold">{formatTime(order.createdAt)}</span>
-                </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setEditStatus("Confirmed");
+                    onSave(order._id!, "Confirmed", editNotes);
+                  }}
+                  disabled={isSaving}
+                  className="flex items-center justify-center gap-2 h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Confirm
+                </button>
+                <button
+                  onClick={() => {
+                    setEditStatus("Cancelled");
+                    onSave(order._id!, "Cancelled", editNotes);
+                  }}
+                  disabled={isSaving}
+                  className="flex items-center justify-center gap-2 h-10 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Cancel
+                </button>
               </div>
             </div>
+          )}
+
+          {/* Customer info */}
+          <div className="card-base rounded-2xl p-4 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <UserIcon className="w-3.5 h-3.5" /> Customer
+            </h3>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{userName}</p>
+              {userEmail && <p className="text-xs text-muted-foreground">{userEmail}</p>}
+            </div>
+            {order.customerName && order.customerName !== userName && (
+              <div>
+                <p className="text-xs text-muted-foreground">Name given at checkout</p>
+                <p className="text-sm font-medium">{order.customerName}</p>
+              </div>
+            )}
+            {order.deliveryAddress && (
+              <div className="flex items-start gap-2 pt-2 border-t border-border">
+                <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground">{order.deliveryAddress}</p>
+              </div>
+            )}
           </div>
 
-          {/* Line Items */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
-              <Package className="w-3 h-3" /> Inventory Manifest
-            </div>
-            <div className="space-y-3">
+          {/* Order items */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <Package className="w-3.5 h-3.5" /> Items ({order.items.length})
+            </h3>
+            <div className="space-y-2">
               {order.items.map((item, idx) => (
                 <div
                   key={`${item.productId}-${item.size}-${idx}`}
-                  className="flex items-center justify-between p-4 bg-muted/20 border border-border/40 rounded-2xl group hover:bg-muted/40 transition-colors"
+                  className="flex items-center gap-3 p-3 bg-secondary rounded-xl"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-14 rounded-xl overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/50">
-                      {item.image ? (
-                        <img src={item.image} className="w-full h-full object-cover" />
-                      ) : (
-                        <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-black italic tracking-tight line-clamp-1">{item.name || `Product ${item.productId.slice(-4)}`}</p>
-                      <p className="text-[10px] font-bold text-muted-foreground">
-                        Variant: {item.size} <span className="mx-1.5 opacity-30">|</span> Qty: {item.quantity}
-                      </p>
-                    </div>
+                  <div className="w-12 h-14 rounded-lg overflow-hidden bg-muted shrink-0">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="w-4 h-4 text-muted-foreground/40" />
+                      </div>
+                    )}
                   </div>
-                  <span className="font-display font-black text-sm text-foreground space-x-1">
-                    <span className="text-[10px] text-primary">₹</span>
-                    <span>{(item.price * item.quantity).toLocaleString()}</span>
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground line-clamp-1">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">Size: {item.size} · Qty: {item.quantity}</p>
+                  </div>
+                  <p className="text-sm font-bold text-foreground shrink-0">
+                    ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                  </p>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between items-center p-6 bg-card border border-primary/20 rounded-[2rem] shadow-sm mt-6">
-              <span className="text-xs font-black uppercase tracking-widest text-primary">Revenue Total</span>
-              <span className="font-display font-black text-2xl text-foreground">₹{total.toLocaleString()}</span>
+            <div className="flex justify-between items-center px-3 py-3 bg-accent rounded-xl">
+              <span className="text-sm font-semibold text-primary">Order Total</span>
+              <span className="text-base font-bold text-foreground">₹{total.toLocaleString("en-IN")}</span>
             </div>
           </div>
 
-          {/* Workflow Status */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
-              <Clock className="w-3 h-3" /> Logistics Workflow
+          {/* Update Status — for non-pending orders */}
+          {!isPending && (
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Update Status
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {STATUS_OPTIONS.filter(s => s !== "Pending").map((s) => {
+                  const m = STATUS_META[s];
+                  const Icon = m.icon;
+                  const active = editStatus === s;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setEditStatus(s)}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${active
+                          ? `${m.bg} ${m.color} border-current`
+                          : "bg-secondary border-border text-muted-foreground hover:bg-muted"
+                        }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {STATUS_OPTIONS.map((s) => {
-                const m = STATUS_META[s];
-                const Icon = m.icon;
-                const active = editStatus === s;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setEditStatus(s)}
-                    className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-all duration-300 ${active
-                      ? `${m.bg} ${m.color} border-current shadow-sm scale-[1.02]`
-                      : "bg-background border-border/60 text-muted-foreground hover:bg-muted/50"
-                      }`}
-                  >
-                    <span className="text-[10px] font-black uppercase tracking-widest">{s}</span>
-                    <Icon className={`w-3.5 h-3.5 ${active ? "opacity-100" : "opacity-30"}`} />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          )}
 
-          {/* Logistics Notes */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
-              <ClipboardList className="w-3 h-3" /> Logistics Memo
-            </div>
+          {/* Admin Notes */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Notes for Customer
+            </h3>
             <Textarea
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Enter shipping details, tracking IDs, or notes for the client..."
-              className="min-h-[120px] bg-muted/30 rounded-[2rem] border-border/50 focus-visible:ring-primary/10 p-6 text-sm resize-none"
+              placeholder="Add tracking ID, delivery updates, or any notes…"
+              className="resize-none min-h-[100px] bg-secondary border-border rounded-xl text-sm focus-visible:ring-primary/20"
             />
-            <p className="text-[10px] text-muted-foreground text-center italic">
-              Note: These memos are visible to the customer on their account page.
-            </p>
+            <p className="text-[10px] text-muted-foreground">These notes are visible to the customer on their account.</p>
           </div>
         </div>
       </ScrollArea>
 
-      <SheetFooter className="p-8 bg-card border-t border-border/30 gap-3 sm:flex-row flex-col">
-        <Button variant="ghost" className="rounded-2xl h-12 flex-1 font-bold text-xs uppercase tracking-widest" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          className="btn-primary rounded-2xl h-12 flex-1 font-bold text-xs uppercase tracking-widest"
-          onClick={() => onSave(order._id!, editStatus, editNotes)}
-          disabled={isSaving}
+      {/* Footer actions */}
+      <div className="p-4 border-t border-border bg-white flex gap-3">
+        <button
+          onClick={onClose}
+          className="btn-secondary flex-1 h-11 flex items-center justify-center"
         >
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Authorize Update"}
-        </Button>
-      </SheetFooter>
+          Close
+        </button>
+        {!isPending && (
+          <button
+            onClick={() => onSave(order._id!, editStatus, editNotes)}
+            disabled={isSaving}
+            className="btn-primary flex-1 h-11 flex items-center justify-center gap-2"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Changes"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
+// ─── Order Row Card ───────────────────────────────────────────────────────────────
+function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
+  const total = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const meta = STATUS_META[order.status];
+  const userName = typeof order.user === "object" ? (order.user as any).name || (order.user as any).email : "Customer";
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      onClick={onClick}
+      className="card-base rounded-2xl p-4 hover:shadow-md cursor-pointer hover:border-primary/20 transition-all duration-200 group"
+    >
+      <div className="flex items-center gap-4">
+        {/* Status icon */}
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color}`}>
+          <meta.icon className="w-4.5 h-4.5" />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-semibold text-foreground">{userName}</p>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${meta.badge}`}>
+              {order.status}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            #{order._id?.slice(-8).toUpperCase()} · {formatDate(order.createdAt)} · {order.items.length} item{order.items.length > 1 ? "s" : ""}
+          </p>
+          {order.deliveryAddress && (
+            <p className="text-xs text-muted-foreground mt-0.5 truncate flex items-center gap-1">
+              <MapPin className="w-3 h-3 shrink-0" />
+              {order.deliveryAddress}
+            </p>
+          )}
+        </div>
+
+        {/* Amount + arrow */}
+        <div className="text-right shrink-0 flex items-center gap-3">
+          <p className="text-sm font-bold text-foreground">₹{total.toLocaleString("en-IN")}</p>
+          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Orders Content ───────────────────────────────────────────────────────────────
 function AdminOrdersContent() {
   const queryClient = useQueryClient();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -282,173 +308,125 @@ function AdminOrdersContent() {
       const { data } = await api.get("/orders");
       return data;
     },
+    refetchInterval: 30000, // auto-refresh every 30s
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, status, notes }: { id: string; status: OrderStatus; notes: string }) =>
       api.put(`/orders/${id}/status`, { status, adminNotes: notes }),
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
-      toast.success("Logistics updated", {
-        description: "Order status and memos have been successfully synchronized."
+      queryClient.invalidateQueries({ queryKey: ["admin_orders_stat"] });
+      toast.success(`Order ${vars.status.toLowerCase()}`, {
+        description: `Order #...${vars.id.slice(-6)} has been updated to ${vars.status}.`,
       });
       setSelectedOrder(null);
     },
-    onError: () => toast.error("Failed to update order architecture"),
+    onError: () => toast.error("Failed to update order status"),
   });
 
   const filtered = useMemo(() => {
-    return orders.filter((o) => {
-      const matchesTab = filterTab === "all" || o.status === filterTab;
-      const matchesSearch = o._id?.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesTab && matchesSearch;
-    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return orders
+      .filter((o) => {
+        const matchesTab = filterTab === "all" || o.status === filterTab;
+        const q = searchQuery.toLowerCase();
+        const userName = typeof o.user === "object" ? ((o.user as any).name || (o.user as any).email || "").toLowerCase() : "";
+        const matchesSearch = !q || o._id?.toLowerCase().includes(q) || userName.includes(q);
+        return matchesTab && matchesSearch;
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [orders, filterTab, searchQuery]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 bg-background/50 backdrop-blur-sm rounded-[3rem] border border-border/50 shadow-sm">
-        <div className="relative">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        </div>
-        <p className="mt-6 text-foreground font-display font-semibold text-lg italic">Accessing Ledger</p>
-        <p className="text-muted-foreground text-sm">Parsing transaction logs...</p>
-      </div>
-    );
-  }
+  const pendingCount = orders.filter((o) => o.status === "Pending").length;
 
   return (
-    <div className="space-y-10 max-w-[1200px]">
-      {/* UI Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">
-            <span className="w-8 h-[1.5px] bg-primary"></span>
-            Order Ledger
-          </div>
-          <h1 className="font-display text-4xl lg:text-5xl font-black tracking-tighter text-foreground italic uppercase">
-            Fulfillment <span className="text-primary tracking-normal not-italic lowercase">.</span>
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-lg text-sm font-medium leading-relaxed">
-            Monitor and manage your sales workflow. Every transaction here represents a commitment to premium street culture.
+          <p className="text-label text-primary mb-1">Management</p>
+          <h1 className="text-heading">Orders</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {orders.length} total orders · {pendingCount} pending
           </p>
         </div>
       </div>
 
-      {/* Filtration Console */}
-      <div className="flex flex-col xl:flex-row items-center gap-4 bg-card/60 backdrop-blur-xl p-5 rounded-[2.5rem] border border-border/40 shadow-sm sticky top-20 z-20 overflow-hidden">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
-          <Input
-            placeholder="Locate by Reference ID..."
-            className="pl-12 h-14 bg-background/40 border-none rounded-3xl focus-visible:ring-1 focus-visible:ring-primary/20 text-sm font-medium italic"
+      {/* Pending alert */}
+      {pendingCount > 0 && (
+        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+          <Clock className="w-5 h-5 text-amber-700 shrink-0" />
+          <p className="text-sm font-medium text-amber-900">
+            <strong>{pendingCount}</strong> order{pendingCount > 1 ? "s" : ""} waiting for confirmation after WhatsApp chat.
+            Confirm or cancel these to update the customer's order status.
+          </p>
+        </div>
+      )}
+
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <input
+            type="search"
+            placeholder="Search by order ID or customer name…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-10 pr-4 bg-white border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
-
-        <div className="flex items-center gap-2 shrink-0 p-1.5 bg-muted/40 rounded-3xl border border-border/30 overflow-x-auto max-w-full">
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setFilterTab(tab.value)}
-              className={`px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${filterTab === tab.value
-                ? "bg-background text-primary shadow-sm scale-105"
-                : "text-muted-foreground/60 hover:text-foreground hover:bg-background/20"
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${filterTab === tab.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-white border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
                 }`}
             >
               {tab.label}
+              {tab.value === "Pending" && pendingCount > 0 && (
+                <span className="ml-1.5 bg-amber-500 text-white text-[9px] font-bold w-4 h-4 rounded-full inline-flex items-center justify-center">
+                  {pendingCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Fulfillment Deck */}
-      {filtered.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-32 rounded-[3.5rem] border-dashed border-2 border-border/50 bg-muted/10"
-        >
-          <ClipboardList className="w-12 h-12 text-muted-foreground/20 mx-auto mb-6" />
-          <h2 className="font-display text-xl font-bold uppercase tracking-widest italic">Ledger Clean</h2>
-          <p className="text-muted-foreground max-w-xs mx-auto text-xs font-semibold py-2">No transaction records match the current filter.</p>
-        </motion.div>
+      {/* Orders List */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-7 h-7 text-primary animate-spin" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
+          <Package className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-sm font-medium text-muted-foreground">
+            {searchQuery ? "No orders match your search" : "No orders in this category"}
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-3">
           <AnimatePresence mode="popLayout">
-            {filtered.map((order, idx) => {
-              const total = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
-              const meta = STATUS_META[order.status];
-              return (
-                <motion.div
-                  layout
-                  key={order._id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.03 }}
-                  className="group bg-card hover:bg-muted/40 border border-border/40 hover:border-primary/30 rounded-[2.5rem] p-6 transition-all duration-500 overflow-hidden flex flex-col md:flex-row md:items-center gap-8 shadow-sm hover:shadow-md cursor-pointer"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  {/* Status Pulse */}
-                  <div className="flex md:flex-col items-center gap-4 shrink-0 px-2">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center ${meta.bg} ${meta.color} shadow-inner`}>
-                      <meta.icon className="w-6 h-6" />
-                    </div>
-                    <div className="md:hidden">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Order Ref</p>
-                      <p className="font-display font-black text-sm uppercase italic">#{order._id?.slice(-6)}</p>
-                    </div>
-                  </div>
-
-                  {/* Order Intel */}
-                  <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2">
-                    <div className="md:flex hidden items-center gap-2 mb-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-primary italic">#{order._id?.slice(-8)}</p>
-                      <span className="w-1 h-1 rounded-full bg-border" />
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{formatDate(order.createdAt)}</p>
-                    </div>
-                    <h3 className="font-display font-black text-base text-foreground truncate italic group-hover:translate-x-1 transition-transform duration-500">
-                      {typeof order.user === 'object' ? (order.user as any).email : 'External Client'}
-                    </h3>
-                    <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground">
-                      <span className="flex items-center gap-1.5"><Package className="w-3.5 h-3.5" /> {order.items.length} Units</span>
-                      <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatTime(order.createdAt)}</span>
-                    </div>
-                  </div>
-
-                  {/* Financials & Action */}
-                  <div className="flex items-center justify-between md:justify-end gap-10 md:bg-transparent bg-muted/20 p-4 md:p-0 rounded-2xl">
-                    <div className="text-right">
-                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Value</p>
-                      <p className="font-display font-black text-xl text-foreground italic space-x-1">
-                        <span className="text-[10px] text-primary not-italic tracking-normal">₹</span>
-                        <span>{total.toLocaleString()}</span>
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={`rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest group-hover:scale-105 transition-transform ${meta.bg} ${meta.color}`}>
-                        {order.status}
-                      </Badge>
-                      <div className="md:flex hidden w-10 h-10 rounded-2xl bg-muted group-hover:bg-primary group-hover:text-primary-foreground items-center justify-center transition-all">
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {filtered.map((order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                onClick={() => setSelectedOrder(order)}
+              />
+            ))}
           </AnimatePresence>
         </div>
       )}
 
-      <Sheet
-        open={!!selectedOrder}
-        onOpenChange={(open) => !open && setSelectedOrder(null)}
-      >
-        <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-l border-border/30 glass-blur-lg">
+      {/* Order Detail Sheet */}
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-md p-0 border-l border-border">
           {selectedOrder && (
-            <OrderDrawerContent
+            <OrderDetailSheet
               key={selectedOrder._id}
               order={selectedOrder}
               onSave={(id, status, notes) => updateMutation.mutate({ id, status, notes })}
@@ -462,6 +440,7 @@ function AdminOrdersContent() {
   );
 }
 
+// ─── Page Export ──────────────────────────────────────────────────────────────────
 export default function AdminOrdersPage() {
   return (
     <Layout>
