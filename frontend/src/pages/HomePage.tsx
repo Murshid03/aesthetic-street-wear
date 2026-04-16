@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 // ─── Category Config ────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -218,109 +219,131 @@ export default function HomePage() {
   return (
     <Layout>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative bg-foreground text-background overflow-hidden" aria-label="Hero">
-        {/* Background pattern */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[hsl(262,40%,15%)] via-[hsl(270,20%,10%)] to-[hsl(270,20%,8%)]" />
-          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/20 blur-[120px]" />
-          <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
-          {/* Grid */}
+      <section className="relative min-h-[80vh] flex items-center bg-[#0a0a0c] text-white overflow-hidden py-16 lg:py-0" aria-label="Hero">
+        {/* Background Layering */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,_rgba(124,58,237,0.12),_transparent_40%),_radial-gradient(circle_at_80%_70%,_rgba(139,92,246,0.08),_transparent_40%)]" />
+
           <div className="absolute inset-0 opacity-[0.03]"
-            style={{ backgroundImage: "linear-gradient(hsl(262,83%,58%) 1px, transparent 1px), linear-gradient(90deg, hsl(262,83%,58%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+            style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+
+          {/* Scaled down Background Text */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black text-white/[0.015] select-none uppercase tracking-tighter whitespace-nowrap leading-none">
+            Aesthetic
+          </div>
         </div>
 
         <div className="container mx-auto container-px relative z-10">
-          <div className="py-16 sm:py-20 lg:py-28 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            {/* Text */}
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+            {/* Left Content */}
             <motion.div
-              className="flex-1 text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
-              initial={{ opacity: 0, y: 32 }}
+              className="flex-1 text-center lg:text-left z-20"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="inline-flex items-center gap-2 bg-primary/20 border border-primary/30 text-primary rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase mb-6">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-                New Collection 2026
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-white/60">New Season Drops</span>
               </div>
 
-              <h1 className="text-hero text-background mb-6">
-                Style That{" "}
-                <span className="relative">
-                  <span className="gradient-text" style={{ background: "linear-gradient(135deg, hsl(262,83%,70%), hsl(280,70%,75%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    Speaks
-                  </span>
-                </span>
-                <br />
-                For Itself
+              <h1 className="text-4xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] mb-6 uppercase italic">
+                Defined by <br />
+                <span className="text-transparent" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.6)" }}>Aesthetics</span>
               </h1>
 
-              <p className="text-background/65 text-base sm:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 mb-8">
-                Premium men's streetwear crafted for those who move through the world with purpose. Curated essentials, modern silhouettes — uncompromising quality.
-              </p>
+              <div className="max-w-lg mx-auto lg:mx-0">
+                <p className="text-white/50 text-sm sm:text-base font-medium leading-relaxed mb-8">
+                  Discover curated silhouettes designed for the modern pioneer. We bridge the gap between street culture and premium luxury.
+                </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10">
-                <Button
-                  asChild
-                  className="btn-primary h-12 px-8 text-sm shadow-lg shadow-primary/30"
-                  data-ocid="hero-cta-primary"
-                >
-                  <Link to="/shirts">
-                    Shop Now <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="h-12 px-8 text-sm border-white/20 text-background hover:bg-white/10 hover:border-white/30"
-                  data-ocid="hero-cta-secondary"
-                >
-                  <Link to="/accessories">View Accessories</Link>
-                </Button>
-              </div>
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <Button
+                    asChild
+                    className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:translate-y-[-2px]"
+                  >
+                    <Link to="/shirts">
+                      Shop Now <ArrowRight className="ml-2 w-4 h-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="h-12 px-7 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-widest backdrop-blur-sm"
+                  >
+                    <Link to="/accessories">Lookbook</Link>
+                  </Button>
+                </div>
 
-              {/* Stats */}
-              <div className="flex items-center gap-8 justify-center lg:justify-start">
-                {[
-                  { val: "500+", label: "Products" },
-                  { val: "10K+", label: "Customers" },
-                  { val: "4.9★", label: "Rating" },
-                ].map((s, i) => (
-                  <div key={i} className="text-center">
-                    <p className="text-2xl font-bold text-background" style={{ fontFamily: "Syne, sans-serif" }}>{s.val}</p>
-                    <p className="text-xs text-background/50 mt-0.5">{s.label}</p>
+                <div className="mt-10 flex items-center justify-center lg:justify-start gap-8">
+                  <div className="flex -space-x-2.5">
+                    {[12, 13, 14, 15].map((i) => (
+                      <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0a0a0c] bg-muted overflow-hidden">
+                        <img src={`https://i.pravatar.cc/100?img=${i}`} alt="User" />
+                      </div>
+                    ))}
+                    <div className="w-8 h-8 rounded-full border-2 border-[#0a0a0c] bg-secondary flex items-center justify-center text-[9px] font-bold text-foreground">
+                      +2k
+                    </div>
                   </div>
-                ))}
+                  <div className="h-6 w-px bg-white/10" />
+                  <div>
+                    <div className="flex gap-0.5 text-primary">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
+                    </div>
+                    <p className="text-[9px] font-bold text-white/40 uppercase tracking-tighter mt-0.5">Verified Quality</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Hero Image */}
+            {/* Right Visual Collage - More Compact */}
             <motion.div
-              className="flex-1 flex justify-center lg:justify-end w-full max-w-sm lg:max-w-none"
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              className="flex-1 relative w-full h-[450px] sm:h-[550px] flex items-center justify-center lg:justify-end"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.1 }}
             >
-              <div className="relative">
-                <div className="absolute -inset-4 rounded-3xl border border-primary/20" />
-                <div className="w-56 h-[320px] sm:w-72 sm:h-[420px] lg:w-80 lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl shadow-primary/20">
+              <div className="relative w-full aspect-square max-w-[420px] lg:max-w-none lg:w-[105%] h-full">
+                {/* Main Large Image */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl z-10 border border-white/5">
                   <img
-                    src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800"
-                    alt="Aesthetic Street Wear"
+                    src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000&q=80"
+                    alt="Streetwear Signature"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800";
-                    }}
                   />
                 </div>
-                {/* Floating card */}
-                <div className="absolute -bottom-4 -left-4 sm:-bottom-5 sm:-left-6 glass rounded-2xl px-4 py-3 shadow-xl border border-white/40">
-                  <p className="text-[10px] text-muted-foreground font-semibold">New Drop</p>
-                  <p className="font-bold text-sm text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Summer 2026</p>
-                </div>
-                {/* Second floating card */}
-                <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-5 bg-primary text-primary-foreground rounded-2xl px-3.5 py-2.5 shadow-lg">
-                  <p className="text-[10px] font-semibold opacity-80">Starting from</p>
-                  <p className="font-bold text-sm">₹599 only</p>
+
+                {/* Secondary Image */}
+                <motion.div
+                  className="absolute top-[5%] right-[5%] w-[40%] aspect-square rounded-2xl overflow-hidden shadow-2xl z-20 border-4 border-[#0a0a0c]"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1539106602058-03836727bc36?w=500&q=80"
+                    alt="Detail"
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+
+                {/* Third Image */}
+                <motion.div
+                  className="absolute bottom-[5%] left-[5%] w-[35%] aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl z-20 border-4 border-[#0a0a0c]"
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=500&q=80"
+                    alt="Style"
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+
+                {/* Accents */}
+                <div className="absolute top-1/4 -left-5 w-24 h-24 border border-primary/10 rounded-full animate-pulse" />
+                <div className="absolute bottom-5 right-5 glass rounded-xl px-4 py-2 border border-white/10 z-30 hidden sm:block">
+                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">Est. 2026</p>
                 </div>
               </div>
             </motion.div>
