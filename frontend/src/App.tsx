@@ -18,6 +18,7 @@ const ShirtsPage = lazy(() => import("@/pages/ShirtsPage"));
 const TShirtsPage = lazy(() => import("@/pages/TShirtsPage"));
 const PantsPage = lazy(() => import("@/pages/PantsPage"));
 const AccessoriesPage = lazy(() => import("@/pages/AccessoriesPage"));
+const NewArrivalsPage = lazy(() => import("@/pages/NewArrivalsPage"));
 const ProductPage = lazy(() => import("@/pages/ProductPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const WishlistPage = lazy(() => import("@/pages/WishlistPage"));
@@ -40,10 +41,12 @@ function PageLoader() {
 // Root
 const rootRoute = createRootRoute({
   component: () => (
-    <>
-      <Outlet />
-      <Toaster position="top-right" richColors />
-    </>
+    <CartProvider>
+      <WishlistProvider>
+        <Outlet />
+        <Toaster position="top-right" richColors />
+      </WishlistProvider>
+    </CartProvider>
   ),
 });
 
@@ -54,6 +57,16 @@ const indexRoute = createRoute({
   component: () => (
     <Suspense fallback={<PageLoader />}>
       <HomePage />
+    </Suspense>
+  ),
+});
+
+const newArrivalsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/new-arrivals",
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <NewArrivalsPage />
     </Suspense>
   ),
 });
@@ -210,6 +223,7 @@ const checkoutRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  newArrivalsRoute,
   shirtsRoute,
   tshirtsRoute,
   pantsRoute,
@@ -247,11 +261,5 @@ export default function App() {
     loadUser();
   }, [loadUser]);
 
-  return (
-    <CartProvider>
-      <WishlistProvider>
-        <RouterProvider router={router} />
-      </WishlistProvider>
-    </CartProvider>
-  );
+  return <RouterProvider router={router} />;
 }

@@ -16,83 +16,69 @@ import {
   ShoppingCart,
   Loader2,
   Zap,
-  RefreshCw,
+  Package,
+  Shield,
+  Truck,
+  RotateCcw
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// Category route mapping
 const CATEGORY_ROUTE: Record<Category, string> = {
   Shirts: "/shirts",
-  TShirts: "/tshirts",
+  "T-Shirts": "/tshirts",
   Pants: "/pants",
   Accessories: "/accessories",
-};
-
-const CATEGORY_LABEL: Record<Category, string> = {
-  Shirts: "Shirts",
-  TShirts: "T-Shirts & Tops",
-  Pants: "Pants & Trousers",
-  Accessories: "Accessories",
 };
 
 function RelatedProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const wished = isInWishlist(product._id!);
+  const [adding, setAdding] = useState(false);
+  const pid = product._id || (product as any).id;
+  const wished = isInWishlist(pid);
+
+  const handleAddToCart = () => {
+    setAdding(true);
+    addToCart(product, product.sizes[0] ?? "One Size");
+    setTimeout(() => {
+      setAdding(false);
+      toast.success("Added to cart", { description: product.name });
+    }, 900);
+  };
 
   return (
-    <div className="card-elevated group overflow-hidden flex flex-col transition-smooth hover:shadow-md hover:-translate-y-0.5">
-      <div className="relative overflow-hidden bg-muted aspect-[3/4]">
-        <Link to="/product/$id" params={{ id: product._id! }}>
+    <div className="group flex flex-col overflow-hidden bg-white transition-all duration-300">
+      <div className="relative aspect-[3/4.2] overflow-hidden bg-muted rounded-xl">
+        <Link to="/product/$id" params={{ id: String(pid) }} className="block h-full w-full">
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
-            }}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         </Link>
         <button
-          type="button"
-          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-smooth hover:bg-card shadow-sm"
-          onClick={() =>
-            wished ? removeFromWishlist(product._id!) : addToWishlist(product)
-          }
+          onClick={() => wished ? removeFromWishlist(pid) : addToWishlist(product)}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm
+            ${wished ? "bg-primary text-white" : "bg-white/80 backdrop-blur-sm text-black hover:bg-white"}`}
         >
-          <Heart
-            className={`w-4 h-4 ${wished ? "fill-primary text-primary" : "text-muted-foreground"}`}
-          />
+          <Heart className={`w-3 h-3 ${wished ? "fill-current" : ""}`} />
         </button>
-      </div>
-      <div className="p-3 flex flex-col flex-1 gap-2">
-        <div className="flex-1 min-w-0">
-          <Link to="/product/$id" params={{ id: product._id! }}>
-            <h4 className="font-semibold text-xs text-foreground leading-snug hover:text-primary transition-colors line-clamp-2">
-              {product.name}
-            </h4>
-          </Link>
-        </div>
-        <div className="flex items-center justify-between gap-1">
-          <span className="font-display font-bold text-base">
-            ₹{product.price}
-          </span>
+        <div className="absolute inset-x-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
-            size="sm"
-            className="btn-primary text-[10px] h-7 px-2"
-            onClick={() => {
-              addToCart(product, product.sizes[0] ?? "One Size");
-              toast.success("Added to cart!");
-            }}
+            onClick={handleAddToCart}
+            disabled={adding || product.stockQuantity <= 0}
+            className="w-full bg-white text-black hover:bg-black hover:text-white rounded-lg h-9 text-[8px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
           >
-            <ShoppingCart className="w-3 h-3 mr-1" />
-            Add
+            {adding ? <Package className="w-3 h-3" /> : <ShoppingCart className="w-3 h-3" />}
+            {adding ? "Added" : product.stockQuantity <= 0 ? "Empty" : "Add"}
           </Button>
         </div>
+      </div>
+      <div className="py-3 space-y-0.5">
+        <h4 className="text-[9px] font-black uppercase tracking-[0.1em] text-black/60 truncate" style={{ fontFamily: "var(--font-accent)" }}>{product.name}</h4>
+        <span className="text-[10px] font-bold text-black tracking-tighter">₹{product.price.toLocaleString("en-IN")}</span>
       </div>
     </div>
   );
@@ -104,6 +90,7 @@ export default function ProductPage() {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const { data: product, isLoading, isError } = useQuery<Product>({
     queryKey: ["product", id],
@@ -125,9 +112,12 @@ export default function ProductPage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-40 flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" />
-          <p className="text-muted-foreground animate-pulse">Loading product details…</p>
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-white">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 rounded-full border-4 border-black/5" />
+            <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Accessing Archive Object...</p>
         </div>
       </Layout>
     );
@@ -136,18 +126,11 @@ export default function ProductPage() {
   if (isError || !product) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-            <ShoppingCart className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h1 className="font-display text-2xl font-bold mb-3">
-            Product Not Found
-          </h1>
-          <p className="text-muted-foreground mb-6">
-            This product doesn't exist or may have been removed.
-          </p>
-          <Button asChild>
-            <Link to="/">Back to Home</Link>
+        <div className="container mx-auto container-px py-40 text-center">
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Fragment Missing</h1>
+          <p className="text-black/40 mb-10 max-w-sm mx-auto">The requested archive fragment could not be located in our current configuration.</p>
+          <Button asChild className="h-12 px-10 rounded-full bg-black">
+            <Link to="/">Return to Hub</Link>
           </Button>
         </div>
       </Layout>
@@ -155,279 +138,185 @@ export default function ProductPage() {
   }
 
   const wished = isInWishlist(product._id!);
-  const activeSize = selectedSize || "";
   const categoryRoute = CATEGORY_ROUTE[product.category];
-  const categoryLabel = CATEGORY_LABEL[product.category];
-
-  // Related products: same category, exclude current
   const related = allProducts.filter(
     (p) => p.category === product.category && p._id !== product._id,
   ).slice(0, 4);
 
   const handleAddToCart = () => {
-    if (!activeSize) {
-      toast.error("Please select a size first");
+    if (!selectedSize) {
+      toast.error("Please select an architectural fit (size)");
       return;
     }
-    addToCart(product, activeSize, quantity);
-    toast.success(`${product.name} added to cart!`, {
-      description: `Size: ${activeSize} · Qty: ${quantity}`,
-    });
+    setAddingToCart(true);
+    addToCart(product, selectedSize, quantity);
+    setTimeout(() => {
+      setAddingToCart(false);
+      toast.success("Segment Authenticated", {
+        description: `Added "${product.name}" [${selectedSize}] to your loadout.`
+      });
+    }, 800);
   };
 
   return (
     <Layout>
-      <div className="bg-background">
-        <div className="container mx-auto px-4 pt-6 pb-12">
-          {/* Breadcrumb */}
-          <nav
-            className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8"
-            aria-label="breadcrumb"
-          >
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link
-              to={categoryRoute}
-              className="hover:text-foreground transition-colors"
-            >
-              {categoryLabel}
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-foreground font-medium line-clamp-1 max-w-[200px]">
-              {product.name}
-            </span>
-          </nav>
+      <div className="bg-white min-h-screen pt-24 pb-20">
+        <div className="container mx-auto container-px">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
+            {/* ── Visual Context ─────────────────────────────────────────── */}
+            <div className="lg:col-span-7">
+              <nav className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+                <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
+                <ChevronRight className="w-2.5 h-2.5" />
+                <Link to={categoryRoute} className="hover:text-primary transition-colors">{product.category}</Link>
+                <ChevronRight className="w-2.5 h-2.5" />
+                <span className="text-black/60 truncate">{product.name}</span>
+              </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* Product Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <div className="relative rounded-2xl overflow-hidden bg-muted aspect-[3/4] shadow-sm">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
-                  }}
-                />
+              <div className="relative group">
+                <div className="aspect-[3/4] md:aspect-[4/5] rounded-[2rem] overflow-hidden bg-muted shadow-2xl">
+                  <motion.img
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1 }}
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <button
-                  type="button"
-                  aria-label={
-                    wished ? "Remove from wishlist" : "Add to wishlist"
-                  }
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center shadow-sm transition-smooth hover:bg-card hover:scale-110"
-                  onClick={() =>
-                    wished
-                      ? removeFromWishlist(product._id!)
-                      : addToWishlist(product)
-                  }
+                  onClick={() => wished ? removeFromWishlist(product._id!) : addToWishlist(product)}
+                  className={`absolute top-8 right-8 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl backdrop-blur-md
+                     ${wished ? "bg-primary text-white scale-110" : "bg-white/80 text-black hover:bg-white"}`}
                 >
-                  <Heart
-                    className={`w-5 h-5 transition-colors ${wished ? "fill-primary text-primary" : "text-muted-foreground"}`}
-                  />
+                  <Heart className={`w-6 h-6 ${wished ? "fill-current" : ""}`} />
                 </button>
-                {product.isSoldOut ? (
-                  <Badge className="absolute top-4 left-4 bg-rose-600 text-white font-bold px-3 py-1">
-                    Sold Out
-                  </Badge>
-                ) : product.stockQuantity <= 5 && (
-                  <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground">
-                    Only {product.stockQuantity} left
-                  </Badge>
+                {product.isSoldOut && (
+                  <div className="absolute top-8 left-8">
+                    <div className="bg-black text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">Non-Exist Project</div>
+                  </div>
                 )}
               </div>
-            </motion.div>
+            </div>
 
-            {/* Product Details */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex flex-col gap-6"
-            >
-              {/* Header */}
-              <div>
-                <Badge
-                  variant="outline"
-                  className="mb-3 text-primary border-primary/30 font-semibold text-xs"
-                >
-                  {categoryLabel}
-                </Badge>
-                <h1 className="font-display text-3xl lg:text-4xl font-bold tracking-tight mb-3 leading-tight">
-                  {product.name}
-                </h1>
-                <p className="font-display text-3xl font-bold text-primary">
-                  ₹{product.price}
-                </p>
-              </div>
-
-              {/* Description */}
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-
-              {/* Size Selector */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold">
-                    Select Size
-                    {activeSize && (
-                      <span className="text-primary ml-2 font-bold">
-                        {activeSize}
-                      </span>
-                    )}
-                  </p>
-                  {!activeSize && (
-                    <span className="text-xs text-muted-foreground">
-                      Required to add to cart
-                    </span>
-                  )}
+            {/* ── Architectural Specs ────────────────────────────────────── */}
+            <div className="lg:col-span-5 flex flex-col pt-10">
+              <div className="space-y-12">
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-[2px] bg-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Signature Collection . 26</span>
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                    {product.name}
+                  </h1>
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-3xl font-black text-black">₹{product.price.toLocaleString("en-IN")}</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">MSRP Inclusive Tax</span>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
-                    <button
-                      type="button"
-                      key={size}
-                      disabled={product.isSoldOut}
-                      onClick={() => setSelectedSize(size)}
-                      className={`min-w-[48px] px-4 py-2.5 text-sm font-medium rounded-lg border-2 transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${activeSize === size
-                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "border-border hover:border-primary/60 bg-card"
-                        } ${product.isSoldOut ? "opacity-50 cursor-not-allowed" : ""}`}
+
+                <div className="space-y-6">
+                  <p className="text-black/40 text-base font-medium leading-relaxed border-l-2 border-black/5 pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
+                    {product.description || "Architectural silhouette engineered with raw urban intent. Every fragment is a signature of modern excellence, designed to define the new standard."}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-4 pt-4">
+                    {[
+                      { icon: Shield, label: "Certified" },
+                      { icon: Truck, label: "Express" },
+                      { icon: RotateCcw, label: "Returnable" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-black/5 hover:bg-black/10 transition-colors">
+                        <item.icon className="w-3.5 h-3.5 text-black/40" />
+                        <span className="text-[8px] font-black uppercase tracking-widest text-black/60">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fit Selection */}
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Architectural Fit:</span>
+                    <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Sizing Grid</button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        disabled={product.isSoldOut}
+                        className={`h-12 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 
+                                    ${selectedSize === size
+                            ? "border-black bg-black text-white shadow-xl scale-105"
+                            : "border-black/5 bg-transparent text-black/40 hover:border-black/20"
+                          } ${product.isSoldOut ? "opacity-20 cursor-not-allowed" : ""}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Primary Action */}
+                <div className="space-y-6 pt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-14 bg-black/5 rounded-full p-1 items-center shrink-0">
+                      <button
+                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                        className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-10 text-center text-[11px] font-black">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(q => q + 1)}
+                        className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <Button
+                      onClick={handleAddToCart}
+                      disabled={product.isSoldOut || addingToCart}
+                      className="flex-1 h-16 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
                     >
-                      {size}
-                    </button>
-                  ))}
+                      <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${addingToCart ? "-translate-y-16" : ""}`}>
+                        <ShoppingCart className="w-4 h-4" />
+                        {product.isSoldOut ? "Project Expired" : "Add to Loadout"}
+                      </span>
+                      <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${addingToCart ? "translate-y-0" : "translate-y-16"}`}>
+                        <Package className="w-4 h-4 animate-bounce" />
+                        Processing...
+                      </span>
+                    </Button>
+                  </div>
                 </div>
-                {!activeSize && !product.isSoldOut && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Please select a size to proceed
-                  </p>
-                )}
-              </div>
 
-              {/* Quantity Selector */}
-              <div>
-                <p className="text-sm font-semibold mb-3">Quantity</p>
-                <div
-                  className="inline-flex items-center border-2 border-border rounded-lg overflow-hidden"
-                >
-                  <button
-                    type="button"
-                    disabled={product.isSoldOut}
-                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30"
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className={`w-12 text-center text-sm font-bold ${product.isSoldOut ? "opacity-30" : ""}`}>
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    disabled={product.isSoldOut}
-                    className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30"
-                    onClick={() => setQuantity((q) => q + 1)}
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="pt-8 border-t border-black/5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">Batch ID: {String(product._id).slice(-8).toUpperCase()}</p>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                {product.isSoldOut ? (
-                  <Button
-                    className="flex-1 h-12 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl px-8"
-                    onClick={() => {
-                      api.post(`/products/${product._id}/notify-me`)
-                        .then(() => toast.success("We'll notify you!", {
-                          description: `You'll be alerted when ${product.name} returns to our collection.`
-                        }))
-                        .catch(() => toast.error("Please sign in to get restock alerts"));
-                    }}
-                  >
-                    <Zap className="w-5 h-5 mr-2" />
-                    Notify Me When Restocked
-                  </Button>
-                ) : (
-                  <Button
-                    className="btn-primary flex-1 h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleAddToCart}
-                    disabled={!activeSize}
-                    title={!activeSize ? "Select a size first" : "Add to cart"}
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    {activeSize ? "Add to Cart" : "Select a Size First"}
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 border-2"
-                  onClick={() =>
-                    wished
-                      ? removeFromWishlist(product._id!)
-                      : addToWishlist(product)
-                  }
-                >
-                  <Heart
-                    className={`w-5 h-5 mr-2 ${wished ? "fill-primary text-primary" : ""}`}
-                  />
-                  {wished ? "Wishlisted" : "Add to Wishlist"}
-                </Button>
-              </div>
-
-              {/* Back to category */}
-              <Link
-                to={categoryRoute}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to {categoryLabel}
-              </Link>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Related Products */}
+          {/* ── Sequence Context ────────────────────────────────────────── */}
           {related.length > 0 && (
-            <section className="mt-16 pt-12 border-t border-border">
-              <div className="flex items-end justify-between mb-8">
+            <section className="mt-40">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                 <div>
-                  <p className="text-label text-primary mb-1">
-                    More from the collection
-                  </p>
-                  <h2 className="font-display text-2xl lg:text-3xl font-bold">
-                    You May Also Like
-                  </h2>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-[2px] bg-primary" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Contextual Pieces</p>
+                  </div>
+                  <h2 className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ARCHIVE PAIRINGS</h2>
                 </div>
-                <Link
-                  to={categoryRoute}
-                  className="text-sm font-semibold text-primary hover:underline underline-offset-2 hidden sm:inline-flex items-center gap-1"
-                >
-                  View All <ChevronRight className="w-4 h-4" />
-                </Link>
+                <Link to={categoryRoute} className="text-[10px] font-black uppercase tracking-[0.3em] pb-1 border-b-2 border-primary hover:text-black transition-colors">Explore Category</Link>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-                {related.map((p, i) => (
-                  <motion.div
-                    key={p._id}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.07 }}
-                  >
-                    <RelatedProductCard product={p} />
-                  </motion.div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+                {related.map((p) => (
+                  <RelatedProductCard key={p._id} product={p} />
                 ))}
               </div>
             </section>

@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { SiteSettings } from "@/types";
 import {
@@ -16,9 +15,9 @@ import {
   Settings,
   Store,
   Loader2,
-  ChevronRight,
   ShieldCheck,
-  Zap
+  Zap,
+  ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
@@ -37,16 +36,16 @@ function SettingBox({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-card border border-border/40 rounded-[3rem] p-8 lg:p-10 shadow-sm space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Icon className="w-5 h-5 text-primary" />
+    <div className="bg-white border border-black/5 rounded-[3rem] p-10 shadow-sm transition-all duration-500 hover:shadow-2xl space-y-10 group">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform">
+              <Icon className="w-5 h-5" />
             </div>
-            <h3 className="font-display font-black italic text-xl uppercase tracking-tight">{title}</h3>
+            <h3 className="text-xl font-black uppercase tracking-tight text-black">{title}</h3>
           </div>
-          <p className="text-xs text-muted-foreground font-medium leading-relaxed max-w-sm">
+          <p className="text-sm font-medium text-black/40 leading-relaxed max-w-sm">
             {description}
           </p>
         </div>
@@ -81,12 +80,10 @@ function AdminSettingsContent() {
     mutationFn: (newSettings: SiteSettings) => api.put("/settings", newSettings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site_settings"] });
-      toast.success("Architecture Synchronized", {
-        description: "Global store configurations have been successfully updated."
-      });
+      toast.success("Protocol Synchronized");
       setIsDirty(false);
     },
-    onError: () => toast.error("Configuration Sync Failed"),
+    onError: () => toast.error("Sync Protocol Failure"),
   });
 
   const updateField = (field: keyof SiteSettings, value: string) => {
@@ -103,62 +100,53 @@ function AdminSettingsContent() {
     if (serverSettings) {
       setLocalSettings(serverSettings);
       setIsDirty(false);
-      toast.info("Changes discarded");
+      toast.info("Changes Discarded");
     }
   };
 
   if (isLoading || !localSettings) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-        <p className="mt-6 text-foreground font-display font-semibold text-lg italic uppercase tracking-widest">Accessing Architecture...</p>
+      <div className="flex flex-col items-center justify-center py-40 gap-6">
+        <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Architecture...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12 py-6 max-w-[900px]">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-16">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
         <div>
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">
-            <span className="w-8 h-[1.5px] bg-primary"></span>
-            System Architecture
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-[2px] bg-primary" />
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Systems . Control</span>
           </div>
-          <h1 className="font-display text-4xl lg:text-5xl font-black tracking-tighter text-foreground italic uppercase">
-            Global Settings <span className="text-primary tracking-normal not-italic lowercase">.</span>
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-lg text-sm font-medium leading-relaxed">
-            Configure the core parameters of your digital flagship. These settings propagate instantly across the client architecture.
-          </p>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>GLOBAL <br /> <span className="text-primary italic text-4xl md:text-6xl">PROTOCOLS</span></h1>
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-10 max-w-3xl">
         {/* Shop Identity */}
         <SettingBox
           icon={Store}
-          title="Brand Identity"
-          description="Your global brand name and public-facing description utilized for SEO and display."
+          title="BRAND SIGNATURE"
+          description="Global manifestation parameters and metadata used for collection identification."
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="shop-name" className="text-[10px] font-black uppercase tracking-widest text-primary">Brand Designation</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Archive Designation</Label>
               <Input
-                id="shop-name"
                 value={localSettings.shopName}
                 onChange={(e) => updateField("shopName", e.target.value)}
-                placeholder="e.g. AESTHETIC STREET WEAR"
-                className="h-12 bg-muted/20 border-border/40 rounded-2xl focus-visible:ring-primary/10 text-sm font-bold"
+                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="shop-desc" className="text-[10px] font-black uppercase tracking-widest text-primary">Brand Vision</Label>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Vision Statement</Label>
               <Input
-                id="shop-desc"
                 value={localSettings.description}
                 onChange={(e) => updateField("description", e.target.value)}
-                placeholder="Curating the future of street culture."
-                className="h-12 bg-muted/20 border-border/40 rounded-2xl focus-visible:ring-primary/10 text-sm font-medium"
+                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
               />
             </div>
           </div>
@@ -167,27 +155,22 @@ function AdminSettingsContent() {
         {/* WhatsApp */}
         <SettingBox
           icon={MessageCircle}
-          title="Hotline Integration"
-          description="The primary communication channel for fulfillment and client queries."
+          title="COMMUNICATION HUB"
+          description="Primary encrypted channel for manifest validation and logistics support."
         >
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp-num" className="text-[10px] font-black uppercase tracking-widest text-primary">WhatsApp Terminal</Label>
-              <div className="relative">
-                <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                <Input
-                  id="whatsapp-num"
-                  value={localSettings.whatsappNumber}
-                  onChange={(e) => updateField("whatsappNumber", e.target.value)}
-                  placeholder="+91 00000 00000"
-                  className="pl-12 h-14 bg-muted/20 border-border/40 rounded-2xl focus-visible:ring-primary/10 text-sm font-black tracking-widest"
-                />
-              </div>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Terminal ID (WhatsApp)</Label>
+              <Input
+                value={localSettings.whatsappNumber}
+                onChange={(e) => updateField("whatsappNumber", e.target.value)}
+                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+              />
             </div>
-            <div className="flex items-center gap-4 p-5 rounded-3xl bg-primary/5 border border-primary/10">
+            <div className="flex items-center gap-4 p-8 rounded-[2rem] bg-black/5 border border-black/5">
               <Info className="w-5 h-5 text-primary shrink-0" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Active Terminal: <span className="font-mono font-bold text-primary">wa.me/{localSettings.whatsappNumber.replace(/\D/g, "")}</span>. Orders will be routed here for final authorization.
+              <p className="text-[10px] font-black uppercase tracking-widest text-black/40 leading-relaxed italic">
+                Active Uplink: <span className="text-primary">ARCHIVE . 0x{localSettings.whatsappNumber.replace(/\D/g, "")}</span>
               </p>
             </div>
           </div>
@@ -196,71 +179,60 @@ function AdminSettingsContent() {
         {/* Banner */}
         <SettingBox
           icon={Megaphone}
-          title="Announcements"
-          description="Manage the high-visibility bulletin bar shown at the system apex."
+          title="APEX ANNOUNCEMENTS"
+          description="High-visibility bulletin deployed across all terminal apex sectors."
         >
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="banner-msg" className="text-[10px] font-black uppercase tracking-widest text-primary">Apex Bulletin</Label>
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Bulletin Script</Label>
               <Textarea
-                id="banner-msg"
                 value={localSettings.bannerMessage}
                 onChange={(e) => updateField("bannerMessage", e.target.value)}
-                placeholder="e.g. 🆕 SEASON 03 DROPPED. FREE SHIPPING ON ALL AUTHORIZED ORDERS."
-                rows={3}
-                className="bg-muted/20 border-border/40 rounded-[2rem] focus-visible:ring-primary/10 p-5 text-sm font-bold resize-none leading-relaxed"
+                className="min-h-[120px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
               />
             </div>
 
-            <div className="space-y-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 text-center">Visual Simulation</p>
-              <div
-                className="w-full px-6 py-4 rounded-[2rem] bg-foreground text-background text-[10px] font-black uppercase tracking-[0.2em] text-center shadow-inner"
-              >
-                {localSettings.bannerMessage || "No message currently deployed"}
+            <div className="space-y-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">Visual Simulation</p>
+              <div className="w-full px-8 py-4 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-[0.3em] text-center shadow-2xl">
+                {localSettings.bannerMessage || "PROTOCOL SILENT"}
               </div>
             </div>
           </div>
         </SettingBox>
       </div>
 
-      {/* Floating Action Bar (Conditional) */}
+      {/* Floating Save */}
       <AnimatePresence>
         {isDirty && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md lg:left-[calc(50%+8rem)]"
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-6"
           >
-            <div className="bg-foreground/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-4 shadow-2xl flex items-center justify-between gap-4">
-              <div className="pl-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Changes Pending</p>
-                <p className="text-[9px] text-white/50 uppercase tracking-widest">Configuration not yet saved</p>
+            <div className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-full p-4 shadow-2xl flex items-center justify-between gap-6">
+              <div className="pl-6">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">MANIFEST MODIFIED</p>
+                <p className="text-[8px] text-white/30 uppercase tracking-[0.3em]">Signature pending synchronization</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={handleReset} className="h-12 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/10">
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" onClick={handleReset} className="h-12 rounded-full px-8 text-[9px] font-black uppercase tracking-widest text-white hover:bg-white/5">
                   Discard
                 </Button>
                 <Button
                   onClick={handleSave}
                   disabled={updateMutation.isPending}
-                  className="h-12 rounded-2xl px-8 text-[10px] font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                  className="h-12 rounded-full px-10 text-[9px] font-black uppercase tracking-widest bg-primary text-white hover:scale-105 transition-all shadow-xl"
                 >
-                  {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Save Architecture
+                  {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  SYNC ARCHITECTURE
                 </Button>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="pt-10 flex items-center justify-center gap-10 opacity-20 grayscale">
-        <ShieldCheck className="w-6 h-6" />
-        <Zap className="w-6 h-6" />
-        <Store className="w-6 h-6" />
-      </div>
     </div>
   );
 }
@@ -269,7 +241,7 @@ export default function AdminSettingsPage() {
   return (
     <Layout>
       <ProtectedRoute adminOnly>
-        <div className="bg-background min-h-[calc(100vh-4rem)]">
+        <div className="bg-white min-h-screen">
           <AdminLayout>
             <AdminSettingsContent />
           </AdminLayout>

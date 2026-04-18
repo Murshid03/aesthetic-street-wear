@@ -20,16 +20,18 @@ import {
   ChevronRight,
   AlertCircle,
   ArrowRight,
+  Shield,
+  Activity,
+  Layers
 } from "lucide-react";
 import { motion } from "motion/react";
 
-// ─── Shared Status Config ────────────────────────────────────────────────────────
 export const STATUS_META: Record<OrderStatus, { color: string; icon: any; bg: string; badge: string }> = {
-  Pending: { color: "text-amber-700", bg: "bg-amber-50", badge: "bg-amber-100 text-amber-700 border-amber-200", icon: Clock },
+  Pending: { color: "text-amber-500", bg: "bg-amber-500/10", badge: "bg-amber-500/10 text-amber-600 border-amber-200/20", icon: Clock },
   Confirmed: { color: "text-primary", bg: "bg-primary/10", badge: "bg-primary/10 text-primary border-primary/20", icon: CheckCircle2 },
-  Shipped: { color: "text-blue-700", bg: "bg-blue-50", badge: "bg-blue-100 text-blue-700 border-blue-200", icon: Truck },
-  Delivered: { color: "text-emerald-700", bg: "bg-emerald-50", badge: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: Star },
-  Cancelled: { color: "text-rose-700", bg: "bg-rose-50", badge: "bg-rose-100 text-rose-700 border-rose-200", icon: AlertCircle },
+  Shipped: { color: "text-blue-500", bg: "bg-blue-500/10", badge: "bg-blue-500/10 text-blue-600 border-blue-200/20", icon: Truck },
+  Delivered: { color: "text-emerald-500", bg: "bg-emerald-500/10", badge: "bg-emerald-500/10 text-emerald-600 border-emerald-200/20", icon: Star },
+  Cancelled: { color: "text-rose-500", bg: "bg-rose-500/10", badge: "bg-rose-500/10 text-rose-600 border-rose-200/20", icon: AlertCircle },
 };
 
 export const STATUS_OPTIONS: OrderStatus[] = ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"];
@@ -38,70 +40,65 @@ export function formatDate(ts: any) {
   return new Date(ts).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export function formatTime(ts: any) {
-  return new Date(ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
-}
-
-// ─── Nav Items ────────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { icon: BarChart3, label: "Dashboard", to: "/admin" },
-  { icon: Package, label: "Products", to: "/admin/products" },
-  { icon: ShoppingBag, label: "Orders", to: "/admin/orders" },
-  { icon: Settings, label: "Settings", to: "/admin/settings" },
+  { icon: BarChart3, label: "COMMAND", to: "/admin" },
+  { icon: Package, label: "INVENTORY", to: "/admin/products" },
+  { icon: ShoppingBag, label: "MANIFESTS", to: "/admin/orders" },
+  { icon: Settings, label: "PROTOCOLS", to: "/admin/settings" },
 ];
 
-// ─── Admin Sidebar ────────────────────────────────────────────────────────────────
 function AdminSidebar() {
   return (
-    <aside className="w-56 shrink-0 hidden lg:flex flex-col gap-1 py-6">
-      <div className="px-3 mb-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
+    <aside className="w-64 shrink-0 hidden lg:flex flex-col gap-1 py-10 sticky top-24 self-start">
+      <div className="px-6 mb-12">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center shadow-xl">
+            <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="text-xs font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Admin Panel</p>
-            <p className="text-[10px] text-primary font-semibold tracking-widest uppercase">Control Center</p>
+            <p className="text-[10px] font-black text-black uppercase tracking-[0.2em]">ADMIN PANEL</p>
+            <p className="text-[11px] text-primary font-black tracking-widest uppercase italic">V.2.6.0</p>
           </div>
         </div>
       </div>
-      {NAV_ITEMS.map((item) => (
-        <Link
-          key={item.label}
-          to={item.to}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-200"
-          activeProps={{ className: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-accent text-primary transition-all duration-200" }}
-          activeOptions={item.to === "/admin" ? { exact: true } : undefined}
-        >
-          <item.icon className="w-4 h-4 shrink-0" />
-          {item.label}
-        </Link>
-      ))}
-    </aside>
-  );
-}
-
-// ─── Admin Layout ────────────────────────────────────────────────────────────────
-export function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="container mx-auto container-px py-6">
-      {/* Mobile navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-4 lg:hidden scrollbar-none">
+      <div className="space-y-2 px-2">
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.label}
             to={item.to}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-card border border-border text-muted-foreground transition-all shrink-0"
-            activeProps={{ className: "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-primary text-primary-foreground border-transparent shrink-0 shadow-md shadow-primary/20" }}
+            className="flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-black/40 hover:bg-black/5 hover:text-black transition-all duration-300 group"
+            activeProps={{ className: "flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] bg-black text-white shadow-xl translate-x-1" }}
             activeOptions={item.to === "/admin" ? { exact: true } : undefined}
           >
-            <item.icon className="w-3.5 h-3.5" />
+            <item.icon className="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform" />
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+export function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="container mx-auto container-px py-10">
+      {/* Mobile navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-6 mb-8 lg:hidden no-scrollbar">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.label}
+            to={item.to}
+            className="flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white border border-black/5 text-black/40 transition-all shrink-0"
+            activeProps={{ className: "flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-black text-white border-transparent shrink-0 shadow-xl" }}
+            activeOptions={item.to === "/admin" ? { exact: true } : undefined}
+          >
+            <item.icon className="w-4 h-4" />
             {item.label}
           </Link>
         ))}
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-12 xl:gap-20">
         <AdminSidebar />
         <div className="flex-1 min-w-0">{children}</div>
       </div>
@@ -109,30 +106,31 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ─── Stat Card ───────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, colorClass, delay, sub, highlight }: {
-  label: string; value: number | string; icon: any; colorClass: string; delay: number; sub: string; highlight?: boolean;
-}) {
+function StatCard({ label, value, icon: Icon, bgClass, textClass, delay, sub, highlight }: any) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`card-base p-5 rounded-2xl ${highlight ? "border-primary/30 bg-accent/30" : ""}`}
+      transition={{ duration: 0.5, delay }}
+      className={`p-8 rounded-[2rem] bg-white border border-black/5 transition-all duration-500 hover:shadow-2xl relative overflow-hidden group ${highlight ? "ring-2 ring-primary ring-offset-4 ring-offset-white" : ""}`}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorClass}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        <span className="text-xs font-medium text-muted-foreground">{sub}</span>
+      <div className={`absolute -right-4 -bottom-4 w-24 h-24 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity`}>
+        <Icon className="w-full h-full" />
       </div>
-      <p className="text-2xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
-      <p className="text-xs text-muted-foreground mt-1 font-medium">{label}</p>
+      <div className="relative z-10">
+        <div className="flex items-center gap-4 mb-8">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${bgClass} ${textClass} shadow-inner`}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20">{sub}</span>
+        </div>
+        <p className="text-4xl font-black text-black leading-none mb-2" style={{ fontFamily: "var(--font-display)" }}>{value}</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">{label}</p>
+      </div>
     </motion.div>
   );
 }
 
-// ─── Dashboard Content ────────────────────────────────────────────────────────────
 function AdminDashboardContent() {
   const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
     queryKey: ["admin_products_stat"],
@@ -153,143 +151,138 @@ function AdminDashboardContent() {
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   ).slice(0, 6);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-
   const stats = [
-    { label: "Total Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, sub: "Confirmed orders", icon: TrendingUp, colorClass: "bg-emerald-100 text-emerald-700", delay: 0 },
-    { label: "Products", value: products.length, sub: "In catalog", icon: Package, colorClass: "bg-blue-100 text-blue-700", delay: 0.07 },
-    { label: "Total Orders", value: orders.length, sub: "All time", icon: ShoppingBag, colorClass: "bg-purple-100 text-purple-700", delay: 0.14 },
-    { label: "Pending Orders", value: pendingOrders.length, sub: "Needs attention", icon: Clock, colorClass: "bg-amber-100 text-amber-700", delay: 0.21, highlight: pendingOrders.length > 0 },
+    { label: "NET VALUATION", value: `₹${totalRevenue.toLocaleString("en-IN")}`, sub: "TOTAL FLOW", icon: TrendingUp, bgClass: "bg-emerald-500/10", textClass: "text-emerald-600", delay: 0 },
+    { label: "ACTIVE ITEMS", value: products.length, sub: "INVENTORY", icon: Package, bgClass: "bg-blue-500/10", textClass: "text-blue-600", delay: 0.1 },
+    { label: "MANIFESTS", value: orders.length, sub: "HISTORICAL", icon: ShoppingBag, bgClass: "bg-purple-500/10", textClass: "text-purple-600", delay: 0.2 },
+    { label: "ATTENTION", value: pendingOrders.length, sub: "PENDING", icon: Clock, bgClass: "bg-amber-500/20", textClass: "text-amber-600", delay: 0.3, highlight: pendingOrders.length > 0 },
   ];
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-32">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      <div className="flex flex-col items-center justify-center py-40 gap-6">
+        <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Master Terminal...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
       {/* Header */}
-      <div>
-        <p className="text-label text-primary mb-1">Overview</p>
-        <h1 className="text-heading">{greeting} 👋</h1>
-        <p className="text-sm text-muted-foreground mt-1">Here's what's happening with your store today.</p>
-      </div>
-
-      {/* Pending Orders Alert */}
-      {pendingOrders.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-2xl"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
-              <Clock className="w-4 h-4 text-amber-700" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-amber-900">
-                {pendingOrders.length} order{pendingOrders.length > 1 ? "s" : ""} awaiting your action
-              </p>
-              <p className="text-xs text-amber-700">Confirm or cancel orders placed via WhatsApp</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-[2px] bg-primary" />
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Overview . Command</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>CONSOLE <br /> <span className="text-primary italic">TERMINAL</span></h1>
+        </div>
+        <div className="hidden xl:flex items-center gap-8 text-right">
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Operational Pulse</span>
+            <div className="flex items-center gap-2 justify-end">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-widest">Systems Nominal</span>
             </div>
           </div>
-          <Link
-            to="/admin/orders"
-            className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors"
-          >
-            Review <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </motion.div>
-      )}
+        </div>
+      </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="card-base rounded-2xl p-6">
-          <h2 className="text-subheading mb-5">Quick Actions</h2>
-          <div className="space-y-2">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+        {/* Recent Orders */}
+        <div className="xl:col-span-8 space-y-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Activity className="w-5 h-5 text-primary" />
+              <h2 className="text-2xl font-black uppercase tracking-tight">RECENT MANIFESTS</h2>
+            </div>
+            <Link to="/admin/orders" className="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 rounded-full border border-black/5 hover:bg-black hover:text-white transition-all">
+              Full Archive
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {recentOrders.map((order) => {
+              const meta = STATUS_META[order.status] || STATUS_META.Pending;
+              const total = order.totalAmount || order.items.reduce((s, x) => s + x.price * x.quantity, 0);
+              const userName = typeof order.user === "object" ? (order.user as any).name || (order.user as any).email : order.customerName || "Vanguard Member";
+              return (
+                <motion.div
+                  key={order._id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="p-6 rounded-3xl bg-white border border-black/5 hover:shadow-xl transition-all duration-500 group"
+                >
+                  <div className="flex flex-col sm:flex-row items-center gap-8">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color} group-hover:scale-105 transition-transform`}>
+                      <meta.icon className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-center sm:text-left space-y-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-black truncate">{userName}</p>
+                      <div className="flex items-center justify-center sm:justify-start gap-3">
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-black/20">#{order._id?.slice(-8).toUpperCase()}</span>
+                        <span className="w-1 h-1 rounded-full bg-black/10" />
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-black/20">{formatDate(order.createdAt)}</span>
+                      </div>
+                    </div>
+                    <div className="text-center sm:text-right space-y-2">
+                      <p className="text-xl font-black text-black">₹{total.toLocaleString("en-IN")}</p>
+                      <Badge className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-none ${meta.badge}`}>
+                        {order.status}
+                      </Badge>
+                    </div>
+                    <Link to="/admin/orders" className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center text-black/20 hover:bg-black hover:text-white transition-all shrink-0">
+                      <ChevronRight className="w-5 h-5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quick Config */}
+        <div className="xl:col-span-4 space-y-10">
+          <div className="flex items-center gap-4">
+            <Layers className="w-5 h-5 text-primary" />
+            <h2 className="text-2xl font-black uppercase tracking-tight">TERMINALS</h2>
+          </div>
+          <div className="grid gap-4">
             {NAV_ITEMS.slice(1).map((item) => (
               <Link
                 key={item.label}
                 to={item.to}
-                className="flex items-center justify-between p-3.5 rounded-xl bg-secondary hover:bg-accent hover:text-accent-foreground transition-all duration-200 group"
+                className="p-8 rounded-[2rem] bg-black text-white hover:bg-primary transition-all duration-500 group flex items-start justify-between relative overflow-hidden shadow-xl"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center group-hover:bg-white transition-colors shadow-sm">
-                    <item.icon className="w-4 h-4 text-primary" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rotate-45 translate-x-12 -translate-y-12" />
+                <div className="relative z-10">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-6 group-hover:bg-white group-hover:text-black transition-all">
+                    <item.icon className="w-5 h-5" />
                   </div>
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <p className="text-[11px] font-black uppercase tracking-[0.3em]">{item.label}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mt-1">Full sector access</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="w-5 h-5 text-white/20 group-hover:translate-x-2 group-hover:text-white transition-all" />
               </Link>
             ))}
           </div>
-        </div>
-
-        {/* Recent Orders */}
-        <div className="card-base rounded-2xl p-6 xl:col-span-2">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-subheading">Recent Orders</h2>
-            <Link to="/admin/orders" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
-              View all <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {recentOrders.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl">
-              <Clock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No orders yet</p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {recentOrders.map((order, i) => {
-                const meta = STATUS_META[order.status] || STATUS_META.Pending;
-                const total = order.totalAmount || order.items.reduce((s, x) => s + x.price * x.quantity, 0);
-                const userName = typeof order.user === "object" ? (order.user as any).name || (order.user as any).email : "Customer";
-                return (
-                  <div key={order._id}>
-                    <div className="flex items-center gap-3 py-2.5 px-2 rounded-xl hover:bg-secondary transition-colors">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color}`}>
-                        <meta.icon className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{userName}</p>
-                        <p className="text-xs text-muted-foreground">#{order._id?.slice(-6).toUpperCase()} · {formatDate(order.createdAt)}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-foreground">₹{total.toLocaleString("en-IN")}</p>
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${meta.badge}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
-                    {i < recentOrders.length - 1 && <Separator className="mx-2" />}
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Page Export ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   return (
     <Layout>
       <ProtectedRoute adminOnly>
-        <div className="bg-background min-h-[calc(100vh-4rem)]">
+        <div className="bg-white min-h-screen">
           <AdminLayout>
             <AdminDashboardContent />
           </AdminLayout>

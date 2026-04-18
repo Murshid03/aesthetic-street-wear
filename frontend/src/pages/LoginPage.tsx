@@ -1,19 +1,20 @@
 import { useAuth } from "@/hooks/use-auth";
 import api from "@/lib/api";
 import { useNavigate, Link, useSearch } from "@tanstack/react-router";
-import { Lock, Mail, User, LogIn, ArrowLeft, Shield, Loader2, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, User, LogIn, ArrowLeft, Shield, Loader2, Eye, EyeOff, ChevronRight, Package } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 type Mode = "login" | "register" | "forgot" | "otp" | "reset";
 
 const modeConfig = {
-  login: { title: "Welcome Back", sub: "Sign in to your account" },
-  register: { title: "Create Account", sub: "Join the street-wear collective" },
-  forgot: { title: "Forgot Password", sub: "Enter your email to receive an OTP" },
-  otp: { title: "Verify Code", sub: "Enter the 6-digit code we sent you" },
-  reset: { title: "New Password", sub: "Create a strong new password" },
+  login: { title: "AUTHENTICATE", sub: "Enter your credentials to access the archive." },
+  register: { title: "JOIN COLLECTIVE", sub: "Secure your position in the vanguard." },
+  forgot: { title: "RECOVERY", sub: "Request an access fragment via email." },
+  otp: { title: "VERIFICATION", sub: "Enter the sequence sent to your terminal." },
+  reset: { title: "RECONFIGURATION", sub: "Establish a new security signature." },
 };
 
 export default function LoginPage() {
@@ -40,358 +41,288 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate, isAdminLogin, form.email]);
 
-  // ── Login / Register ──────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (mode === "login") {
         await login(form.email.trim().toLowerCase(), form.password);
-        toast.success(isAdminLogin ? "Access Granted" : "Welcome back!", {
-          description: isAdminLogin ? "Administrative privileges authorized." : "You're now signed in.",
-        });
+        toast.success(isAdminLogin ? "Access Granted" : "Session Initialized");
       } else {
         await register(form.name.trim(), form.email.trim().toLowerCase(), form.password);
-        toast.success("Account Created!", {
-          description: "You're now part of the collective.",
-        });
+        toast.success("Identity Registered");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Authentication failed");
+      toast.error(err.response?.data?.error || "Auth Error");
     }
   };
 
-  // ── Forgot Password ───────────────────────────────────────────────────────
   const handleForgotPassword = async () => {
     const email = form.email.trim().toLowerCase();
-    if (!email) return toast.error("Please enter your email address");
+    if (!email) return toast.error("Identity Required");
     setResetLoading(true);
     try {
       await api.post("/auth/forgot-password", { email });
-      toast.success("OTP Sent!", { description: "Check your email for the 6-digit code." });
       setMode("otp");
+      toast.success("Sequence Dispatched");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to send recovery code");
+      toast.error(err.response?.data?.error || "Dispatch Failed");
     } finally {
       setResetLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (otp.length !== 6) return toast.error("Please enter the full 6-digit code");
+    if (otp.length !== 6) return toast.error("Invalid Sequence");
     const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
       await api.post("/auth/verify-otp", { email, otp });
-      toast.success("Code Verified!", { description: "Now set your new password." });
       setMode("reset");
+      toast.success("Identity Verified");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Invalid or expired code");
+      toast.error(err.response?.data?.error || "Sequence Mismatch");
     } finally {
       setResetLoading(false);
     }
   };
 
   const handleResetPassword = async () => {
-    if (newPassword.length < 6) return toast.error("Password must be at least 6 characters");
+    if (newPassword.length < 6) return toast.error("Insecure Signature");
     const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
       await api.post("/auth/reset-password", { email, otp, newPassword });
-      toast.success("Password Updated!", { description: "You can now sign in with your new password." });
       setMode("login");
-      setOtp("");
-      setNewPassword("");
+      toast.success("Signature Updated");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to reset password");
+      toast.error(err.response?.data?.error || "Reconfig Failed");
     } finally {
       setResetLoading(false);
     }
   };
 
   const config = isAdminLogin
-    ? { title: "Admin Sign In", sub: "Restricted access — authorized personnel only" }
+    ? { title: "ADMIN ACCESS", sub: "Restricted sector. Authorized signatures only." }
     : modeConfig[mode];
 
-  const isRecoveryMode = mode === "forgot" || mode === "otp" || mode === "reset";
   const loading = isLoading || resetLoading;
 
   return (
-    <div className="min-h-screen bg-secondary flex flex-col">
-      {/* Top bar */}
-      <div className="p-4 sm:p-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Store
-        </Link>
+    <div className="min-h-screen bg-white flex flex-col md:flex-row overflow-hidden">
+      {/* ── Visual Side ────────────────────────────────────────────────── */}
+      <div className="hidden md:flex md:w-1/2 bg-[#0a0a0a] relative items-center justify-center p-20 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#6d28d9_1.5px,transparent_1.5px)] bg-[size:40px_40px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 blur-[180px] rounded-full opacity-50" />
+
+        <div className="relative z-10 text-center space-y-8">
+          <div className="inline-flex items-center gap-4 mb-4">
+            <div className="w-12 h-px bg-white/10" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Vanguard Access</span>
+            <div className="w-12 h-px bg-white/10" />
+          </div>
+          <h2 className="text-6xl font-black text-white uppercase tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
+            THE <br /> <span className="text-primary italic">SIGNATURE</span> <br /> GATEWAY
+          </h2>
+          <p className="text-white/20 text-xs font-black uppercase tracking-[0.3em] max-w-xs mx-auto">Establishing a new standard of architectural streetwear excellence.</p>
+        </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md"
-        >
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2.5 mb-6">
-              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-base">A</span>
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-bold text-foreground leading-tight" style={{ fontFamily: "Syne, sans-serif" }}>Aesthetic</p>
-                <p className="text-[10px] text-primary font-semibold tracking-widest uppercase">Street Wear</p>
-              </div>
-            </Link>
+      {/* ── Form Side ──────────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col p-8 sm:p-20 relative bg-white min-h-screen">
+        <div className="flex items-center justify-between mb-20">
+          <Link to="/" className="group flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-black/30 group-hover:text-black transition-colors">Return</span>
+          </Link>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={mode + String(isAdminLogin)}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                {isAdminLogin && (
-                  <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
-                    <Shield className="w-3 h-3 text-primary" />
-                    <span className="text-xs font-semibold text-primary">Admin Access</span>
-                  </div>
-                )}
-                <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
-                  {config.title}
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">{config.sub}</p>
-              </motion.div>
-            </AnimatePresence>
+          <div className="text-right">
+            <p className="text-[9px] font-black text-black/20 uppercase tracking-widest">Protocol 2.6.0</p>
+            <p className="text-[10px] font-black text-black italic">AS-COLLECTIVE</p>
           </div>
+        </div>
 
-          {/* Card */}
-          <div className="card-elevated rounded-3xl p-6 sm:p-8">
+        <div className="max-w-md w-full mx-auto flex-1 flex flex-col justify-center">
+          <div className="mb-12">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mode}
-                initial={{ opacity: 0, x: 12 }}
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.4 }}
               >
-                {/* ── LOGIN / REGISTER form ── */}
-                {(mode === "login" || mode === "register") && (
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {mode === "register" && (
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Full Name</label>
-                        <div className="relative">
-                          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                          <input
-                            type="text"
-                            required
-                            placeholder="Your name"
-                            value={form.name}
-                            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                            className="w-full h-11 pl-10 pr-4 bg-secondary border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                          />
-                        </div>
-                      </div>
-                    )}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-[2px] bg-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Sector</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                  {config.title}
+                </h1>
+                <p className="text-black/40 text-xs md:text-sm font-medium leading-relaxed" style={{ fontFamily: "var(--font-secondary)" }}>
+                  {config.sub}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email Address</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                        <input
-                          type="email"
-                          required
-                          placeholder="you@example.com"
-                          value={form.email}
-                          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                          className="w-full h-11 pl-10 pr-4 bg-secondary border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Password</label>
-                        {mode === "login" && !isAdminLogin && (
-                          <button
-                            type="button"
-                            onClick={() => setMode("forgot")}
-                            className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
-                          >
-                            Forgot password?
-                          </button>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          required
-                          placeholder="••••••••"
-                          value={form.password}
-                          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                          className="w-full h-11 pl-10 pr-10 bg-secondary border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((v) => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="btn-primary w-full h-11 flex items-center justify-center gap-2 mt-2"
-                    >
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <LogIn className="w-4 h-4" />
-                          {mode === "login"
-                            ? isAdminLogin ? "Sign In as Admin" : "Sign In"
-                            : "Create Account"}
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-
-                {/* ── FORGOT PASSWORD ── */}
-                {mode === "forgot" && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email Address</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                        <input
-                          type="email"
-                          placeholder="you@example.com"
-                          value={form.email}
-                          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                          className="w-full h-11 pl-10 pr-4 bg-secondary border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      onClick={handleForgotPassword}
-                      disabled={loading}
-                      className="btn-primary w-full h-11 flex items-center justify-center gap-2"
-                    >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send OTP"}
-                    </button>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={mode}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-5"
+              >
+                {mode === "register" && (
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Full Identity</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter Designation"
+                      value={form.name}
+                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                    />
                   </div>
                 )}
 
-                {/* ── OTP VERIFICATION ── */}
+                {(mode === "login" || mode === "register" || mode === "forgot") && (
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Communication Hash (Email)</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="archival@sector.com"
+                      value={form.email}
+                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                    />
+                  </div>
+                )}
+
+                {(mode === "login" || mode === "register") && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Security Signature</label>
+                      {mode === "login" && !isAdminLogin && (
+                        <button type="button" onClick={() => setMode("forgot")} className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-black transition-colors">Lost Sequence?</button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        placeholder="••••••••"
+                        value={form.password}
+                        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-black/20 hover:text-black transition-all"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {mode === "otp" && (
                   <div className="space-y-4">
-                    <div className="p-3 bg-accent rounded-xl text-center">
-                      <p className="text-xs text-accent-foreground font-medium">
-                        OTP sent to <strong>{form.email}</strong>
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">6-Digit Code</label>
-                      <input
-                        type="text"
-                        maxLength={6}
-                        placeholder="000000"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                        className="w-full h-14 px-4 bg-secondary border border-border rounded-xl text-center text-2xl font-bold tracking-[0.5em] text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      />
-                    </div>
-                    <button
-                      onClick={handleVerifyOtp}
-                      disabled={loading}
-                      className="btn-primary w-full h-11 flex items-center justify-center gap-2"
-                    >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify Code"}
-                    </button>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">6-Digit Hash Fragment</label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="000 000"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                      className="w-full h-20 px-4 bg-black/5 rounded-2xl text-center text-4xl font-black tracking-[0.5em] focus:border-black border-2 border-transparent transition-all outline-none"
+                    />
                   </div>
                 )}
 
-                {/* ── NEW PASSWORD ── */}
                 {mode === "reset" && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">New Password</label>
-                      <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                        <input
-                          type={showNewPassword ? "text" : "password"}
-                          placeholder="Min. 6 characters"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full h-11 pl-10 pr-10 bg-secondary border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowNewPassword((v) => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">New Security Signature</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-black/20 hover:text-black transition-all"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
-                    <button
-                      onClick={handleResetPassword}
-                      disabled={loading}
-                      className="btn-primary w-full h-11 flex items-center justify-center gap-2"
-                    >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Password"}
-                    </button>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
-            {/* Footer links */}
-            <div className="mt-6 pt-5 border-t border-border space-y-3">
-              {/* Login ↔ Register toggle */}
-              {!isAdminLogin && !isRecoveryMode && (
-                <p className="text-center text-sm text-muted-foreground">
-                  {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-                  <button
-                    onClick={() => { setMode(mode === "login" ? "register" : "login"); }}
-                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                  >
-                    {mode === "login" ? "Sign Up" : "Sign In"}
-                  </button>
-                </p>
-              )}
-
-              {/* Return to login from recovery modes */}
-              {isRecoveryMode && (
-                <p className="text-center text-sm text-muted-foreground">
-                  <button
-                    onClick={() => { setMode("login"); setOtp(""); setNewPassword(""); }}
-                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                  >
-                    ← Back to Sign In
-                  </button>
-                </p>
-              )}
-
-              {isAdminLogin && (
-                <p className="text-center text-xs text-muted-foreground">
-                  Privileged session — all activity is logged
-                </p>
+            <div className="pt-6">
+              {mode === "login" || mode === "register" ? (
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-16 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
+                >
+                  <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${loading ? "-translate-y-16" : ""}`}>
+                    {mode === "login" ? "INITIALIZE SESSION" : "REGISTER IDENTITY"}
+                    <ChevronRight className="w-4 h-4" />
+                  </span>
+                  <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${loading ? "translate-y-0" : "translate-y-16"}`}>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </span>
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={mode === "forgot" ? handleForgotPassword : mode === "otp" ? handleVerifyOtp : handleResetPassword}
+                  disabled={loading}
+                  className="w-full h-16 rounded-full bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em]"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === "forgot" ? "DISPATCH OTP" : mode === "otp" ? "VERIFY SEQUENCE" : "APPLY SIGNATURE"}
+                </Button>
               )}
             </div>
+          </form>
+
+          <div className="mt-12 pt-8 border-t border-black/5 text-center">
+            {!isAdminLogin && (mode === "login" || mode === "register") && (
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">
+                {mode === "login" ? "Identity unknown? " : "Already authenticated? "}
+                <button
+                  onClick={() => setMode(mode === "login" ? "register" : "login")}
+                  className="text-primary hover:text-black transition-colors"
+                >
+                  {mode === "login" ? "Register Identity" : "Initialize Session"}
+                </button>
+              </p>
+            )}
+            {(mode === "otp" || mode === "reset" || mode === "forgot") && (
+              <button
+                onClick={() => setMode("login")}
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors"
+              >
+                Return to Authentication Portal
+              </button>
+            )}
+            {isAdminLogin && (
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary italic">PRIVILEGED ACCESS SECTOR</p>
+            )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

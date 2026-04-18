@@ -14,97 +14,85 @@ import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import type { Product } from "@/types";
 import { Link } from "@tanstack/react-router";
-import { Gem, Heart, ShoppingBag, SlidersHorizontal, Loader2 } from "lucide-react";
+import { Heart, ShoppingBag, ShoppingCart, SlidersHorizontal, Package, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const wished = isInWishlist(product._id!);
+  const [adding, setAdding] = useState(false);
+  const pid = product._id || (product as any).id;
+  const wished = isInWishlist(pid);
+
+  const handleAddToCart = () => {
+    setAdding(true);
+    addToCart(product, product.sizes[0] ?? "One Size");
+    setTimeout(() => {
+      setAdding(false);
+      toast.success("Added to cart", { description: product.name });
+    }, 900);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: (index % 4) * 0.08 }}
-      className="card-elevated group overflow-hidden flex flex-col transition-smooth hover:shadow-md hover:-translate-y-0.5"
-    >
-      <div className="relative overflow-hidden bg-muted aspect-square">
-        <Link to="/product/$id" params={{ id: product._id! }}>
+    <div className="group flex flex-col overflow-hidden bg-white transition-all duration-300">
+      <div className="relative aspect-[3/4.2] overflow-hidden bg-muted rounded-xl">
+        <Link to="/product/$id" params={{ id: String(pid) }} className="block h-full w-full">
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
-                "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
+                "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=800";
             }}
           />
         </Link>
         <button
-          type="button"
-          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-smooth hover:bg-card shadow-sm hover:scale-110"
-          onClick={() =>
-            wished ? removeFromWishlist(product._id!) : addToWishlist(product)
-          }
+          onClick={() => wished ? removeFromWishlist(pid) : addToWishlist(product)}
+          className={`absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm
+            ${wished ? "bg-primary text-white" : "bg-white/80 backdrop-blur-sm text-black hover:bg-white"}`}
         >
-          <Heart
-            className={`w-4 h-4 transition-colors ${wished ? "fill-primary text-primary" : "text-muted-foreground"}`}
-          />
+          <Heart className={`w-3.5 h-3.5 ${wished ? "fill-current" : ""}`} />
         </button>
-        {product.stockQuantity <= 5 && (
-          <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px] font-semibold">
-            Low Stock
-          </Badge>
-        )}
-      </div>
-      <div className="p-4 flex flex-col flex-1 gap-2">
-        <Badge
-          variant="outline"
-          className="self-start text-primary border-primary/30 text-[10px] px-2 py-0.5 font-semibold"
-        >
-          Accessories
-        </Badge>
-        <div className="flex-1 min-w-0">
-          <Link to="/product/$id" params={{ id: product._id! }}>
-            <h3 className="font-semibold text-sm text-foreground leading-snug hover:text-primary transition-colors line-clamp-2">
-              {product.name}
-            </h3>
-          </Link>
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            {product.sizes.join(" · ")}
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-2 pt-1">
-          <span className="font-display font-bold text-lg text-foreground">
-            ₹{product.price}
-          </span>
+        <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
-            size="sm"
-            className="btn-primary text-xs h-8 px-3"
-            onClick={() => {
-              addToCart(product, product.sizes[0] ?? "One Size");
-              toast.success("Added to cart!", { description: product.name });
-            }}
+            onClick={handleAddToCart}
+            disabled={adding || product.stockQuantity <= 0}
+            className="w-full bg-white text-black hover:bg-black hover:text-white rounded-lg h-10 text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
           >
-            <ShoppingBag className="w-3.5 h-3.5 mr-1.5" />
-            Add
+            {adding ? <Package className="w-3 h-3" /> : <ShoppingCart className="w-3 h-3" />}
+            {adding ? "Added" : product.stockQuantity <= 0 ? "Sold Out" : "Add to Cart"}
           </Button>
         </div>
       </div>
-    </motion.div>
+      <div className="py-4 space-y-1">
+        <Link to="/product/$id" params={{ id: String(pid) }}>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-black hover:text-primary transition-colors line-clamp-1" style={{ fontFamily: "var(--font-accent)" }}>
+            {product.name}
+          </h3>
+        </Link>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-black/40 tracking-tighter">₹{product.price.toLocaleString("en-IN")}</span>
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">Ltd . Ed</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-const SORT_OPTIONS = [
-  { value: "newest", label: "Newest First" },
-  { value: "price-asc", label: "Price: Low → High" },
-  { value: "price-desc", label: "Price: High → Low" },
-];
+function SkeletonCard() {
+  return (
+    <div className="space-y-4">
+      <div className="skeleton aspect-[3/4.2] rounded-xl" />
+      <div className="space-y-2">
+        <div className="skeleton h-3 rounded-lg w-2/3" />
+        <div className="skeleton h-2 rounded-lg w-1/3" />
+      </div>
+    </div>
+  );
+}
 
 export default function AccessoriesPage() {
   const [sortBy, setSortBy] = useState<string>("newest");
@@ -118,85 +106,67 @@ export default function AccessoriesPage() {
   });
 
   const accessories = useMemo(() => {
-    const filtered = allProducts.filter((p) => p.category === "Accessories");
+    let filtered = allProducts.filter((p) => p.category === "Accessories");
     if (sortBy === "price-asc")
       return [...filtered].sort((a, b) => a.price - b.price);
     if (sortBy === "price-desc")
       return [...filtered].sort((a, b) => b.price - a.price);
     return [...filtered].sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     );
   }, [allProducts, sortBy]);
 
   return (
     <Layout>
-      {/* Category Header */}
-      <section className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-10 lg:py-14">
-          <nav
-            className="flex items-center gap-2 text-sm text-muted-foreground mb-5"
-            aria-label="breadcrumb"
-          >
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">Accessories</span>
-          </nav>
-          <div className="flex items-start gap-4">
-            <div className="hidden sm:flex w-12 h-12 rounded-xl bg-primary/10 items-center justify-center shrink-0">
-              <Gem className="w-6 h-6 text-primary" />
+      {/* ── Editorial Header ────────────────────────────────────────── */}
+      <section className="pt-32 pb-20 bg-white border-b border-black/5 overflow-hidden">
+        <div className="container mx-auto container-px">
+          <div className="max-w-4xl">
+            <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+              <span className="w-1 h-1 rounded-full bg-black/10" />
+              <span className="text-black/60">Archive</span>
+              <span className="w-1 h-1 rounded-full bg-black/10" />
+              <span className="text-primary italic">Accessories</span>
+            </nav>
+
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-12 h-[2px] bg-primary" />
+              <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
             </div>
-            <div>
-              <h1 className="font-display text-3xl lg:text-5xl font-bold tracking-tight mb-3">
-                Accessories
-              </h1>
-              <p className="text-muted-foreground max-w-xl leading-relaxed text-sm sm:text-base">
-                The finishing touches that define your signature style. Timeless
-                watches, belts, scarves, and more — each piece crafted to
-                complete your look with intention.
-              </p>
-              {isLoading ? (
-                <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Updating collection…
-                </div>
-              ) : (
-                <p className="text-sm text-primary font-semibold mt-3">
-                  {accessories.length} product
-                  {accessories.length !== 1 ? "s" : ""}
-                </p>
-              )}
-            </div>
+
+            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-10" style={{ fontFamily: "var(--font-display)" }}>
+              ESSENTIAL <br /> <span className="text-primary italic">FRAGMENTS</span>
+            </h1>
+
+            <p className="max-w-2xl text-black/40 text-base md:text-lg font-medium leading-relaxed border-l-2 border-black/5 pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
+              The final signatures of urban architecture. Meticulously crafted accessories designed to complete the contemporary silhouette.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Sort Bar */}
-      <div className="bg-muted/30 border-b border-border sticky top-0 z-10 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-3">
-          <div
-            className="flex items-center gap-3"
-          >
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span className="font-medium text-xs hidden sm:inline">
-                Sort:
-              </span>
+      {/* ── Modern Controls ─────────────────────────────────────────── */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[72px] z-30 py-4">
+        <div className="container mx-auto container-px">
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center gap-2 shrink-0">
+              <SlidersHorizontal className="w-3 h-3 text-black/30" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Hierarchy:</span>
             </div>
-            <div className="ml-auto">
+
+            <div className="flex items-center justify-end gap-6">
+              <div className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-black/20">
+                {accessories.length} Artifacts Found
+              </div>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger
-                  className="h-8 w-36 sm:w-40 text-xs"
-                >
-                  <SelectValue placeholder="Sort by" />
+                <SelectTrigger className="h-10 w-44 rounded-full border-black/5 bg-black/5 text-[10px] font-black uppercase tracking-widest focus:ring-primary/20">
+                  <SelectValue placeholder="Sort Hierarchy" />
                 </SelectTrigger>
-                <SelectContent>
-                  {SORT_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="rounded-2xl border-black/5 shadow-2xl">
+                  <SelectItem value="newest" className="text-[10px] font-black uppercase tracking-widest">Newest Arrival</SelectItem>
+                  <SelectItem value="price-asc" className="text-[10px] font-black uppercase tracking-widest">Price Low → High</SelectItem>
+                  <SelectItem value="price-desc" className="text-[10px] font-black uppercase tracking-widest">Price High → Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -204,40 +174,33 @@ export default function AccessoriesPage() {
         </div>
       </div>
 
-      {/* Product Grid */}
-      <section className="py-10 lg:py-14 bg-background">
-        <div className="container mx-auto px-4">
+      {/* ── Result Grid ─────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto container-px">
           {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-muted animate-pulse" />
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+              {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : accessories.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-              {accessories.map((p, i) => (
-                <ProductCard key={p._id} product={p} index={i} />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+              {accessories.map((p) => (
+                <ProductCard key={p._id} product={p} />
               ))}
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-24"
-            >
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <Gem className="w-8 h-8 text-muted-foreground" />
+            <div className="py-40 text-center">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-8">
+                <Sparkles className="w-10 h-10 text-black/20" />
               </div>
-              <h2 className="font-display text-xl font-bold mb-2">
-                No accessories available
-              </h2>
-              <p className="text-muted-foreground mb-6 text-sm">
-                Check back soon for new arrivals
-              </p>
-              <Button asChild variant="outline">
-                <Link to="/">Back to Home</Link>
+              <h2 className="text-3xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Sequence Missing</h2>
+              <p className="text-black/40 text-sm font-medium mb-10 max-w-sm mx-auto">The requested archive fragment could not be located in this configuration.</p>
+              <Button
+                variant="outline"
+                className="h-12 px-10 rounded-full border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
+              >
+                Reset Archive
               </Button>
-            </motion.div>
+            </div>
           )}
         </div>
       </section>

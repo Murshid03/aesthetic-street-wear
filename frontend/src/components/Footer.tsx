@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Mail, MapPin, Phone, Twitter, ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 
 const shopLinks = [
   { label: "New Arrivals", to: "/" },
@@ -20,63 +21,39 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-foreground text-background">
-      {/* Newsletter strip */}
-      <div className="border-b border-white/10">
-        <div className="container mx-auto container-px py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-base font-bold text-background" style={{ fontFamily: "Syne, sans-serif" }}>
-                Get 10% off your first order
-              </h3>
-              <p className="text-sm text-background/60 mt-0.5">
-                Subscribe for exclusive drops & style tips
-              </p>
-            </div>
-            <form className="flex w-full sm:w-auto gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 sm:w-64 h-10 px-4 rounded-xl bg-white/10 border border-white/20 text-background text-sm placeholder:text-background/40 focus:outline-none focus:border-primary/60 focus:bg-white/15 transition-all"
-              />
-              <button
-                type="submit"
-                className="h-10 px-5 gradient-primary rounded-xl text-white text-sm font-semibold flex items-center gap-1.5 hover:opacity-90 transition-opacity shrink-0"
-              >
-                Subscribe <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </form>
-          </div>
-        </div>
+    <footer className="bg-[#050505] text-white overflow-hidden relative" data-ocid="footer">
+      {/* Decorative large text background */}
+      <div className="absolute -bottom-10 -right-20 pointer-events-none select-none opacity-[0.02]">
+        <h2 className="text-[18vw] font-black italic tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
+          AESTHETIC
+        </h2>
       </div>
 
-      {/* Main footer */}
-      <div className="container mx-auto container-px py-12 lg:py-14">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
+      <div className="container mx-auto container-px pt-16 pb-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 items-start mb-12">
+
+          {/* Brand & Manifesto */}
+          <div className="lg:col-span-5 pr-0 lg:pr-10">
+            <Link to="/" className="flex items-center gap-3 group mb-6">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-[360deg]">
+                <span className="text-white font-black text-xl italic">A</span>
               </div>
-              <div>
-                <p className="text-sm font-bold text-background leading-tight" style={{ fontFamily: "Syne, sans-serif" }}>Aesthetic</p>
-                <p className="text-[10px] text-primary font-semibold tracking-widest uppercase">Street Wear</p>
-              </div>
-            </div>
-            <p className="text-sm text-background/60 leading-relaxed max-w-xs mb-5">
-              Premium men's fashion designed for the modern street-savvy individual. Quality craft, bold style.
+              <span className="text-xl font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+                Aesthetic
+              </span>
+            </Link>
+            <p className="text-sm text-white/40 font-medium leading-relaxed max-w-sm mb-8" style={{ fontFamily: "var(--font-secondary)" }}>
+              Transcending the boundaries of urban fashion. We don't follow trends; we architect the future of street culture through premium craftsmanship.
             </p>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-6">
               {[
-                { href: "https://instagram.com", label: "Instagram", icon: Instagram },
-                { href: "https://twitter.com", label: "Twitter", icon: Twitter },
-              ].map(({ href, label, icon: Icon }) => (
+                { href: "https://instagram.com", icon: Instagram },
+                { href: "https://twitter.com", icon: Twitter },
+              ].map(({ href, icon: Icon }, i) => (
                 <a
-                  key={label}
+                  key={i}
                   href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/10 text-background/60 hover:bg-primary/80 hover:text-white transition-all duration-200"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all duration-300"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -84,16 +61,17 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Shop */}
-          <div>
-            <h3 className="text-xs font-bold text-background/40 uppercase tracking-widest mb-4">Shop</h3>
-            <ul className="space-y-2.5">
+          {/* Quick Links */}
+          <div className="lg:col-span-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6" style={{ fontFamily: "var(--font-accent)" }}>Navigation</h3>
+            <ul className="space-y-3.5">
               {shopLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="text-sm text-background/65 hover:text-background transition-colors hover:text-primary"
+                    className="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors"
                   >
+                    <div className="w-0 h-px bg-primary group-hover:w-4 transition-all duration-300" />
                     {link.label}
                   </Link>
                 </li>
@@ -101,16 +79,17 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Help */}
-          <div>
-            <h3 className="text-xs font-bold text-background/40 uppercase tracking-widest mb-4">Account</h3>
-            <ul className="space-y-2.5">
+          {/* Account */}
+          <div className="lg:col-span-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6" style={{ fontFamily: "var(--font-accent)" }}>Account</h3>
+            <ul className="space-y-3.5">
               {helpLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="text-sm text-background/65 hover:text-background transition-colors hover:text-primary"
+                    className="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors"
                   >
+                    <div className="w-0 h-px bg-primary group-hover:w-4 transition-all duration-300" />
                     {link.label}
                   </Link>
                 </li>
@@ -118,34 +97,32 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-xs font-bold text-background/40 uppercase tracking-widest mb-4">Contact</h3>
-            <ul className="space-y-3">
-              {[
-                { icon: Mail, text: "hello@aestheticstreet.com" },
-                { icon: Phone, text: "+91 98765 43210" },
-                { icon: MapPin, text: "Chennai, Tamil Nadu, India" },
-              ].map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-start gap-2.5">
-                  <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <span className="text-sm text-background/65">{text}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Contact & Support */}
+          <div className="lg:col-span-3">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6" style={{ fontFamily: "var(--font-accent)" }}>Support</h3>
+            <div className="space-y-5">
+              <div className="group cursor-pointer">
+                <p className="text-[10px] uppercase font-black tracking-widest text-white/20 mb-1">Email</p>
+                <p className="text-sm font-bold group-hover:text-primary transition-colors">hello@aestheticstreet.com</p>
+              </div>
+              <div className="group cursor-pointer">
+                <p className="text-[10px] uppercase font-black tracking-widest text-white/20 mb-1">Global HQ</p>
+                <p className="text-sm font-bold group-hover:text-primary transition-colors italic">Chennai, IN</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-background/40">
-            © {year} Aesthetic Street Wear. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4 text-xs text-background/40">
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
-            <span>Returns</span>
+        {/* Bottom Bar */}
+        <div className="pt-10 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+            <Link to="/" className="hover:text-white transition-colors">Returns</Link>
+            <Link to="/" className="hover:text-white transition-colors">Privacy</Link>
+            <Link to="/" className="hover:text-white transition-colors">Terms</Link>
           </div>
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10">
+            © {year} AESTHETIC REVOLUTION.
+          </p>
         </div>
       </div>
     </footer>
