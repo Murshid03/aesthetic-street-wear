@@ -12,6 +12,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { Order, OrderStatus } from "@/types";
 import {
   CheckCircle2,
@@ -55,7 +57,7 @@ function OrderDetailSheet({
   const [editStatus, setEditStatus] = useState<OrderStatus>(order.status);
   const [editNotes, setEditNotes] = useState(order.adminNotes || "");
   const total = order.items.reduce((s, i) => s + (i.price || 0) * (i.quantity || 0), 0);
-  const userName = order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Vanguard Member" : "Vanguard Member");
+  const userName = order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Customer" : "Customer");
 
   const isPending = order.status === "Pending";
 
@@ -68,10 +70,10 @@ function OrderDetailSheet({
           <SheetHeader className="text-left space-y-6">
             <div className="flex items-center gap-3">
               <div className="w-8 h-[2px] bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Manifest Details</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Details</span>
             </div>
             <SheetTitle className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-              #{order._id?.slice(-8).toUpperCase()} <br /> <span className="text-primary italic">SPECIFICATION</span>
+              #{order._id?.slice(-8).toUpperCase()} <br /> <span className="text-primary italic">OVERVIEW</span>
             </SheetTitle>
             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-black/30">
               <span>Created: {formatDate(order.createdAt)}</span>
@@ -84,10 +86,10 @@ function OrderDetailSheet({
             <div className="p-8 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 space-y-6">
               <div className="flex items-center gap-3 text-amber-600">
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Operational Verification Needed</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Verification Needed</span>
               </div>
               <p className="text-sm font-medium text-amber-800/60 leading-relaxed italic">
-                "Confirm procurement sequence via WhatsApp before finalizing administrative status."
+                "Confirm order via WhatsApp before updating status."
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <button
@@ -95,14 +97,14 @@ function OrderDetailSheet({
                   disabled={isSaving}
                   className="h-14 bg-black text-white hover:bg-primary transition-all text-[10px] font-black uppercase tracking-widest rounded-full flex items-center justify-center gap-2"
                 >
-                  Confirm Sequence
+                  Confirm Order
                 </button>
                 <button
                   onClick={() => onSave(order._id!, "Cancelled", editNotes)}
                   disabled={isSaving}
                   className="h-14 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest rounded-full flex items-center justify-center gap-2"
                 >
-                  Terminate
+                  Cancel Order
                 </button>
               </div>
             </div>
@@ -111,7 +113,7 @@ function OrderDetailSheet({
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <UserIcon className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Member Identity</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Customer Details</span>
             </div>
             <div className="p-8 rounded-[2rem] bg-black/5 border border-black/5 space-y-2">
               <p className="text-lg font-black uppercase tracking-tight text-black">{userName}</p>
@@ -122,7 +124,7 @@ function OrderDetailSheet({
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Package className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Artifact Loadout</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Items</span>
             </div>
             <div className="space-y-4">
               {order.items.map((item, idx) => (
@@ -139,7 +141,7 @@ function OrderDetailSheet({
               ))}
             </div>
             <div className="p-8 rounded-[2rem] bg-black text-white flex justify-between items-center">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Manifest Sum</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Order Total</span>
               <span className="text-3xl font-black italic">₹{total.toLocaleString("en-IN")}</span>
             </div>
           </div>
@@ -148,7 +150,7 @@ function OrderDetailSheet({
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Operational Status</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Order Status</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {STATUS_OPTIONS.filter(s => s !== "Pending").map((s) => {
@@ -173,12 +175,12 @@ function OrderDetailSheet({
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Star className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Communication Fragment</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Admin Notes</span>
             </div>
             <Textarea
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Dispatches manifest notes to member terminal..."
+              placeholder="Add internal notes about this order..."
               className="min-h-[150px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
             />
           </div>
@@ -210,7 +212,7 @@ function OrderDetailSheet({
 function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
   const total = order.items.reduce((s, i) => s + (i.price || 0) * (i.quantity || 0), 0);
   const meta = STATUS_META[order.status];
-  const userName = order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Vanguard Member" : "Vanguard Member");
+  const userName = order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Customer" : "Customer");
 
   return (
     <motion.div
@@ -238,14 +240,14 @@ function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
           <span className="w-1 h-1 rounded-full bg-black/10" />
           <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black/40">
             <Package className="w-3 h-3" />
-            {order.items.length} Artifacts
+            {order.items.length} {order.items.length === 1 ? "Item" : "Items"}
           </div>
         </div>
       </div>
 
       <div className="flex items-center gap-8 shrink-0">
         <div className="text-center md:text-right">
-          <span className="text-[8px] font-black uppercase tracking-widest text-black/20 block mb-1">Valuation Sum</span>
+          <span className="text-[8px] font-black uppercase tracking-widest text-black/20 block mb-1">Order Amount</span>
           <p className="text-2xl font-black text-black">₹{total.toLocaleString("en-IN")}</p>
         </div>
         <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center text-black/20 group-hover:bg-black group-hover:text-white transition-all">
@@ -276,10 +278,10 @@ function AdminOrdersContent() {
       api.put(`/orders/${id}/status`, { status, adminNotes: notes }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
-      toast.success("Manifest Updated");
+      toast.success("Order Updated");
       setSelectedOrder(null);
     },
-    onError: () => toast.error("Sync Protocol Failure"),
+    onError: () => toast.error("Update Failed"),
   });
 
   const filtered = useMemo(() => {
@@ -300,7 +302,7 @@ function AdminOrdersContent() {
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-6">
         <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Manifests...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading orders...</p>
       </div>
     );
   }
@@ -312,13 +314,13 @@ function AdminOrdersContent() {
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-[2px] bg-primary" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Logistics . Command</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Management</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>MANIFEST <br /> <span className="text-primary italic text-4xl md:text-6xl">HISTORY</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ORDER <br /> <span className="text-primary italic text-4xl md:text-6xl">HISTORY</span></h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex flex-col text-right">
-            <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Active Queue</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Active Orders</span>
             <span className="text-xs font-black uppercase">{orders.length} total . {pendingCount} PENDING</span>
           </div>
         </div>
@@ -329,7 +331,7 @@ function AdminOrdersContent() {
         <div className="lg:col-span-12 xl:col-span-5 relative group">
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-black/20 group-focus-within:text-black transition-colors" />
           <Input
-            placeholder="Search Manifest ID or Name..."
+            placeholder="Search Order ID or Name..."
             className="h-16 pl-14 pr-6 bg-black/5 rounded-3xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -360,7 +362,7 @@ function AdminOrdersContent() {
       {filtered.length === 0 ? (
         <div className="py-40 text-center bg-black/5 rounded-[3rem]">
           <Package className="w-12 h-12 text-black/10 mx-auto mb-8" />
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">No matching manifests found.</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">No matching orders found.</p>
         </div>
       ) : (
         <div className="grid gap-4">

@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 type Mode = "login" | "register" | "forgot" | "otp" | "reset";
 
 const modeConfig = {
-  login: { title: "AUTHENTICATE", sub: "Enter your credentials to access the archive." },
-  register: { title: "JOIN COLLECTIVE", sub: "Secure your position in the vanguard." },
-  forgot: { title: "RECOVERY", sub: "Request an access fragment via email." },
-  otp: { title: "VERIFICATION", sub: "Enter the sequence sent to your terminal." },
-  reset: { title: "RECONFIGURATION", sub: "Establish a new security signature." },
+  login: { title: "WELCOME BACK", sub: "Please enter your credentials to access your account." },
+  register: { title: "CREATE ACCOUNT", sub: "Join our community and start shopping." },
+  forgot: { title: "FORGOT PASSWORD", sub: "Enter your email to receive a password reset link." },
+  otp: { title: "VERIFY EMAIL", sub: "Enter the code sent to your email address." },
+  reset: { title: "RESET PASSWORD", sub: "Choose a new password for your account." },
 };
 
 export default function LoginPage() {
@@ -46,24 +46,25 @@ export default function LoginPage() {
     try {
       if (mode === "login") {
         await login(form.email.trim().toLowerCase(), form.password);
-        toast.success(isAdminLogin ? "Access Granted" : "Session Initialized");
+        toast.success(isAdminLogin ? "Admin Login Successful" : "Welcome back!");
       } else {
         await register(form.name.trim(), form.email.trim().toLowerCase(), form.password);
-        toast.success("Identity Registered");
+        toast.success("Account created successfully!");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Auth Error");
+      const message = err.response?.data?.error || err.message || "Auth Error";
+      toast.error(message);
     }
   };
 
   const handleForgotPassword = async () => {
     const email = form.email.trim().toLowerCase();
-    if (!email) return toast.error("Identity Required");
+    if (!email) return toast.error("Email is required");
     setResetLoading(true);
     try {
       await api.post("/auth/forgot-password", { email });
       setMode("otp");
-      toast.success("Sequence Dispatched");
+      toast.success("OTP sent to your email");
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Dispatch Failed");
     } finally {
@@ -72,28 +73,28 @@ export default function LoginPage() {
   };
 
   const handleVerifyOtp = async () => {
-    if (otp.length !== 6) return toast.error("Invalid Sequence");
+    if (otp.length !== 6) return toast.error("Invalid OTP");
     const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
       await api.post("/auth/verify-otp", { email, otp });
       setMode("reset");
-      toast.success("Identity Verified");
+      toast.success("OTP verified");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Sequence Mismatch");
+      toast.error(err.response?.data?.error || "Invalid OTP");
     } finally {
       setResetLoading(false);
     }
   };
 
   const handleResetPassword = async () => {
-    if (newPassword.length < 6) return toast.error("Insecure Signature");
+    if (newPassword.length < 6) return toast.error("Password too short");
     const email = form.email.trim().toLowerCase();
     setResetLoading(true);
     try {
       await api.post("/auth/reset-password", { email, otp, newPassword });
       setMode("login");
-      toast.success("Signature Updated");
+      toast.success("Password reset successfully");
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Reconfig Failed");
     } finally {
@@ -102,7 +103,7 @@ export default function LoginPage() {
   };
 
   const config = isAdminLogin
-    ? { title: "ADMIN ACCESS", sub: "Restricted sector. Authorized signatures only." }
+    ? { title: "ADMIN LOGIN", sub: "Restricted area. Authorized personnel only." }
     : modeConfig[mode];
 
   const loading = isLoading || resetLoading;
@@ -117,13 +118,13 @@ export default function LoginPage() {
         <div className="relative z-10 text-center space-y-8">
           <div className="inline-flex items-center gap-4 mb-4">
             <div className="w-12 h-px bg-white/10" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Vanguard Access</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Member Access</span>
             <div className="w-12 h-px bg-white/10" />
           </div>
           <h2 className="text-6xl font-black text-white uppercase tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
-            THE <br /> <span className="text-primary italic">SIGNATURE</span> <br /> GATEWAY
+            AESTHETIC <br /> <span className="text-primary italic">STREET</span> <br /> WEAR
           </h2>
-          <p className="text-white/20 text-xs font-black uppercase tracking-[0.3em] max-w-xs mx-auto">Establishing a new standard of architectural streetwear excellence.</p>
+          <p className="text-white/20 text-xs font-black uppercase tracking-[0.3em] max-w-xs mx-auto">Premium architectural streetwear for the modern individual.</p>
         </div>
       </div>
 
@@ -138,8 +139,8 @@ export default function LoginPage() {
           </Link>
 
           <div className="text-right">
-            <p className="text-[9px] font-black text-black/20 uppercase tracking-widest">Protocol 2.6.0</p>
-            <p className="text-[10px] font-black text-black italic">AS-COLLECTIVE</p>
+            <p className="text-[9px] font-black text-black/20 uppercase tracking-widest">Version 2.6.0</p>
+            <p className="text-[10px] font-black text-black italic">AESTHETIC-COLLECTIVE</p>
           </div>
         </div>
 
@@ -155,7 +156,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-[2px] bg-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Sector</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">User Login</span>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
                   {config.title}
@@ -177,11 +178,11 @@ export default function LoginPage() {
               >
                 {mode === "register" && (
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Full Identity</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Full Name</label>
                     <input
                       type="text"
                       required
-                      placeholder="Enter Designation"
+                      placeholder="e.g. John Doe"
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                       className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
@@ -191,11 +192,11 @@ export default function LoginPage() {
 
                 {(mode === "login" || mode === "register" || mode === "forgot") && (
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Communication Hash (Email)</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Email Address</label>
                     <input
                       type="email"
                       required
-                      placeholder="archival@sector.com"
+                      placeholder="your@email.com"
                       value={form.email}
                       onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                       className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
@@ -206,9 +207,9 @@ export default function LoginPage() {
                 {(mode === "login" || mode === "register") && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Security Signature</label>
+                      <label className="text-[9px] font-black uppercase tracking-widest text-black/40">Password</label>
                       {mode === "login" && !isAdminLogin && (
-                        <button type="button" onClick={() => setMode("forgot")} className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-black transition-colors">Lost Sequence?</button>
+                        <button type="button" onClick={() => setMode("forgot")} className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-black transition-colors">Forgot Password?</button>
                       )}
                     </div>
                     <div className="relative">
@@ -233,7 +234,7 @@ export default function LoginPage() {
 
                 {mode === "otp" && (
                   <div className="space-y-4">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">6-Digit Hash Fragment</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">6-Digit OTP</label>
                     <input
                       type="text"
                       maxLength={6}
@@ -247,7 +248,7 @@ export default function LoginPage() {
 
                 {mode === "reset" && (
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">New Security Signature</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-black/40">New Password</label>
                     <div className="relative">
                       <input
                         type={showNewPassword ? "text" : "password"}
@@ -277,7 +278,7 @@ export default function LoginPage() {
                   className="w-full h-16 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
                 >
                   <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${loading ? "-translate-y-16" : ""}`}>
-                    {mode === "login" ? "INITIALIZE SESSION" : "REGISTER IDENTITY"}
+                    {mode === "login" ? "LOGIN" : "SIGN UP"}
                     <ChevronRight className="w-4 h-4" />
                   </span>
                   <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${loading ? "translate-y-0" : "translate-y-16"}`}>
@@ -292,7 +293,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full h-16 rounded-full bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em]"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === "forgot" ? "DISPATCH OTP" : mode === "otp" ? "VERIFY SEQUENCE" : "APPLY SIGNATURE"}
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === "forgot" ? "SEND OTP" : mode === "otp" ? "VERIFY OTP" : "RESET PASSWORD"}
                 </Button>
               )}
             </div>
@@ -306,7 +307,7 @@ export default function LoginPage() {
                   onClick={() => setMode(mode === "login" ? "register" : "login")}
                   className="text-primary hover:text-black transition-colors"
                 >
-                  {mode === "login" ? "Register Identity" : "Initialize Session"}
+                  {mode === "login" ? "Create Account" : "Login Now"}
                 </button>
               </p>
             )}
@@ -315,7 +316,7 @@ export default function LoginPage() {
                 onClick={() => setMode("login")}
                 className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30 hover:text-black transition-colors"
               >
-                Return to Authentication Portal
+                Back to Login
               </button>
             )}
             {isAdminLogin && (

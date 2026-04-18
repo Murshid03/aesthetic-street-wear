@@ -113,7 +113,7 @@ function CartItemRow({
             onIncrease={() => onQtyChange(item.quantity + 1)}
           />
           <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-widest text-black/20 mb-1">Unit Valuation</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-black/20 mb-1">Subtotal</p>
             <p className="text-lg font-black tabular-nums">₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</p>
           </div>
         </div>
@@ -146,16 +146,16 @@ export default function CartPage() {
       <section className="pt-32 pb-20 bg-white border-b border-black/5">
         <div className="container mx-auto container-px">
           <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
-            <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
+            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="w-2.5 h-2.5" />
-            <span className="text-primary italic">Loadout Logistics</span>
+            <span className="text-primary italic">Shopping Cart</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
             <div className="max-w-xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-[2px] bg-primary" />
-                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Dispatch Ready</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Selection</span>
               </div>
               <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
                 ACTIVE <br /> <span className="text-primary italic">CART</span>
@@ -164,7 +164,7 @@ export default function CartPage() {
 
             {!isEmpty && (
               <div className="flex flex-col items-end gap-2 text-right">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">Total Valuation</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">Cart Total</p>
                 <div className="text-4xl font-black text-black leading-none">₹{total.toLocaleString("en-IN")}</div>
               </div>
             )}
@@ -180,10 +180,10 @@ export default function CartPage() {
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-10">
                 <ShoppingBag className="w-10 h-10 text-black/10" />
               </div>
-              <h2 className="text-3xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Cart Vacant</h2>
-              <p className="text-black/40 text-sm font-medium leading-relaxed mb-12">No active segments found in your logistics queue. Begin your procurement to fill this void.</p>
+              <h2 className="text-3xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Your Cart is Empty</h2>
+              <p className="text-black/40 text-sm font-medium leading-relaxed mb-12">Looks like you haven't added anything to your cart yet. Browse our collections to find something you like.</p>
               <Button asChild className="h-16 px-12 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.4em] shadow-xl">
-                <Link to="/shirts">Project Discovery</Link>
+                <Link to="/">Start Shopping</Link>
               </Button>
             </div>
           ) : (
@@ -208,7 +208,7 @@ export default function CartPage() {
                     <div className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
                       <ArrowLeft className="w-3.5 h-3.5" />
                     </div>
-                    Archive Protocol
+                    Continue Shopping
                   </Link>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export default function CartPage() {
                 <div className="sticky top-32 p-10 rounded-[2.5rem] bg-black text-white shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 blur-[100px] rounded-full" />
                   <div className="relative z-10 space-y-10">
-                    <h2 className="text-xl font-black uppercase tracking-widest mb-10">LOGISTICS SUMMARY</h2>
+                    <h2 className="text-xl font-black uppercase tracking-widest mb-10">ORDER SUMMARY</h2>
 
                     <div className="space-y-6">
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
@@ -226,19 +226,19 @@ export default function CartPage() {
                         <span className="text-white">₹{total.toLocaleString("en-IN")}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
-                        <span>Shipping Protocol</span>
-                        <span className="text-primary italic italic">Standard Express / ₹0</span>
+                        <span>Shipping</span>
+                        <span className="text-primary italic italic">Standard Delivery / Free</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
-                        <span>Tax Fragment</span>
-                        <span className="text-white italic">Inclusive</span>
+                        <span>Taxes</span>
+                        <span className="text-white italic">Included</span>
                       </div>
                     </div>
 
                     <Separator className="bg-white/10" />
 
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Combined Total</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Total Amount</span>
                       <span className="text-3xl font-black">₹{total.toLocaleString("en-IN")}</span>
                     </div>
 
@@ -248,7 +248,7 @@ export default function CartPage() {
                       className="w-full h-16 rounded-full bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
                     >
                       <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${checkoutLoading ? "-translate-y-16" : ""}`}>
-                        {isAuthenticated ? "INITIALIZE DISPATCH" : "AUTHENTICATE"}
+                        {isAuthenticated ? "PROCEED TO CHECKOUT" : "LOGIN TO CHECKOUT"}
                         <ChevronRight className="w-4 h-4" />
                       </span>
                       <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${checkoutLoading ? "translate-y-0" : "translate-y-16"}`}>

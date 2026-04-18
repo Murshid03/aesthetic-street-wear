@@ -39,13 +39,13 @@ const STATUS_CONFIG: Record<
   { label: string; bg: string; text: string; icon: React.ElementType }
 > = {
   Pending: {
-    label: "ARCHIVING",
+    label: "PENDING",
     bg: "bg-amber-500/10",
     text: "text-amber-600",
     icon: Circle,
   },
   Confirmed: {
-    label: "AUTHENTICATED",
+    label: "CONFIRMED",
     bg: "bg-primary/10",
     text: "text-primary",
     icon: CheckCircle2,
@@ -57,13 +57,13 @@ const STATUS_CONFIG: Record<
     icon: Truck,
   },
   Delivered: {
-    label: "DISPATCHED",
+    label: "DELIVERED",
     bg: "bg-emerald-500/10",
     text: "text-emerald-600",
     icon: MapPin,
   },
   Cancelled: {
-    label: "EXPIRED",
+    label: "CANCELLED",
     bg: "bg-rose-500/10",
     text: "text-rose-600",
     icon: XCircle,
@@ -125,7 +125,7 @@ function OrderCard({ order }: { order: Order }) {
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">Archived ID:</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">Order ID:</span>
               <span className="text-xs font-black uppercase">#{String(order._id).slice(-8).toUpperCase()}</span>
               <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${cfg.bg} ${cfg.text}`}>
                 {cfg.label}
@@ -133,20 +133,20 @@ function OrderCard({ order }: { order: Order }) {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex flex-col">
-                <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1">Time Signature</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1">Order Date</span>
                 <span className="text-xs font-bold text-black">{new Date(order.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
               </div>
               <div className="w-px h-8 bg-black/5" />
               <div className="flex flex-col">
-                <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1">Inventory Sum</span>
-                <span className="text-xs font-bold text-black">{itemCount} Artifacts</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1">Items</span>
+                <span className="text-xs font-bold text-black">{itemCount} {itemCount === 1 ? "Item" : "Items"}</span>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col items-end gap-4">
             <div className="text-right">
-              <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1 block">Logistics Value</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-black/20 mb-1 block">Total Amount</span>
               <span className="text-3xl font-black text-black">₹{total.toLocaleString("en-IN")}</span>
             </div>
             <Button
@@ -154,7 +154,7 @@ function OrderCard({ order }: { order: Order }) {
               onClick={() => setExpanded(!expanded)}
               className="h-10 px-6 rounded-full bg-black/5 text-[9px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all gap-2"
             >
-              {expanded ? "Collapse Archive" : "Expand Artifacts"}
+              {expanded ? "View Less" : "Order Details"}
               <ChevronDown className={`w-3 h-3 transition-transform duration-500 ${expanded ? "rotate-180" : ""}`} />
             </Button>
           </div>
@@ -170,7 +170,7 @@ function OrderCard({ order }: { order: Order }) {
             >
               <div className="pt-10 space-y-8">
                 <div className="space-y-4">
-                  <div className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20 pb-4 border-b border-black/5">Artifact Specification:</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20 pb-4 border-b border-black/5">Items in this Order:</div>
                   <div className="grid gap-4">
                     {order.items.map((item, idx) => (
                       <div key={idx} className="flex items-center gap-6 p-4 rounded-3xl bg-black/5 group hover:bg-black/10 transition-colors">
@@ -180,7 +180,7 @@ function OrderCard({ order }: { order: Order }) {
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] font-black uppercase tracking-widest text-black mb-1">{item.name}</p>
                           <div className="flex items-center gap-3">
-                            <span className="text-[9px] font-black uppercase text-black/40 tracking-widest">Fit: {item.size}</span>
+                            <span className="text-[9px] font-black uppercase text-black/40 tracking-widest">Size: {item.size}</span>
                             <span className="w-1 h-1 rounded-full bg-black/10" />
                             <span className="text-[9px] font-black uppercase text-black/40 tracking-widest">Qty: {item.quantity}</span>
                           </div>
@@ -197,16 +197,16 @@ function OrderCard({ order }: { order: Order }) {
                   <div className="p-8 rounded-[2rem] bg-rose-50 border border-rose-100 space-y-4">
                     <div className="flex items-center gap-3 text-rose-600">
                       <XCircle className="w-5 h-5" />
-                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Session Expired / Terminated</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Order Cancelled</span>
                     </div>
                     <p className="text-sm font-medium text-rose-800 italic leading-relaxed">
-                      "{order.adminNotes || "Project trajectory terminated by administrative override."}"
+                      "{order.adminNotes || "This order has been cancelled by the administrator."}"
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-10">
                     <div className="p-8 rounded-[2rem] bg-black/5 border border-black/5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-black/20 block mb-6 px-1">Trajectory Status:</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-black/20 block mb-6 px-1">Order Status:</span>
                       <StatusTimeline status={order.status} />
                     </div>
 
@@ -214,7 +214,7 @@ function OrderCard({ order }: { order: Order }) {
                       <div className="p-8 rounded-[2rem] bg-primary/5 border border-primary/10 space-y-4">
                         <div className="flex items-center gap-3 text-primary">
                           <Package className="w-4 h-4" />
-                          <span className="text-[11px] font-black uppercase tracking-[0.3em]">Command Communiqué</span>
+                          <span className="text-[11px] font-black uppercase tracking-[0.3em]">Admin Notes</span>
                         </div>
                         <p className="text-sm font-medium text-black/60 leading-relaxed">
                           {order.adminNotes}
@@ -257,16 +257,16 @@ function AccountContent() {
       <section className="pt-32 pb-20 bg-white border-b border-black/5">
         <div className="container mx-auto container-px">
           <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
-            <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
+            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="w-2.5 h-2.5" />
-            <span className="text-primary italic">Identity Portal</span>
+            <span className="text-primary italic">Account</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
             <div className="max-w-xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-[2px] bg-primary" />
-                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Authorized Session</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Account Overview</span>
               </div>
               <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
                 MY <br /> <span className="text-primary italic">PROFILE</span>
@@ -280,7 +280,7 @@ function AccountContent() {
                 className="h-14 px-10 rounded-full border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all flex items-center gap-3"
               >
                 <LogOut className="w-4 h-4" />
-                Terminate Session
+                Logout
               </Button>
             </div>
           </div>
@@ -316,12 +316,12 @@ function AccountContent() {
 
                   <div className="pt-8 border-t border-white/5 space-y-4">
                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/40">
-                      <span>Classification</span>
-                      <span className="text-primary">{user?.role === "admin" ? "Systems Admin" : "Vanguard Member"}</span>
+                      <span>Member Type</span>
+                      <span className="text-primary">{user?.role === "admin" ? "Administrator" : "Member"}</span>
                     </div>
                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/40">
                       <span>Status</span>
-                      <span className="text-white italic">Authorized . Active</span>
+                      <span className="text-white italic">Active</span>
                     </div>
                   </div>
                 </div>
@@ -330,9 +330,9 @@ function AccountContent() {
               <div className="mt-12 p-10 rounded-[2.5rem] border border-black/5 bg-white space-y-6">
                 <div className="flex items-center gap-3 mb-2">
                   <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Communication Sector</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Account Info</span>
                 </div>
-                <p className="text-sm font-medium text-black/40 leading-relaxed italic">"Logistics coordinates and communication fragments are managed per individual dispatch. Security remains our priority."</p>
+                <p className="text-sm font-medium text-black/40 leading-relaxed italic">"Your order history and account details are managed here securely. We value your privacy and security."</p>
               </div>
             </div>
 
@@ -340,13 +340,13 @@ function AccountContent() {
             <div className="lg:col-span-8">
               <div className="flex items-center gap-3 mb-12">
                 <div className="w-8 h-[2px] bg-primary" />
-                <h2 className="text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ARCHIVE HISTORY</h2>
+                <h2 className="text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ORDER HISTORY</h2>
               </div>
 
               {isLoading ? (
                 <div className="py-20 flex flex-col items-center gap-6">
                   <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Dispatch History...</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading orders...</p>
                 </div>
               ) : orders.length > 0 ? (
                 <div className="space-y-6">
@@ -359,10 +359,10 @@ function AccountContent() {
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white shadow-sm mb-8">
                     <Package className="w-8 h-8 text-black/10" />
                   </div>
-                  <h3 className="text-xl font-black uppercase tracking-tighter mb-4">Trajectory Vacant</h3>
-                  <p className="text-black/40 text-sm font-medium mb-10 max-w-sm mx-auto">No dispatch sequences have been initialized. Explore the archive to begin your collection trajectory.</p>
+                  <h3 className="text-xl font-black uppercase tracking-tighter mb-4">No Orders Found</h3>
+                  <p className="text-black/40 text-sm font-medium mb-10 max-w-sm mx-auto">You haven't placed any orders yet. Explore our collections to start your first order.</p>
                   <Button asChild className="h-16 px-12 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-[0.4em]">
-                    <Link to="/shirts">Initialize Procurement</Link>
+                    <Link to="/">Start Shopping</Link>
                   </Button>
                 </div>
               )}

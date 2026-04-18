@@ -102,15 +102,15 @@ function ConfirmationScreen({
             </motion.div>
 
             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
-              SEQUENCE <br /> <span className="text-primary italic">SYNCHRONIZED</span>
+              ORDER <br /> <span className="text-primary italic">CONFIRMED</span>
             </h1>
 
             <p className="text-white/40 text-sm font-medium leading-relaxed mb-12 max-w-md mx-auto">
-              Your architectural loadout has been registered. Our logistics terminal is now awaiting WhatsApp verification to finalize dispatch.
+              Your order has been successfully placed. Please complete the WhatsApp verification to finalize your shipment.
             </p>
 
             <div className="bg-white/5 rounded-3xl p-8 mb-12 border border-white/5 backdrop-blur-sm">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">Manifest Tracking ID</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">Order Reference</p>
               <p className="text-3xl font-black text-primary tracking-[0.2em]">#{orderRef.slice(-8).toUpperCase()}</p>
               <div className="w-12 h-1 bg-primary/20 mx-auto mt-6 rounded-full" />
             </div>
@@ -121,7 +121,7 @@ function ConfirmationScreen({
                 className="h-16 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all font-black text-[10px] uppercase tracking-[0.3em] shadow-xl"
               >
                 <Link to="/account">
-                  Track Manifest
+                  Track Order
                 </Link>
               </Button>
               <Button
@@ -129,7 +129,7 @@ function ConfirmationScreen({
                 className="h-16 rounded-full border-white/10 text-white hover:bg-white hover:text-black transition-all font-black text-[10px] uppercase tracking-[0.3em]"
                 onClick={onReset}
               >
-                New Procurement
+                Continue Shopping
               </Button>
             </div>
           </div>
@@ -173,24 +173,24 @@ export default function CheckoutPage() {
       );
 
       const message = [
-        `👋 *ORDER INQUIRY — Aesthetic Street Wear*`,
-        `Manifest protocol initiated. Requesting validation for current loadout.`,
+        `📦 *NEW ORDER CONFIRMATION — Aesthetic Street Wear*`,
+        `Hi, I've just placed an order! Please confirm my details below:`,
         `━━━━━━━━━━━━━━━━━━━━━`,
-        `📋 *Tracking ID:* #${orderRef}`,
-        `📅 *Timestamp:* ${now}`,
+        `🆔 *Order ID:* #${orderRef}`,
+        `📅 *Date:* ${now}`,
         ``,
-        `👤 *Vanguard:*`,
+        `👤 *Customer Info:*`,
         `   Name: ${customerName}`,
-        `   Sector: ${deliveryAddress}`,
+        `   Address: ${deliveryAddress}`,
         ``,
-        `🛒 *Archive Fragments:*`,
+        `🛒 *My Order Elements:*`,
         `─────────────────────`,
         ...lineItems,
         `─────────────────────`,
-        `💰 *Valuation Sum:* ₹${total.toLocaleString("en-IN")}`,
-        `💳 *Protocol:* Cash on Delivery`,
+        `💰 *Total Amount:* ₹${total.toLocaleString("en-IN")}`,
+        `💳 *Payment Method:* Cash on Delivery`,
         `━━━━━━━━━━━━━━━━━━━━━`,
-        `Awaiting administrative response. Over. 🙏`,
+        `Awaiting your confirmation for this order. Thank you! 🙏`,
       ].join("\n");
 
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -214,8 +214,8 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = () => {
-    if (!customerName.trim()) { toast.error("Identity Required."); return; }
-    if (!deliveryAddress.trim()) { toast.error("Sector Coords Required."); return; }
+    if (!customerName.trim()) { toast.error("Please enter your name."); return; }
+    if (!deliveryAddress.trim()) { toast.error("Please enter your delivery address."); return; }
 
     const orderData = {
       customerName: customerName.trim(),
@@ -243,10 +243,10 @@ export default function CheckoutPage() {
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-8">
             <ShoppingBag className="w-10 h-10 text-black/10" />
           </div>
-          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Command Vacant</h1>
-          <p className="text-black/40 mb-10 max-w-sm mx-auto">No procurement segments registered. Return to the archive to begin your sequence.</p>
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Cart is Empty</h1>
+          <p className="text-black/40 mb-10 max-w-sm mx-auto">You haven't added any items to your cart yet. Browse our collection to get started.</p>
           <Button asChild className="h-16 px-12 rounded-full bg-black">
-            <Link to="/">Explore Archive</Link>
+            <Link to="/">Shop Now</Link>
           </Button>
         </div>
       </Layout>
@@ -268,7 +268,7 @@ export default function CheckoutPage() {
                 <span className="text-primary italic">Checkout Protocol</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-                FINALIZE <br /> <span className="text-primary italic text-4xl md:text-6xl">PROCUREMENT</span>
+                CHECKOUT <br /> <span className="text-primary italic text-4xl md:text-6xl">DETAILS</span>
               </h1>
             </div>
 
@@ -279,22 +279,22 @@ export default function CheckoutPage() {
                 <div className="space-y-10 group">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-black shadow-lg">01</div>
-                    <h2 className="text-xl font-black uppercase tracking-widest">IDENTIFICATION</h2>
+                    <h2 className="text-xl font-black uppercase tracking-widest">SHIPPING INFO</h2>
                   </div>
                   <div className="grid gap-8 p-10 rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent">
                     <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Full Signature</Label>
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Full Name</Label>
                       <Input
-                        placeholder="Enter Persona Designation"
+                        placeholder="e.g. John Doe"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
                         className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Dispatch Sector (Address)</Label>
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Delivery Address</Label>
                       <Input
-                        placeholder="Street, Sector, City, PIN"
+                        placeholder="House No, Street, City, State, PIN"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                 <div className="space-y-10 group">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-black shadow-lg">02</div>
-                    <h2 className="text-xl font-black uppercase tracking-widest">LOADOUT VALIDATION</h2>
+                    <h2 className="text-xl font-black uppercase tracking-widest">ORDER ITEMS</h2>
                   </div>
                   <div className="p-10 rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent divide-y divide-black/5">
                     {items.map((item) => (
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                         <span className="text-primary italic">Standard / Free</span>
                       </div>
                       <div className="flex justify-between items-end pt-4">
-                        <span className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">COMBINED SUM</span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">TOTAL AMOUNT</span>
                         <span className="text-4xl font-black text-white">₹{total.toLocaleString("en-IN")}</span>
                       </div>
                     </div>
@@ -359,12 +359,12 @@ export default function CheckoutPage() {
                       className="w-full h-16 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
                     >
                       <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${orderMutation.isPending ? "-translate-y-16" : ""}`}>
-                        INITIALIZE DISPATCH
+                        PLACE ORDER
                         <ChevronRight className="w-4 h-4" />
                       </span>
                       <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${orderMutation.isPending ? "translate-y-0" : "translate-y-16"}`}>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Processing Manifest...
+                        Placing Order...
                       </span>
                     </Button>
 

@@ -239,7 +239,7 @@ export function Header() {
                             className="w-full flex items-center gap-3 px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
                           >
                             <Power className="w-3.5 h-3.5" />
-                            Terminate
+                            Logout
                           </button>
                         </div>
                       </div>
@@ -272,29 +272,18 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <User className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all" />
-                            Account
-                          </Link>
-                          <Link
-                            to="/account"
-                            search={{ tab: 'orders' }}
-                            className="flex items-center gap-3 px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-black/60 hover:text-black hover:bg-black/5 rounded-lg transition-all group"
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            <Package className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all" />
-                            Orders
+                            Profile
                           </Link>
                         </div>
-                        {!isAdmin && (
-                          <div className="px-1 pt-1 mt-1 border-t border-black/5">
-                            <button
-                              onClick={handleLogout}
-                              className="w-full flex items-center gap-3 px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
-                            >
-                              <LogOut className="w-3.5 h-3.5" />
-                              Sign Out
-                            </button>
-                          </div>
-                        )}
+                        <div className="px-1 pt-1 mt-1 border-t border-black/5">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                          >
+                            <LogOut className="w-3.5 h-3.5" />
+                            Logout
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -377,7 +366,7 @@ export function Header() {
                 className="flex items-center justify-between p-4 bg-black/5 rounded-3xl"
                 onClick={() => setMobileOpen(false)}
               >
-                <span className="text-sm font-black uppercase tracking-widest">My Account</span>
+                <span className="text-sm font-black uppercase tracking-widest">Profile</span>
                 <User className="w-5 h-5" />
               </Link>
             </div>

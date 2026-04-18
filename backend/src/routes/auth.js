@@ -17,10 +17,11 @@ router.post('/register', async (req, res) => {
         if (!name || !email || !password) {
             return res.status(400).json({ error: 'All fields are required' });
         }
-        const existing = await User.findOne({ email });
+        const cleanEmail = email.trim().toLowerCase();
+        const existing = await User.findOne({ email: cleanEmail });
         if (existing) return res.status(400).json({ error: 'User already exists' });
 
-        const user = await User.create({ name, email, password });
+        const user = await User.create({ name, email: cleanEmail, password });
         res.status(201).json({
             _id: user._id,
             name: user.name,
@@ -39,7 +40,8 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
-        const user = await User.findOne({ email });
+        const cleanEmail = email.trim().toLowerCase();
+        const user = await User.findOne({ email: cleanEmail });
         if (!user || !(await user.comparePassword(password))) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
@@ -65,11 +67,12 @@ router.get('/me', protect, (req, res) => {
 router.post('/forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
-        console.log(`[AUTH] Forgot password request for: ${email}`);
+        const cleanEmail = email.trim().toLowerCase();
+        console.log(`[AUTH] Forgot password request for: ${cleanEmail}`);
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: cleanEmail });
         if (!user) {
-            console.log(`[AUTH] User not found: ${email}`);
+            console.log(`[AUTH] User not found: ${cleanEmail}`);
             return res.status(404).json({ error: 'User not found with this email' });
         }
 
