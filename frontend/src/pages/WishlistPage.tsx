@@ -67,8 +67,8 @@ function SizePickerDialog({
                                 key={size}
                                 type="button"
                                 className={`h-12 flex-1 min-w-[60px] flex items-center justify-center text-[11px] font-black uppercase tracking-widest rounded-xl border-2 transition-all ${selected === size
-                                        ? "border-black bg-black text-white shadow-lg scale-105"
-                                        : "border-black/5 hover:border-black/10 text-black/40"
+                                    ? "border-black bg-black text-white shadow-lg scale-105"
+                                    : "border-black/5 hover:border-black/10 text-black/40"
                                     }`}
                                 onClick={() => setSelected(size)}
                             >
@@ -187,21 +187,21 @@ export default function WishlistPage() {
     return (
         <Layout>
             {/* ── Editorial Header ────────────────────────────────────────── */}
-            <section className="pt-32 pb-20 bg-white border-b border-black/5">
-                <div className="container mx-auto container-px">
-                    <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+            <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5">
+                <div className="container mx-auto px-6 lg:px-12">
+                    <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
                         <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
                         <ChevronRight className="w-2.5 h-2.5" />
                         <span className="text-primary italic">Saved Project</span>
                     </nav>
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
-                        <div className="max-w-xl">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-[2px] bg-primary" />
-                                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Personal Curation</span>
+                        <div className="max-w-xl text-center md:text-left">
+                            <div className="flex items-center justify-center md:justify-start gap-3 mb-4 lg:mb-6">
+                                <div className="w-8 lg:w-12 h-[2px] bg-primary" />
+                                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Personal Curation</span>
                             </div>
-                            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
+                            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
                                 MY <br /> <span className="text-primary italic">WISHLIST</span>
                             </h1>
                         </div>
@@ -217,8 +217,8 @@ export default function WishlistPage() {
             </section>
 
             {/* ── Main Content ────────────────────────────────────────────── */}
-            <section className="py-20 bg-white min-h-[60vh]">
-                <div className="container mx-auto container-px">
+            <section className="py-12 lg:py-20 bg-white min-h-[60vh] pb-32">
+                <div className="container mx-auto px-6 lg:px-12">
                     {itemCount === 0 ? (
                         <div className="py-32 text-center max-w-md mx-auto">
                             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-10">

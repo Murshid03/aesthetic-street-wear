@@ -160,16 +160,16 @@ export default function ProductPage() {
 
   return (
     <Layout>
-      <div className="bg-white min-h-screen pt-24 pb-20">
-        <div className="container mx-auto container-px">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
+      <div className="bg-white min-h-screen pt-16 lg:pt-24 pb-24 lg:pb-20">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
             {/* ── Visual Context ─────────────────────────────────────────── */}
-            <div className="lg:col-span-7">
-              <nav className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+            <div className="lg:col-span-7 order-1">
+              <nav className="flex items-center gap-2 lg:gap-3 text-[8px] lg:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
                 <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
-                <ChevronRight className="w-2.5 h-2.5" />
+                <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <Link to={categoryRoute} className="hover:text-primary transition-colors">{product.category}</Link>
-                <ChevronRight className="w-2.5 h-2.5" />
+                <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <span className="text-black/60 truncate">{product.name}</span>
               </nav>
 
@@ -186,10 +186,10 @@ export default function ProductPage() {
                 </div>
                 <button
                   onClick={() => wished ? removeFromWishlist(product._id!) : addToWishlist(product)}
-                  className={`absolute top-8 right-8 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl backdrop-blur-md
+                  className={`absolute top-4 right-4 lg:top-8 lg:right-8 w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl backdrop-blur-md
                      ${wished ? "bg-primary text-white scale-110" : "bg-white/80 text-black hover:bg-white"}`}
                 >
-                  <Heart className={`w-6 h-6 ${wished ? "fill-current" : ""}`} />
+                  <Heart className={`w-5 h-5 lg:w-6 lg:h-6 ${wished ? "fill-current" : ""}`} />
                 </button>
                 {product.isSoldOut && (
                   <div className="absolute top-8 left-8">
@@ -200,19 +200,19 @@ export default function ProductPage() {
             </div>
 
             {/* ── Architectural Specs ────────────────────────────────────── */}
-            <div className="lg:col-span-5 flex flex-col pt-10">
-              <div className="space-y-12">
-                <div>
-                  <div className="flex items-center gap-3 mb-6">
+            <div className="lg:col-span-5 flex flex-col pt-0 lg:pt-10 order-2">
+              <div className="space-y-8 lg:space-y-12">
+                <div className="text-center lg:text-left">
+                  <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 lg:mb-6">
                     <div className="w-8 h-[2px] bg-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Signature Collection . 26</span>
+                    <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Signature Collection . 26</span>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                  <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
                     {product.name}
                   </h1>
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-3xl font-black text-black">₹{product.price.toLocaleString("en-IN")}</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">MSRP Inclusive Tax</span>
+                  <div className="flex items-baseline justify-center lg:justify-start gap-4">
+                    <span className="text-2xl lg:text-3xl font-black text-black">₹{product.price.toLocaleString("en-IN")}</span>
+                    <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-[0.2em] text-black/20">MSRP Inclusive Tax</span>
                   </div>
                 </div>
 
@@ -241,13 +241,13 @@ export default function ProductPage() {
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Architectural Fit:</span>
                     <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Sizing Grid</button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
                     {product.sizes.map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
                         disabled={product.isSoldOut}
-                        className={`h-12 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 
+                        className={`h-12 min-w-[3.5rem] px-5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 
                                     ${selectedSize === size
                             ? "border-black bg-black text-white shadow-xl scale-105"
                             : "border-black/5 bg-transparent text-black/40 hover:border-black/20"

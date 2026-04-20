@@ -53,7 +53,14 @@ startServer();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: (origin, callback) => {
+        // Allow localhost and any local network IP (192.168.x.x)
+        if (!origin || origin.startsWith('http://localhost') || origin.startsWith('http://192.168.')) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all in dev for convenience, or refine as needed
+        }
+    },
     credentials: true,
 }));
 app.use(express.json());

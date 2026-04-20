@@ -105,42 +105,42 @@ export function Header() {
     <>
       <header
         className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-          ? "bg-white/80 backdrop-blur-xl border-b border-black/5 py-1.5"
-          : "bg-white border-b border-transparent py-4"
+          ? "bg-white/80 backdrop-blur-xl border-b border-black/5 py-1"
+          : "bg-white border-b border-transparent py-2 lg:py-4"
           }`}
         data-ocid="header"
       >
         {!scrolled && (
-          <div className="bg-black text-[10px] text-white/70 text-center py-1.5 px-4 font-bold tracking-[0.2em] uppercase transition-all duration-500 mb-4">
+          <div className="bg-black text-[9px] lg:text-[10px] text-white/70 text-center py-1 px-4 font-bold tracking-[0.2em] uppercase transition-all duration-500 mb-2 lg:mb-4">
             <span>Standard delivery over ₹999 — Standard delivery over ₹999</span>
           </div>
         )}
 
-        <div className="container mx-auto container-px">
-          <div className="flex items-center h-14 gap-4">
-            {/* Logo - More Minimal & Premium */}
-            <Link to="/" className="shrink-0 flex items-center gap-3 group" aria-label="Aesthetic Street Wear home">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-14 gap-2 sm:gap-4">
+            {/* Logo */}
+            <Link to="/" className="shrink-0 flex items-center gap-2 lg:gap-3 group mr-auto" aria-label="Aesthetic Street Wear home">
               <div className="relative">
-                <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center transition-all duration-500 group-hover:bg-primary group-hover:rotate-[360deg]">
-                  <span className="text-white font-black text-xl italic">A</span>
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-black rounded-full flex items-center justify-center transition-all duration-500 group-hover:bg-primary group-hover:rotate-[360deg]">
+                  <span className="text-white font-black text-sm lg:text-xl italic">A</span>
                 </div>
-                <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-primary rounded-full border-2 border-white shadow-lg" />
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 bg-primary rounded-full border-2 border-white shadow-lg" />
               </div>
               <div className="hidden sm:block leading-none">
-                <span className="block text-base font-black text-black tracking-tighter uppercase italic" style={{ fontFamily: "var(--font-display)" }}>
+                <span className="block text-xs lg:text-base font-black text-black tracking-tighter uppercase italic" style={{ fontFamily: "var(--font-display)" }}>
                   Aesthetic
                 </span>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-5 h-[1.5px] bg-primary rounded-full" />
-                  <span className="block text-[8px] font-black text-black/30 tracking-[0.4em] uppercase" style={{ fontFamily: "var(--font-accent)" }}>
+                <div className="flex items-center gap-1.5 mt-0.5 lg:mt-1">
+                  <div className="w-4 lg:w-5 h-[1.5px] bg-primary rounded-full" />
+                  <span className="block text-[7px] lg:text-[8px] font-black text-black/30 tracking-[0.4em] uppercase" style={{ fontFamily: "var(--font-accent)" }}>
                     Fragments
                   </span>
                 </div>
               </div>
             </Link>
 
-            {/* Desktop Nav - Editorial Style */}
-            <nav className="hidden lg:flex items-center justify-center flex-1 gap-2 mx-8" aria-label="Main navigation">
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center justify-center gap-2 mx-8" aria-label="Main navigation">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.to}
@@ -154,14 +154,13 @@ export function Header() {
               ))}
             </nav>
 
-            {/* Actions */}
-            <div className="flex items-center gap-1 sm:gap-3">
+            {/* Actions Grouped in Right Corner */}
+            <div className="flex items-center gap-0.5 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
                 className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                 aria-label="Search"
-                data-ocid="search-trigger"
               >
                 <Search className="w-4 h-4 text-black" />
               </button>
@@ -170,13 +169,12 @@ export function Header() {
 
               <Link
                 to="/wishlist"
-                className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+                className="relative hidden sm:flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                 aria-label={`Wishlist: ${wishlistCount} items`}
-                data-ocid="wishlist-link"
               >
                 <Heart className="w-4 h-4 text-black" />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+                  <span className="absolute top-1 right-1 bg-primary text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-sm">
                     {wishlistCount}
                   </span>
                 )}
@@ -184,27 +182,24 @@ export function Header() {
 
               <Link
                 to="/cart"
-                className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+                className="relative flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                 aria-label={`Cart: ${cartCount} items`}
-                data-ocid="cart-link"
               >
                 <ShoppingCart className="w-4 h-4 text-black" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+                  <span className="absolute top-1 right-1 bg-black text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-sm">
                     {cartCount}
                   </span>
                 )}
               </Link>
 
-              <span className="w-px h-6 bg-black/5 mx-1 hidden sm:block" />
-
-              <div className="relative ml-1 flex items-center gap-1">
+              <div className="relative flex items-center">
                 {isAdmin && (
                   <div className="relative" ref={adminMenuRef}>
                     <button
                       type="button"
                       onClick={() => setAdminMenuOpen(!adminMenuOpen)}
-                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+                      className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                       aria-expanded={adminMenuOpen}
                       aria-haspopup="true"
                     >
@@ -246,15 +241,14 @@ export function Header() {
                     )}
                   </div>
                 )}
-                {isAuthenticated ? (
+                {isAuthenticated && (
                   <div className="relative" ref={userMenuRef}>
                     <button
                       type="button"
                       onClick={() => setUserMenuOpen(!userMenuOpen)}
-                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-all group"
+                      className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-all group"
                       aria-expanded={userMenuOpen}
                       aria-haspopup="true"
-                      data-ocid="user-menu-trigger"
                     >
                       <User className="w-4 h-4 text-black group-hover:text-primary transition-colors" />
                     </button>
@@ -287,34 +281,14 @@ export function Header() {
                       </div>
                     )}
                   </div>
-                ) : (
-                  <>
-                    <Link
-                      to="/admin"
-                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
-                      aria-label="Admin Access"
-                      title="Admin Access"
-                    >
-                      <Shield className="w-4 h-4 text-black/10 hover:text-black transition-colors" />
-                    </Link>
-                    <Link
-                      to="/login"
-                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
-                      aria-label="Login"
-                      data-ocid="login-link"
-                    >
-                      <User className="w-4 h-4 text-black" />
-                    </Link>
-                  </>
                 )}
               </div>
 
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-black/5 text-black"
+                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-primary transition-all duration-300 shadow-lg shadow-black/10"
                 aria-label="Toggle menu"
-                data-ocid="mobile-menu-trigger"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -323,52 +297,117 @@ export function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Enhanced */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[100] bg-white animate-fade-in lg:hidden h-screen overflow-y-auto">
-          <div className="container mx-auto container-px py-6">
-            <div className="flex items-center justify-between mb-12">
-              <span className="text-lg font-black italic tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>Aesthetic</span>
+        <div className="fixed inset-0 z-[100] lg:hidden">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileOpen(false)} />
+          <div className="absolute top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl flex flex-col items-stretch animate-drawer-in overflow-y-auto no-scrollbar">
+            <div className="p-6 border-b border-black/5 flex items-center justify-between sticky top-0 bg-white z-10">
+              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                  <span className="text-white font-black text-sm italic">A</span>
+                </div>
+                <span className="text-base font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>Aesthetic</span>
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <nav className="space-y-6">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="block text-4xl font-black uppercase tracking-tight text-black hover:text-primary transition-colors"
-                  style={{ fontFamily: "var(--font-display)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+            <div className="flex-1 px-8 py-10 overflow-x-hidden">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-8 ml-1">Archive Navigation</p>
+              <nav className="flex flex-col gap-6">
+                {NAV_LINKS.map((link, idx) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="group flex items-end gap-3 break-words"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span className="text-[9px] font-black text-black/10 group-hover:text-primary transition-colors leading-none mb-1.5 shrink-0">0{idx + 1}</span>
+                    <span
+                      className="text-2xl sm:text-3xl font-black uppercase tracking-normal text-black group-hover:text-primary group-hover:italic transition-all duration-300 break-words"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      {link.label}
+                    </span>
+                  </Link>
+                ))}
+              </nav>
 
-            <div className="mt-20 pt-10 border-t border-black/5 space-y-4">
-              <Link
-                to="/wishlist"
-                className="flex items-center justify-between p-4 bg-black/5 rounded-3xl"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-sm font-black uppercase tracking-widest">Wishlist</span>
-                <Heart className="w-5 h-5" />
-              </Link>
-              <Link
-                to="/account"
-                className="flex items-center justify-between p-4 bg-black/5 rounded-3xl"
-                onClick={() => setMobileOpen(false)}
-              >
-                <span className="text-sm font-black uppercase tracking-widest">Profile</span>
-                <User className="w-5 h-5" />
-              </Link>
+              <div className="mt-16 pt-10 border-t border-black/5">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20 mb-6 ml-1">User Command</p>
+                <div className="grid gap-3">
+                  <Link
+                    to="/wishlist"
+                    className="flex items-center justify-between h-14 px-6 bg-black/5 rounded-2xl hover:bg-black hover:text-white transition-all group"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <Heart className="w-4 h-4 text-black/40 group-hover:text-white transition-colors" />
+                      <span className="text-[11px] font-black uppercase tracking-widest">My Wishlist</span>
+                    </div>
+                    {wishlistCount > 0 && <span className="text-[10px] font-black px-2 py-0.5 bg-black text-white group-hover:bg-white group-hover:text-black rounded-full">{wishlistCount}</span>}
+                  </Link>
+                  <Link
+                    to="/account"
+                    className="flex items-center justify-between h-14 px-6 bg-black/5 rounded-2xl hover:bg-black hover:text-white transition-all group"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <User className="w-4 h-4 text-black/40 group-hover:text-white transition-colors" />
+                      <span className="text-[11px] font-black uppercase tracking-widest">My Profile</span>
+                    </div>
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center justify-between h-14 px-6 bg-primary text-white rounded-2xl hover:bg-black transition-all"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <Shield className="w-4 h-4" />
+                        <span className="text-[11px] font-black uppercase tracking-widest">Admin Dashboard</span>
+                      </div>
+                    </Link>
+                  )}
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => { handleLogout(); setMobileOpen(false); }}
+                      className="flex items-center justify-between h-14 px-6 bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all group mt-2"
+                    >
+                      <div className="flex items-center gap-4">
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-[11px] font-black uppercase tracking-widest">Protocol Logout</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="flex items-center justify-between h-14 px-6 bg-black text-white rounded-2xl hover:bg-primary transition-all group mt-2 shadow-xl shadow-black/10"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <LogIn className="w-4 h-4" />
+                        <span className="text-[11px] font-black uppercase tracking-widest">Member Login</span>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-8 bg-black/2 space-y-4">
+              <div className="flex items-center gap-6 justify-center opacity-30">
+                <Box className="w-4 h-4" />
+                <Settings className="w-4 h-4" />
+                <HardDrive className="w-4 h-4" />
+              </div>
+              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-center text-black/20">ESTD // 2026</p>
             </div>
           </div>
         </div>

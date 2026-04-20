@@ -129,13 +129,13 @@ export default function LoginPage() {
       </div>
 
       {/* ── Form Side ──────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col p-8 sm:p-20 relative bg-white min-h-screen">
-        <div className="flex items-center justify-between mb-20">
+      <div className="flex-1 flex flex-col p-6 sm:p-20 relative bg-white min-h-screen">
+        <div className="flex items-center justify-between mb-12 lg:mb-20">
           <Link to="/" className="group flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
+            <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
               <ArrowLeft className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-black/30 group-hover:text-black transition-colors">Return</span>
+            <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-black/30 group-hover:text-black transition-colors">Return</span>
           </Link>
 
           <div className="text-right">
@@ -153,15 +153,16 @@ export default function LoginPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
+                className="text-center md:text-left"
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
                   <div className="w-8 h-[2px] bg-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">User Login</span>
+                  <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">User Login</span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
                   {config.title}
                 </h1>
-                <p className="text-black/40 text-xs md:text-sm font-medium leading-relaxed" style={{ fontFamily: "var(--font-secondary)" }}>
+                <p className="text-black/40 text-[11px] lg:text-sm font-medium leading-relaxed max-w-sm mx-auto md:mx-0" style={{ fontFamily: "var(--font-secondary)" }}>
                   {config.sub}
                 </p>
               </motion.div>

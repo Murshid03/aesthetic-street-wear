@@ -256,19 +256,19 @@ export default function CheckoutPage() {
   return (
     <ProtectedRoute redirectTo="/login">
       <Layout>
-        <div className="bg-white min-h-screen pt-24 pb-20">
-          <div className="container mx-auto container-px">
+        <div className="bg-white min-h-screen pt-16 lg:pt-24 pb-32 lg:pb-20">
+          <div className="container mx-auto px-6 lg:px-12">
             {/* ── Editorial Header ────────────────────────────────────────── */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+            <div className="mb-12 lg:mb-16">
+              <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
                 <Link to="/cart" className="hover:text-primary transition-colors flex items-center gap-2">
                   <ArrowLeft className="w-3 h-3" /> Logistics
                 </Link>
-                <ChevronRight className="w-2.5 h-2.5" />
+                <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <span className="text-primary italic">Checkout Protocol</span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-                CHECKOUT <br /> <span className="text-primary italic text-4xl md:text-6xl">DETAILS</span>
+              </nav>
+              <h1 className="text-4xl lg:text-7xl font-black uppercase tracking-tighter leading-tight text-center md:text-left" style={{ fontFamily: "var(--font-display)" }}>
+                CHECKOUT <br /> <span className="text-primary italic text-3xl lg:text-6xl">DETAILS</span>
               </h1>
             </div>
 
@@ -277,11 +277,11 @@ export default function CheckoutPage() {
               <div className="lg:col-span-12 xl:col-span-7 space-y-16">
                 {/* Customer details */}
                 <div className="space-y-10 group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-black shadow-lg">01</div>
-                    <h2 className="text-xl font-black uppercase tracking-widest">SHIPPING INFO</h2>
+                  <div className="flex items-center gap-4 px-4 lg:px-0">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black text-white flex items-center justify-center text-[9px] lg:text-[11px] font-black shadow-lg">01</div>
+                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">SHIPPING INFO</h2>
                   </div>
-                  <div className="grid gap-8 p-10 rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent">
+                  <div className="grid gap-6 lg:gap-8 p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent">
                     <div className="space-y-3">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Full Name</Label>
                       <Input
@@ -305,11 +305,11 @@ export default function CheckoutPage() {
 
                 {/* Order items */}
                 <div className="space-y-10 group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-black shadow-lg">02</div>
-                    <h2 className="text-xl font-black uppercase tracking-widest">ORDER ITEMS</h2>
+                  <div className="flex items-center gap-4 px-4 lg:px-0">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black text-white flex items-center justify-center text-[9px] lg:text-[11px] font-black shadow-lg">02</div>
+                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">ORDER ITEMS</h2>
                   </div>
-                  <div className="p-10 rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent divide-y divide-black/5">
+                  <div className="p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent divide-y divide-black/5">
                     {items.map((item) => (
                       <SizeRow
                         key={`${item.productId}-${item.size}`}
@@ -323,7 +323,7 @@ export default function CheckoutPage() {
 
               {/* ── Summary Side ────────────────────────────────────────────── */}
               <div className="lg:col-span-12 xl:col-span-5">
-                <div className="sticky top-32 p-10 rounded-[3rem] bg-black text-white shadow-2xl relative overflow-hidden">
+                <div className="sticky top-32 p-7 sm:p-10 rounded-[3rem] bg-black text-white shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[130px] rounded-full" />
                   <div className="relative z-10 space-y-10">
                     <div className="flex items-center justify-between">

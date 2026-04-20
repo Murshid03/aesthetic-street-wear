@@ -125,10 +125,10 @@ export default function PantsPage() {
   return (
     <Layout>
       {/* ── Editorial Header ────────────────────────────────────────── */}
-      <section className="pt-32 pb-20 bg-white border-b border-black/5 overflow-hidden">
-        <div className="container mx-auto container-px">
-          <div className="max-w-4xl">
-            <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+      <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5 overflow-hidden">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="max-w-4xl text-center md:text-left">
+            <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
               <span className="w-1 h-1 rounded-full bg-black/10" />
               <span className="text-black/60">Archive</span>
@@ -153,10 +153,10 @@ export default function PantsPage() {
       </section>
 
       {/* ── Modern Controls ─────────────────────────────────────────── */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[72px] z-30 py-4">
-        <div className="container mx-auto container-px">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-6 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[56px] lg:top-[72px] z-30 py-3 lg:py-4">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 lg:gap-6">
+            <div className="flex items-center gap-4 lg:gap-6 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
               <div className="flex items-center gap-2 shrink-0">
                 <SlidersHorizontal className="w-3 h-3 text-black/30" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Size:</span>

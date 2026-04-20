@@ -125,10 +125,10 @@ export default function TShirtsPage() {
   return (
     <Layout>
       {/* ── Editorial Header ────────────────────────────────────────── */}
-      <section className="pt-32 pb-20 bg-white border-b border-black/5 overflow-hidden">
-        <div className="container mx-auto container-px">
-          <div className="max-w-4xl">
-            <nav className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-8">
+      <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5 overflow-hidden">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="max-w-4xl text-center md:text-left">
+            <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
               <span className="w-1 h-1 rounded-full bg-black/10" />
               <span className="text-black/60">Archive</span>
@@ -136,12 +136,13 @@ export default function TShirtsPage() {
               <span className="text-primary italic">T-Shirts</span>
             </nav>
 
-            <div className="flex items-center gap-6 mb-8">
-              <div className="w-12 h-[2px] bg-primary" />
-              <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
+            <div className="flex items-center justify-center md:justify-start gap-4 lg:gap-6 mb-4 lg:mb-8">
+              <div className="w-8 lg:w-12 h-[2px] bg-primary" />
+              <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
+              <div className="md:hidden w-8 h-[2px] bg-primary" />
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-10" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-6 lg:mb-10" style={{ fontFamily: "var(--font-display)" }}>
               GRAPHIC <br /> <span className="text-primary italic">TEES</span>
             </h1>
 
@@ -153,10 +154,10 @@ export default function TShirtsPage() {
       </section>
 
       {/* ── Modern Controls ─────────────────────────────────────────── */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[72px] z-30 py-4">
-        <div className="container mx-auto container-px">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-6 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[56px] lg:top-[72px] z-30 py-3 lg:py-4">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 lg:gap-6">
+            <div className="flex items-center gap-4 lg:gap-6 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
               <div className="flex items-center gap-2 shrink-0">
                 <SlidersHorizontal className="w-3 h-3 text-black/30" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Size:</span>
@@ -200,14 +201,14 @@ export default function TShirtsPage() {
       </div>
 
       {/* ── Result Grid ─────────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto container-px">
+      <section className="py-12 lg:py-20 bg-white pb-32">
+        <div className="container mx-auto px-6 lg:px-12">
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
               {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : tshirts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-x-8 lg:gap-y-16">
               {tshirts.map((p) => (
                 <ProductCard key={p._id} product={p} />
               ))}
