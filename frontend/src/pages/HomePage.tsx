@@ -117,15 +117,15 @@ export default function HomePage() {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative pt-16 lg:pt-24 pb-12 lg:pb-20 overflow-hidden bg-white min-h-[70vh] lg:min-h-[80vh] flex items-center" aria-label="Hero">
         <div className="container mx-auto px-6 md:px-12 lg:px-24">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-20">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             {/* Visual Side - Show first on mobile for engagement */}
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
-              className="w-full lg:w-1/2 order-1 lg:order-2"
+              className="w-full lg:w-[45%] order-1 lg:order-2"
             >
-              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-muted max-w-[280px] sm:max-w-md mx-auto lg:ml-auto lg:mr-0">
+              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-muted max-w-[280px] sm:max-w-md lg:max-w-[380px] xl:max-w-md mx-auto lg:ml-auto lg:mr-0">
                 <img
                   src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1200&q=90"
                   alt="Aesthetic street wear focus"
@@ -139,14 +139,14 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-              className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1"
+              className="w-full lg:w-[55%] flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 lg:pr-10"
             >
               <div className="flex items-center gap-4 mb-4 lg:mb-6">
                 <div className="w-8 h-[2px] bg-primary" />
                 <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Vol . 01 // DROP 26</span>
                 <div className="hidden lg:block w-8 h-[2px] bg-primary" />
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase tracking-tight leading-[1.1] lg:leading-[0.85] mb-6 lg:mb-8" style={{ fontFamily: "var(--font-display)" }}>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[clamp(2.5rem,4vw,3.5rem)] xl:text-6xl font-black uppercase tracking-tighter leading-[1.1] lg:leading-[1] mb-6 lg:mb-8" style={{ fontFamily: "var(--font-display)" }}>
                 AESTHETIC <br />
                 <span className="text-primary italic">STREET</span>WEAR
               </h1>

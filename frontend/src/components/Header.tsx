@@ -301,7 +301,7 @@ export function Header() {
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileOpen(false)} />
-          <div className="absolute top-0 right-0 w-full max-w-sm h-full bg-white shadow-2xl flex flex-col items-stretch animate-drawer-in overflow-y-auto no-scrollbar">
+          <div className="absolute top-0 right-0 w-full h-full bg-white shadow-2xl flex flex-col items-stretch animate-drawer-in overflow-y-auto no-scrollbar">
             <div className="p-6 border-b border-black/5 flex items-center justify-between sticky top-0 bg-white z-10">
               <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
                 <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
