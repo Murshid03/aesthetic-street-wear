@@ -41,10 +41,10 @@ export function formatDate(ts: any) {
 }
 
 const NAV_ITEMS = [
-  { icon: BarChart3, label: "COMMAND", to: "/admin" },
-  { icon: Package, label: "INVENTORY", to: "/admin/products" },
-  { icon: ShoppingBag, label: "MANIFESTS", to: "/admin/orders" },
-  { icon: Settings, label: "PROTOCOLS", to: "/admin/settings" },
+  { icon: BarChart3, label: "DASHBOARD", to: "/admin" },
+  { icon: Package, label: "PRODUCTS", to: "/admin/products" },
+  { icon: ShoppingBag, label: "ORDERS", to: "/admin/orders" },
+  { icon: Settings, label: "SETTINGS", to: "/admin/settings" },
 ];
 
 function AdminSidebar() {
@@ -152,17 +152,17 @@ function AdminDashboardContent() {
   ).slice(0, 6);
 
   const stats = [
-    { label: "NET VALUATION", value: `₹${totalRevenue.toLocaleString("en-IN")}`, sub: "TOTAL FLOW", icon: TrendingUp, bgClass: "bg-emerald-500/10", textClass: "text-emerald-600", delay: 0 },
-    { label: "ACTIVE ITEMS", value: products.length, sub: "INVENTORY", icon: Package, bgClass: "bg-blue-500/10", textClass: "text-blue-600", delay: 0.1 },
-    { label: "MANIFESTS", value: orders.length, sub: "HISTORICAL", icon: ShoppingBag, bgClass: "bg-purple-500/10", textClass: "text-purple-600", delay: 0.2 },
-    { label: "ATTENTION", value: pendingOrders.length, sub: "PENDING", icon: Clock, bgClass: "bg-amber-500/20", textClass: "text-amber-600", delay: 0.3, highlight: pendingOrders.length > 0 },
+    { label: "NET REVENUE", value: `₹${totalRevenue.toLocaleString("en-IN")}`, sub: "TOTAL FLOW", icon: TrendingUp, bgClass: "bg-emerald-500/10", textClass: "text-emerald-600", delay: 0 },
+    { label: "ACTIVE PRODUCTS", value: products.length, sub: "INVENTORY", icon: Package, bgClass: "bg-blue-500/10", textClass: "text-blue-600", delay: 0.1 },
+    { label: "TOTAL ORDERS", value: orders.length, sub: "HISTORY", icon: ShoppingBag, bgClass: "bg-purple-500/10", textClass: "text-purple-600", delay: 0.2 },
+    { label: "PENDING ORDERS", value: pendingOrders.length, sub: "ATTENTION", icon: Clock, bgClass: "bg-amber-500/20", textClass: "text-amber-600", delay: 0.3, highlight: pendingOrders.length > 0 },
   ];
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-6">
         <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Master Terminal...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading Dashboard...</p>
       </div>
     );
   }
@@ -174,9 +174,9 @@ function AdminDashboardContent() {
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-[2px] bg-primary" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Overview . Command</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Overview</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>CONSOLE <br /> <span className="text-primary italic">TERMINAL</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ADMIN <br /> <span className="text-primary italic">DASHBOARD</span></h1>
         </div>
         <div className="hidden xl:flex items-center gap-8 text-right">
           <div className="flex flex-col">
@@ -200,10 +200,10 @@ function AdminDashboardContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Activity className="w-5 h-5 text-primary" />
-              <h2 className="text-2xl font-black uppercase tracking-tight">RECENT MANIFESTS</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight">RECENT ORDERS</h2>
             </div>
             <Link to="/admin/orders" className="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 rounded-full border border-black/5 hover:bg-black hover:text-white transition-all">
-              Full Archive
+              View All
             </Link>
           </div>
 
@@ -211,7 +211,7 @@ function AdminDashboardContent() {
             {recentOrders.map((order) => {
               const meta = STATUS_META[order.status] || STATUS_META.Pending;
               const total = order.totalAmount || order.items.reduce((s, x) => s + x.price * x.quantity, 0);
-              const userName = typeof order.user === "object" ? (order.user as any).name || (order.user as any).email : order.customerName || "Vanguard Member";
+              const userName = typeof order.user === "object" ? (order.user as any).name || (order.user as any).email : order.customerName || "Member";
               return (
                 <motion.div
                   key={order._id}
@@ -251,7 +251,7 @@ function AdminDashboardContent() {
         <div className="xl:col-span-4 space-y-10">
           <div className="flex items-center gap-4">
             <Layers className="w-5 h-5 text-primary" />
-            <h2 className="text-2xl font-black uppercase tracking-tight">TERMINALS</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight">QUICK LINKS</h2>
           </div>
           <div className="grid gap-4">
             {NAV_ITEMS.slice(1).map((item) => (

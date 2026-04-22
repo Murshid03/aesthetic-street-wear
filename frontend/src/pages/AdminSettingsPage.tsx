@@ -80,10 +80,10 @@ function AdminSettingsContent() {
     mutationFn: (newSettings: SiteSettings) => api.put("/settings", newSettings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site_settings"] });
-      toast.success("Protocol Synchronized");
+      toast.success("Settings saved successfully");
       setIsDirty(false);
     },
-    onError: () => toast.error("Sync Protocol Failure"),
+    onError: () => toast.error("Failed to save settings"),
   });
 
   const updateField = (field: keyof SiteSettings, value: string) => {
@@ -100,7 +100,7 @@ function AdminSettingsContent() {
     if (serverSettings) {
       setLocalSettings(serverSettings);
       setIsDirty(false);
-      toast.info("Changes Discarded");
+      toast.info("Changes discarded");
     }
   };
 
@@ -108,7 +108,7 @@ function AdminSettingsContent() {
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-6">
         <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Syncing Architecture...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading Settings...</p>
       </div>
     );
   }
@@ -119,9 +119,9 @@ function AdminSettingsContent() {
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-[2px] bg-primary" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Systems . Control</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Configuration</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>GLOBAL <br /> <span className="text-primary italic text-4xl md:text-6xl">PROTOCOLS</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>SITE <br /> <span className="text-primary italic text-4xl md:text-6xl">SETTINGS</span></h1>
         </div>
       </div>
 
@@ -129,12 +129,12 @@ function AdminSettingsContent() {
         {/* Shop Identity */}
         <SettingBox
           icon={Store}
-          title="BRAND SIGNATURE"
-          description="Global manifestation parameters and metadata used for collection identification."
+          title="BRAND IDENTITY"
+          description="Update your shop name and description used across the website."
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Archive Designation</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Shop Name</Label>
               <Input
                 value={localSettings.shopName}
                 onChange={(e) => updateField("shopName", e.target.value)}
@@ -142,7 +142,7 @@ function AdminSettingsContent() {
               />
             </div>
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Vision Statement</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Shop Description</Label>
               <Input
                 value={localSettings.description}
                 onChange={(e) => updateField("description", e.target.value)}
@@ -152,25 +152,26 @@ function AdminSettingsContent() {
           </div>
         </SettingBox>
 
-        {/* WhatsApp */}
+        {/* WhatsApp Order Confirmation */}
         <SettingBox
           icon={MessageCircle}
-          title="COMMUNICATION HUB"
-          description="Primary encrypted channel for manifest validation and logistics support."
+          title="ORDER CONFIRMATION HUB"
+          description="Set the primary WhatsApp number where customers will be redirected to verify and confirm their orders after checkout."
         >
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Terminal ID (WhatsApp)</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Confirmation Number (10 Digits)</Label>
               <Input
                 value={localSettings.whatsappNumber}
                 onChange={(e) => updateField("whatsappNumber", e.target.value)}
-                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+                placeholder="e.g. 7540096446"
+                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
               />
             </div>
             <div className="flex items-center gap-4 p-8 rounded-[2rem] bg-black/5 border border-black/5">
               <Info className="w-5 h-5 text-primary shrink-0" />
               <p className="text-[10px] font-black uppercase tracking-widest text-black/40 leading-relaxed italic">
-                Active Uplink: <span className="text-primary">ARCHIVE . 0x{localSettings.whatsappNumber.replace(/\D/g, "")}</span>
+                Current Redirect Terminal: <span className="text-primary">{localSettings.whatsappNumber || "NOT SET"}</span>
               </p>
             </div>
           </div>
@@ -179,15 +180,16 @@ function AdminSettingsContent() {
         {/* Banner */}
         <SettingBox
           icon={Megaphone}
-          title="APEX ANNOUNCEMENTS"
-          description="High-visibility bulletin deployed across all terminal apex sectors."
+          title="TOP BANNER"
+          description="Update the announcement message shown at the very top of your website."
         >
           <div className="space-y-8">
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Bulletin Script</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Banner Text</Label>
               <Textarea
                 value={localSettings.bannerMessage}
                 onChange={(e) => updateField("bannerMessage", e.target.value)}
+                placeholder="e.g. Free shipping on orders over ₹999!"
                 className="min-h-[120px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
               />
             </div>
@@ -213,8 +215,8 @@ function AdminSettingsContent() {
           >
             <div className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-full p-4 shadow-2xl flex items-center justify-between gap-6">
               <div className="pl-6">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">MANIFEST MODIFIED</p>
-                <p className="text-[8px] text-white/30 uppercase tracking-[0.3em]">Signature pending synchronization</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">SETTINGS MODIFIED</p>
+                <p className="text-[8px] text-white/30 uppercase tracking-[0.3em]">Save changes to apply</p>
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="ghost" onClick={handleReset} className="h-12 rounded-full px-8 text-[9px] font-black uppercase tracking-widest text-white hover:bg-white/5">
@@ -226,7 +228,7 @@ function AdminSettingsContent() {
                   className="h-12 rounded-full px-10 text-[9px] font-black uppercase tracking-widest bg-primary text-white hover:scale-105 transition-all shadow-xl"
                 >
                   {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                  SYNC ARCHITECTURE
+                  SAVE SETTINGS
                 </Button>
               </div>
             </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import api from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
-import type { CartItem } from "@/types";
+import type { CartItem, SiteSettings } from "@/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -110,7 +110,7 @@ function ConfirmationScreen({
             </p>
 
             <div className="bg-white/5 rounded-3xl p-8 mb-12 border border-white/5 backdrop-blur-sm">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">Order Reference</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">Order ID</p>
               <p className="text-3xl font-black text-primary tracking-[0.2em]">#{orderRef.slice(-8).toUpperCase()}</p>
               <div className="w-12 h-1 bg-primary/20 mx-auto mt-6 rounded-full" />
             </div>
@@ -148,7 +148,17 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
-  const WHATSAPP_NUMBER = "917540096446";
+  const { data: settings } = useQuery<SiteSettings>({
+    queryKey: ["site_settings"],
+    queryFn: async () => {
+      const { data } = await api.get("/settings");
+      return data;
+    },
+  });
+
+  // Automatically add 91 prefix if number is 10 digits
+  const rawNum = (settings?.whatsappNumber || "7540096446").replace(/\D/g, "");
+  const WHATSAPP_NUMBER = rawNum.length === 10 ? `91${rawNum}` : rawNum;
 
   const orderMutation = useMutation({
     mutationFn: async (orderData: any) => {
@@ -262,7 +272,7 @@ export default function CheckoutPage() {
             <div className="mb-12 lg:mb-16">
               <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
                 <Link to="/cart" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <ArrowLeft className="w-3 h-3" /> Logistics
+                  <ArrowLeft className="w-3 h-3" /> Cart
                 </Link>
                 <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <span className="text-primary italic">Checkout Protocol</span>
@@ -307,7 +317,7 @@ export default function CheckoutPage() {
                 <div className="space-y-10 group">
                   <div className="flex items-center gap-4 px-4 lg:px-0">
                     <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black text-white flex items-center justify-center text-[9px] lg:text-[11px] font-black shadow-lg">02</div>
-                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">ORDER ITEMS</h2>
+                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">ORDER SUMMARY</h2>
                   </div>
                   <div className="p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent divide-y divide-black/5">
                     {items.map((item) => (
@@ -328,7 +338,7 @@ export default function CheckoutPage() {
                   <div className="relative z-10 space-y-10">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black uppercase tracking-widest">SUMMARY</h2>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-white/30 italic">COD Protocol Active</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/30 italic">CASH ON DELIVERY</span>
                     </div>
 
                     <div className="space-y-6">

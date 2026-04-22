@@ -2,6 +2,7 @@ import express from 'express';
 import Order from '../models/Order.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import Notification from '../models/Notification.js';
+import { sendEmail } from '../utils/email.js';
 
 const router = express.Router();
 
@@ -83,14 +84,33 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
 
         if (!order) return res.status(404).json({ error: 'Order not found' });
 
-        // CREATE NOTIFICATION for user
+        // Generate human-friendly message
+        const statusMsg = `Your order #${order._id.toString().slice(-8).toUpperCase()} has been ${status.toLowerCase()}.`;
+        const fullMsg = statusMsg + (adminNotes ? `\n\nAdmin Note: ${adminNotes}` : "") + `\n\nThank you for shopping with us!`;
+
+        // CREATE NOTIFICATION for user (App notification)
         await Notification.create({
             user: order.user._id,
             title: `📦 Order ${status}`,
-            message: `Your order #...${order._id.toString().slice(-6).toUpperCase()} has been ${status.toLowerCase()}.${adminNotes ? ` Note: ${adminNotes}` : ''}`,
+            message: statusMsg + (adminNotes ? ` Note: ${adminNotes}` : ''),
             type: 'order_status',
             relatedId: order._id.toString()
         });
+
+        // SEND EMAIL NOTIFICATION
+        if (order.user && order.user.email) {
+            try {
+                await sendEmail({
+                    email: order.user.email,
+                    subject: `Update on your Order #${order._id.toString().slice(-8).toUpperCase()}`,
+                    message: `Hi ${order.user.name || 'Value Customer'},\n\n${fullMsg}`
+                });
+                console.log(`📧 Status email sent to ${order.user.email}`);
+            } catch (emailErr) {
+                console.error('❌ Failed to send status email:', emailErr);
+                // We don't fail the entire request if email fails
+            }
+        }
 
         res.json(order);
     } catch (err) {

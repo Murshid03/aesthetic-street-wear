@@ -193,8 +193,9 @@ export function Header() {
                 )}
               </Link>
 
-              <div className="relative flex items-center">
-                {isAdmin && (
+              <div className="relative flex items-center gap-0.5 sm:gap-1">
+                {/* Admin Access Case */}
+                {isAdmin ? (
                   <div className="relative" ref={adminMenuRef}>
                     <button
                       type="button"
@@ -209,7 +210,7 @@ export function Header() {
                     {adminMenuOpen && (
                       <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl border border-black/5 shadow-2xl py-1.5 z-[60] animate-fade-up">
                         <div className="px-4 py-2 border-b border-black/5">
-                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">Admin . Terminal</p>
+                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">Admin Access</p>
                         </div>
                         <div className="p-1 space-y-0.5">
                           {[
@@ -240,8 +241,19 @@ export function Header() {
                       </div>
                     )}
                   </div>
+                ) : !isAuthenticated && (
+                  <Link
+                    to="/login"
+                    search={{ admin: "true" }}
+                    className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-colors group"
+                    aria-label="Admin Portal"
+                  >
+                    <Shield className="w-4 h-4 text-black group-hover:text-primary transition-colors" />
+                  </Link>
                 )}
-                {isAuthenticated && (
+
+                {/* User Access Case */}
+                {isAuthenticated ? (
                   <div className="relative" ref={userMenuRef}>
                     <button
                       type="button"
@@ -256,7 +268,7 @@ export function Header() {
                     {userMenuOpen && (
                       <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl border border-black/5 shadow-2xl py-1.5 z-[60] animate-fade-up">
                         <div className="px-4 py-2 border-b border-black/5">
-                          <p className="text-[9px] font-bold uppercase tracking-wider text-black/30 mb-0.5">Signature</p>
+                          <p className="text-[9px] font-bold uppercase tracking-wider text-black/30 mb-0.5">Account</p>
                           <p className="text-xs font-black text-black truncate uppercase tracking-tighter">{user?.name}</p>
                         </div>
                         <div className="p-1 space-y-0.5">
@@ -281,6 +293,14 @@ export function Header() {
                       </div>
                     )}
                   </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full hover:bg-black/5 transition-colors group"
+                    aria-label="Account Login"
+                  >
+                    <User className="w-4 h-4 text-black group-hover:text-primary transition-colors" />
+                  </Link>
                 )}
               </div>
 
@@ -319,7 +339,7 @@ export function Header() {
             </div>
 
             <div className="flex-1 px-8 py-10 overflow-x-hidden">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-8 ml-1">Archive Navigation</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-8 ml-1">Menu</p>
               <nav className="flex flex-col gap-6">
                 {NAV_LINKS.map((link, idx) => (
                   <Link
@@ -340,7 +360,7 @@ export function Header() {
               </nav>
 
               <div className="mt-16 pt-10 border-t border-black/5">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20 mb-6 ml-1">User Command</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20 mb-6 ml-1">Account</p>
                 <div className="grid gap-3">
                   <Link
                     to="/wishlist"
@@ -363,7 +383,7 @@ export function Header() {
                       <span className="text-[11px] font-black uppercase tracking-widest">My Profile</span>
                     </div>
                   </Link>
-                  {isAdmin && (
+                  {isAdmin ? (
                     <Link
                       to="/admin"
                       className="flex items-center justify-between h-14 px-6 bg-primary text-white rounded-2xl hover:bg-black transition-all"
@@ -374,6 +394,18 @@ export function Header() {
                         <span className="text-[11px] font-black uppercase tracking-widest">Admin Dashboard</span>
                       </div>
                     </Link>
+                  ) : !isAuthenticated && (
+                    <Link
+                      to="/login"
+                      search={{ admin: "true" }}
+                      className="flex items-center justify-between h-14 px-6 border border-primary/20 bg-primary/5 text-primary rounded-2xl hover:bg-primary hover:text-white transition-all group"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <Shield className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
+                        <span className="text-[11px] font-black uppercase tracking-widest">Admin Console</span>
+                      </div>
+                    </Link>
                   )}
                   {isAuthenticated ? (
                     <button
@@ -382,7 +414,7 @@ export function Header() {
                     >
                       <div className="flex items-center gap-4">
                         <LogOut className="w-4 h-4" />
-                        <span className="text-[11px] font-black uppercase tracking-widest">Protocol Logout</span>
+                        <span className="text-[11px] font-black uppercase tracking-widest">Logout</span>
                       </div>
                     </button>
                   ) : (
@@ -425,7 +457,7 @@ export function Header() {
               <input
                 ref={searchRef}
                 type="search"
-                placeholder="Search signatures..."
+                placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent text-xl font-black text-black placeholder:text-black/10 outline-none"

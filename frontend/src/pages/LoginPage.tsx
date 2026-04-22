@@ -52,7 +52,7 @@ export default function LoginPage() {
         toast.success("Account created successfully!");
       }
     } catch (err: any) {
-      const message = err.response?.data?.error || err.message || "Auth Error";
+      const message = err.response?.data?.error || err.message || "Authentication failed";
       toast.error(message);
     }
   };
@@ -66,7 +66,7 @@ export default function LoginPage() {
       setMode("otp");
       toast.success("OTP sent to your email");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Dispatch Failed");
+      toast.error(err.response?.data?.error || "Failed to send code");
     } finally {
       setResetLoading(false);
     }
@@ -96,7 +96,7 @@ export default function LoginPage() {
       setMode("login");
       toast.success("Password reset successfully");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Reconfig Failed");
+      toast.error(err.response?.data?.error || "Failed to reset password");
     } finally {
       setResetLoading(false);
     }
@@ -118,7 +118,7 @@ export default function LoginPage() {
         <div className="relative z-10 text-center space-y-8">
           <div className="inline-flex items-center gap-4 mb-4">
             <div className="w-12 h-px bg-white/10" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Member Access</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Member Login</span>
             <div className="w-12 h-px bg-white/10" />
           </div>
           <h2 className="text-6xl font-black text-white uppercase tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
@@ -157,7 +157,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
                   <div className="w-8 h-[2px] bg-primary" />
-                  <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">User Login</span>
+                  <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Secure Login</span>
                 </div>
                 <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
                   {config.title}
@@ -303,7 +303,7 @@ export default function LoginPage() {
           <div className="mt-12 pt-8 border-t border-black/5 text-center">
             {!isAdminLogin && (mode === "login" || mode === "register") && (
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">
-                {mode === "login" ? "Identity unknown? " : "Already authenticated? "}
+                {mode === "login" ? "New customer? " : "Already have an account? "}
                 <button
                   onClick={() => setMode(mode === "login" ? "register" : "login")}
                   className="text-primary hover:text-black transition-colors"
@@ -321,7 +321,7 @@ export default function LoginPage() {
               </button>
             )}
             {isAdminLogin && (
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary italic">PRIVILEGED ACCESS SECTOR</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary italic">RESTRICTED ADMIN ACCESS</p>
             )}
           </div>
         </div>

@@ -70,10 +70,10 @@ function OrderDetailSheet({
           <SheetHeader className="text-left space-y-6">
             <div className="flex items-center gap-3">
               <div className="w-8 h-[2px] bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Details</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Overview</span>
             </div>
             <SheetTitle className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-              #{order._id?.slice(-8).toUpperCase()} <br /> <span className="text-primary italic">OVERVIEW</span>
+              #{order._id?.slice(-8).toUpperCase()} <br /> <span className="text-primary italic">DETAILS</span>
             </SheetTitle>
             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-black/30">
               <span>Created: {formatDate(order.createdAt)}</span>
@@ -86,10 +86,10 @@ function OrderDetailSheet({
             <div className="p-8 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 space-y-6">
               <div className="flex items-center gap-3 text-amber-600">
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Verification Needed</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Confirm via WhatsApp</span>
               </div>
               <p className="text-sm font-medium text-amber-800/60 leading-relaxed italic">
-                "Confirm order via WhatsApp before updating status."
+                Please verify this order with the customer before confirming.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <button
@@ -278,10 +278,10 @@ function AdminOrdersContent() {
       api.put(`/orders/${id}/status`, { status, adminNotes: notes }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
-      toast.success("Order Updated");
+      toast.success("Order status updated successfully");
       setSelectedOrder(null);
     },
-    onError: () => toast.error("Update Failed"),
+    onError: () => toast.error("Failed to update order status"),
   });
 
   const filtered = useMemo(() => {

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const settingsSchema = new mongoose.Schema(
     {
         shopName: { type: String, default: 'Aesthetic Street Wear' },
-        whatsappNumber: { type: String, default: '+91 98765 43210' },
+        whatsappNumber: { type: String, default: '7540096446' },
         description: { type: String, default: 'Modern luxury streetwear for men' },
         bannerMessage: { type: String, default: 'Free shipping on orders above ₹999!' },
         email: { type: String, default: 'hello@aesthetic.com' },

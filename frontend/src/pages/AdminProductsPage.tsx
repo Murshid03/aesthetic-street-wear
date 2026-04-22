@@ -116,39 +116,39 @@ function AdminProductsContent() {
     mutationFn: (newP: any) => api.post("/products", newP),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_products"] });
-      toast.success("Artifact Archived Successfully");
+      toast.success("Product added successfully");
       setIsOpen(false);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Registration Failed"),
+    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to add product"),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => api.put(`/products/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_products"] });
-      toast.success("Manifest Updated");
+      toast.success("Product updated successfully");
       setIsOpen(false);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Update Failed"),
+    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to update product"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_products"] });
-      toast.success("Artifact De-registered");
+      toast.success("Product deleted successfully");
       setDeleteId(null);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Destruction Failed"),
+    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to delete product"),
   });
 
   const toggleSoldOutMutation = useMutation({
     mutationFn: (id: string) => api.put(`/products/${id}/toggle-sold-out`),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["admin_products"] });
-      toast.success("Status Updated");
+      toast.success("Status updated");
     },
-    onError: () => toast.error("Sync Failed"),
+    onError: () => toast.error("Failed to update status"),
   });
 
   const filtered = useMemo(() => {
@@ -166,8 +166,9 @@ function AdminProductsContent() {
       sizes: ["S", "M", "L", "XL"],
       isActive: true,
       stockQuantity: 10,
-      price: 0,
-      image: ""
+      price: undefined,
+      image: "",
+      description: ""
     });
     setSelectedFile(null);
     setIsOpen(true);
@@ -181,8 +182,8 @@ function AdminProductsContent() {
   };
 
   const handleSave = () => {
-    if (!form.name?.trim() || form.price === undefined || form.price < 0) {
-      toast.error("Invalid Signature");
+    if (!form.name?.trim() || !form.description?.trim() || form.price === undefined || form.price < 0) {
+      toast.error("Please enter a name and description");
       return;
     }
 
@@ -223,16 +224,16 @@ function AdminProductsContent() {
         <div>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-[2px] bg-primary" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Catalog . Command</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Management</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>INVENTORY <br /> <span className="text-primary italic text-4xl md:text-6xl">ARCHIVE</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>PRODUCT <br /> <span className="text-primary italic text-4xl md:text-6xl">INVENTORY</span></h1>
         </div>
         <Button
           onClick={openCreate}
           className="h-16 px-10 rounded-full bg-black text-white hover:bg-primary transition-all font-black text-[10px] uppercase tracking-[0.4em] shadow-xl"
         >
           <Plus className="w-4 h-4 mr-3" />
-          New Artifact
+          Add Product
         </Button>
       </div>
 
@@ -272,8 +273,8 @@ function AdminProductsContent() {
       ) : (
         <div className="grid gap-4">
           <div className="flex items-center justify-between px-10 text-[9px] font-black uppercase tracking-[0.4em] text-black/20">
-            <span>Artifact Specification</span>
-            <span>Collection Presence</span>
+            <span>Product Details</span>
+            <span>Availability</span>
           </div>
           <AnimatePresence mode="popLayout">
             {filtered.map((p, idx) => (
@@ -347,16 +348,16 @@ function AdminProductsContent() {
           <SheetHeader className="mb-12 text-left">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-[2px] bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Protocol Addition</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Product Details</span>
             </div>
             <SheetTitle className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-              {editing ? "MODIFY" : "RECRUIT"} <br /> <span className="text-primary italic">ARTIFACT</span>
+              {editing ? "EDIT" : "ADD"} <br /> <span className="text-primary italic">PRODUCT</span>
             </SheetTitle>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-10 custom-scrollbar">
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Visualization</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Product Image</Label>
               <div className="flex gap-6">
                 <div className="w-32 h-44 rounded-[2rem] bg-black/5 overflow-hidden border border-black/5 shrink-0">
                   {form.image ? <img src={form.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-8 h-8 text-black/5" /></div>}
@@ -372,7 +373,7 @@ function AdminProductsContent() {
                   />
                   <div className="text-[9px] font-black uppercase tracking-widest text-black/20 text-center">OR</div>
                   <Input
-                    placeholder="Manifest Image Link"
+                    placeholder="Image URL"
                     className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
                     value={selectedFile ? "" : (form.image ?? "")}
                     onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))}
@@ -383,7 +384,7 @@ function AdminProductsContent() {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Sector (Category)</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Category</Label>
                 <Select value={form.category} onValueChange={(v) => setForm(f => ({ ...f, category: v as Category }))}>
                   <SelectTrigger className="h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-none">
                     <SelectValue />
@@ -394,18 +395,18 @@ function AdminProductsContent() {
                 </Select>
               </div>
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Operational State</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Visibility Status</Label>
                 <div className="flex items-center h-14 px-6 bg-black/5 rounded-2xl justify-between">
-                  <span className="text-[9px] font-black uppercase tracking-widest">{form.isActive ? "ACTIVE" : "DORMANT"}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest">{form.isActive ? "ACTIVE" : "HIDDEN"}</span>
                   <Switch checked={form.isActive} onCheckedChange={(v) => setForm(f => ({ ...f, isActive: v }))} />
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Signature Designation</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Product Name</Label>
               <Input
-                placeholder="Artifact Title"
+                placeholder="Product Title"
                 className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
                 value={form.name ?? ""}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
@@ -414,21 +415,27 @@ function AdminProductsContent() {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Procurement Value (₹)</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Price (₹)</Label>
                 <Input
                   type="number"
                   className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
-                  value={form.price ?? ""}
-                  onChange={(e) => setForm(f => ({ ...f, price: Number(e.target.value) }))}
+                  value={form.price === undefined ? "" : form.price}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setForm(f => ({ ...f, price: val === "" ? undefined : Number(val) }));
+                  }}
                 />
               </div>
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Fragment Supply</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Stock Quantity</Label>
                 <Input
                   type="number"
                   className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
-                  value={form.stockQuantity ?? ""}
-                  onChange={(e) => setForm(f => ({ ...f, stockQuantity: Number(e.target.value) }))}
+                  value={form.stockQuantity === undefined ? "" : form.stockQuantity}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setForm(f => ({ ...f, stockQuantity: val === "" ? undefined : Number(val) }));
+                  }}
                 />
               </div>
             </div>
@@ -439,9 +446,9 @@ function AdminProductsContent() {
             </div>
 
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Structural Details</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Description</Label>
               <Textarea
-                placeholder="Architectural specifications..."
+                placeholder="Product description and details..."
                 className="min-h-[150px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
                 value={form.description ?? ""}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
@@ -455,7 +462,7 @@ function AdminProductsContent() {
               onClick={handleSave}
               disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="animate-spin" /> : editing ? "UPDATE ARCHIVE" : "RECRUIT ARTIFACT"}
+              {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="animate-spin" /> : editing ? "SAVE CHANGES" : "ADD PRODUCT"}
             </Button>
           </SheetFooter>
         </SheetContent>
