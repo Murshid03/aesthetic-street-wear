@@ -50,7 +50,7 @@ router.post('/', protect, adminOnly, upload.single('image'), async (req, res) =>
         }
 
         if (req.file) {
-            productData.image = `/uploads/${req.file.filename}`;
+            productData.image = req.file.location;
         }
 
         // Explicit Type Conversion for FormData strings
@@ -80,7 +80,7 @@ router.put('/:id', protect, adminOnly, upload.single('image'), async (req, res) 
         }
 
         if (req.file) {
-            productData.image = `/uploads/${req.file.filename}`;
+            productData.image = req.file.location;
         }
 
         // Explicit Type Conversion for FormData strings
