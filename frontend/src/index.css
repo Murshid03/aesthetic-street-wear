@@ -271,13 +271,26 @@
   }
 
   /* Scroll hide */
-  .scrollbar-none::-webkit-scrollbar {
+  .scrollbar-none::-webkit-scrollbar,
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
-  .scrollbar-none {
+  .scrollbar-none,
+  .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Mobile safe area */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Minimum touch target */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   /* Focus ring */

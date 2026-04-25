@@ -31,18 +31,18 @@ function QuantityControl({
   onIncrease: () => void;
 }) {
   return (
-    <div className="flex items-center bg-black/5 rounded-full p-1 border border-black/5">
+    <div className="flex items-center bg-black/5 rounded-full p-0.5 border border-black/5">
       <button
         onClick={onDecrease}
         disabled={quantity <= 1}
-        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all disabled:opacity-20"
+        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all disabled:opacity-20 touch-target"
       >
         <Minus className="w-3 h-3" />
       </button>
       <span className="w-8 text-center text-[11px] font-black">{quantity}</span>
       <button
         onClick={onIncrease}
-        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all"
+        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all touch-target"
       >
         <Plus className="w-3 h-3" />
       </button>
@@ -62,15 +62,15 @@ function CartItemRow({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col sm:flex-row gap-6 py-8 border-b border-black/5 last:border-0 group"
+      exit={{ opacity: 0, x: -16 }}
+      className="flex gap-4 py-5 border-b border-black/5 last:border-0 group"
     >
       <Link
         to="/product/$id"
         params={{ id: String(item.productId) }}
-        className="shrink-0 aspect-[3/4] w-32 rounded-2xl overflow-hidden bg-muted relative"
+        className="shrink-0 w-20 sm:w-28 aspect-[3/4] rounded-2xl overflow-hidden bg-muted"
       >
         <img
           src={item.product.image}
@@ -79,42 +79,39 @@ function CartItemRow({
         />
       </Link>
 
-      <div className="flex-1 flex flex-col justify-between py-1">
-        <div className="space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
+      <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-0.5 min-w-0">
               <Link
                 to="/product/$id"
                 params={{ id: String(item.productId) }}
-                className="text-xs font-black uppercase tracking-[0.1em] hover:text-primary transition-colors block"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-[0.1em] hover:text-primary transition-colors block truncate"
                 style={{ fontFamily: "var(--font-accent)" }}
               >
                 {item.product.name}
               </Link>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-black uppercase tracking-widest text-black/30">Fitment: <span className="text-black">{item.size}</span></span>
-                <span className="w-1 h-1 rounded-full bg-black/10" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-black/30">ID: {String(item.productId).slice(-6).toUpperCase()}</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/30">Size: <span className="text-black">{item.size}</span></span>
               </div>
             </div>
             <button
               onClick={onRemove}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-black/20 hover:text-rose-500 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-black/20 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-3">
           <QuantityControl
             quantity={item.quantity}
             onDecrease={() => onQtyChange(item.quantity - 1)}
             onIncrease={() => onQtyChange(item.quantity + 1)}
           />
           <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-widest text-black/20 mb-1">Subtotal</p>
-            <p className="text-lg font-black tabular-nums">₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</p>
+            <p className="text-sm sm:text-base font-black tabular-nums">₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</p>
           </div>
         </div>
       </div>
@@ -142,55 +139,55 @@ export default function CartPage() {
 
   return (
     <Layout>
-      {/* ── Editorial Header ────────────────────────────────────────── */}
-      <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5">
-        <div className="container mx-auto px-6 lg:px-12">
-          <nav className="flex items-center gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
+      {/* Header */}
+      <section className="pt-16 sm:pt-20 pb-6 sm:pb-10 bg-white border-b border-black/5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          <nav className="flex items-center gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
             <Link to="/" className="hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="w-2.5 h-2.5 shrink-0" />
             <span className="text-primary italic">Shopping Cart</span>
           </nav>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 lg:gap-10">
-            <div className="max-w-xl text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4 lg:mb-6">
-                <div className="w-8 lg:w-12 h-[2px] bg-primary" />
-                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Cart</span>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 sm:w-8 h-[2px] bg-primary" />
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Your Cart</span>
               </div>
-              <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
-                MY <br /> <span className="text-primary italic">CART</span>
+              <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
+                My <span className="text-primary italic">Cart</span>
               </h1>
             </div>
 
             {!isEmpty && (
-              <div className="flex flex-col items-end gap-2 text-right">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">Cart Total</p>
-                <div className="text-4xl font-black text-black leading-none">₹{total.toLocaleString("en-IN")}</div>
+              <div className="text-right">
+                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-black/30">Total</p>
+                <div className="text-2xl sm:text-3xl font-black text-black leading-none">₹{total.toLocaleString("en-IN")}</div>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Main Content ────────────────────────────────────────────── */}
-      <section className="py-12 lg:py-20 bg-white min-h-[60vh] pb-32">
-        <div className="container mx-auto px-6 lg:px-12">
+      {/* Content */}
+      <section className="py-6 sm:py-10 bg-white min-h-[60vh] pb-28 sm:pb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           {isEmpty ? (
-            <div className="py-32 text-center max-w-md mx-auto">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-10">
-                <ShoppingBag className="w-10 h-10 text-black/10" />
+            <div className="py-20 text-center max-w-sm mx-auto">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-black/5 mb-8">
+                <ShoppingBag className="w-8 h-8 text-black/10" />
               </div>
-              <h2 className="text-3xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Your Cart is Empty</h2>
-              <p className="text-black/40 text-sm font-medium leading-relaxed mb-12">Looks like you haven't added anything to your cart yet. Browse our collections to find something you like.</p>
-              <Button asChild className="h-16 px-12 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.4em] shadow-xl">
+              <h2 className="text-2xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Your Cart is Empty</h2>
+              <p className="text-black/40 text-sm font-medium leading-relaxed mb-10">Browse our collections to find something you like.</p>
+              <Button asChild className="h-12 px-10 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.4em] shadow-lg">
                 <Link to="/">Start Shopping</Link>
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
               {/* Items */}
-              <div className="lg:col-span-12 xl:col-span-8">
-                <div className="space-y-4">
+              <div className="lg:col-span-7 xl:col-span-8">
+                <div className="space-y-0">
                   <AnimatePresence initial={false} mode="popLayout">
                     {items.map((item) => (
                       <CartItemRow
@@ -203,33 +200,33 @@ export default function CartPage() {
                   </AnimatePresence>
                 </div>
 
-                <div className="mt-12">
-                  <Link to="/" className="group inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-black/30 hover:text-black transition-colors">
-                    <div className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                      <ArrowLeft className="w-3.5 h-3.5" />
+                <div className="mt-8">
+                  <Link to="/" className="group inline-flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.3em] text-black/30 hover:text-black transition-colors">
+                    <div className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
+                      <ArrowLeft className="w-3 h-3" />
                     </div>
                     Continue Shopping
                   </Link>
                 </div>
               </div>
 
-              {/* Summary Summary Sidebar */}
-              <div className="lg:col-span-12 xl:col-span-4 lg:pt-8">
-                <div className="sticky top-32 p-7 sm:p-10 rounded-[2.5rem] bg-black text-white shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 blur-[100px] rounded-full" />
-                  <div className="relative z-10 space-y-10">
-                    <h2 className="text-xl font-black uppercase tracking-widest mb-10">ORDER SUMMARY</h2>
+              {/* Summary */}
+              <div className="lg:col-span-5 xl:col-span-4">
+                <div className="sticky top-24 p-5 sm:p-7 rounded-3xl bg-black text-white shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full" />
+                  <div className="relative z-10 space-y-6">
+                    <h2 className="text-base font-black uppercase tracking-widest">Order Summary</h2>
 
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/30">
                         <span>Sub-Total</span>
                         <span className="text-white">₹{total.toLocaleString("en-IN")}</span>
                       </div>
-                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/30">
                         <span>Shipping</span>
-                        <span className="text-primary italic italic">Standard Delivery / Free</span>
+                        <span className="text-primary italic">Free</span>
                       </div>
-                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/30">
                         <span>Taxes</span>
                         <span className="text-white italic">Included</span>
                       </div>
@@ -238,32 +235,26 @@ export default function CartPage() {
                     <Separator className="bg-white/10" />
 
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Total Amount</span>
-                      <span className="text-3xl font-black">₹{total.toLocaleString("en-IN")}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Total</span>
+                      <span className="text-2xl sm:text-3xl font-black">₹{total.toLocaleString("en-IN")}</span>
                     </div>
 
                     <Button
                       onClick={handleCheckout}
                       disabled={checkoutLoading}
-                      className="w-full h-16 rounded-full bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
+                      className="w-full h-12 sm:h-14 rounded-full bg-white text-black hover:bg-primary hover:text-white transition-all duration-500 font-black text-[10px] uppercase tracking-[0.3em] shadow-xl"
                     >
-                      <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${checkoutLoading ? "-translate-y-16" : ""}`}>
-                        {isAuthenticated ? "PROCEED TO CHECKOUT" : "LOGIN TO CHECKOUT"}
-                        <ChevronRight className="w-4 h-4" />
-                      </span>
-                      <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${checkoutLoading ? "translate-y-0" : "translate-y-16"}`}>
-                        <Package className="w-4 h-4 animate-bounce" />
-                        Processing...
-                      </span>
+                      {isAuthenticated ? "Proceed to Checkout" : "Login to Checkout"}
+                      <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
 
-                    <div className="grid grid-cols-3 gap-2 pt-6 border-t border-white/5">
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5">
                       {[
                         { icon: ShieldCheck, label: "Secure" },
                         { icon: Truck, label: "Fast" },
                         { icon: Package, label: "Packed" }
                       ].map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2 opacity-20">
+                        <div key={i} className="flex flex-col items-center gap-1.5 opacity-20">
                           <item.icon className="w-3.5 h-3.5" />
                           <span className="text-[7px] font-black uppercase tracking-widest">{item.label}</span>
                         </div>

@@ -186,51 +186,51 @@ export default function WishlistPage() {
 
     return (
         <Layout>
-            {/* ── Editorial Header ────────────────────────────────────────── */}
-            <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5">
-                <div className="container mx-auto px-6 lg:px-12">
-                    <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
+            {/* Header */}
+            <section className="pt-16 sm:pt-24 pb-8 sm:pb-12 bg-white border-b border-black/5">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+                    <nav className="flex items-center gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                         <ChevronRight className="w-2.5 h-2.5" />
                         <span className="text-primary italic">My Wishlist</span>
                     </nav>
 
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
-                        <div className="max-w-xl text-center md:text-left">
-                            <div className="flex items-center justify-center md:justify-start gap-3 mb-4 lg:mb-6">
-                                <div className="w-8 lg:w-12 h-[2px] bg-primary" />
-                                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Wishlist</span>
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-6 sm:w-8 h-[2px] bg-primary" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Your Wishlist</span>
                             </div>
-                            <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
-                                MY <br /> <span className="text-primary italic">WISHLIST</span>
+                            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+                                My <span className="text-primary italic">Wishlist</span>
                             </h1>
                         </div>
 
                         {itemCount > 0 && (
-                            <div className="flex flex-col items-end gap-2 text-right">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">Current Loadout</p>
-                                <div className="text-4xl font-black text-black leading-none">{itemCount < 10 ? `0${itemCount}` : itemCount}</div>
+                            <div className="text-right">
+                                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-black/30">Items</p>
+                                <div className="text-2xl sm:text-3xl font-black text-black leading-none">{itemCount < 10 ? `0${itemCount}` : itemCount}</div>
                             </div>
                         )}
                     </div>
                 </div>
             </section>
 
-            {/* ── Main Content ────────────────────────────────────────────── */}
-            <section className="py-12 lg:py-20 bg-white min-h-[60vh] pb-32">
-                <div className="container mx-auto px-6 lg:px-12">
+            {/* Main Content */}
+            <section className="py-6 sm:py-10 bg-white min-h-[60vh] pb-24">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-12">
                     {itemCount === 0 ? (
-                        <div className="py-32 text-center max-w-md mx-auto">
-                            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-black/5 mb-10">
-                                <Heart className="w-10 h-10 text-black/10" />
+                        <div className="py-20 text-center max-w-sm mx-auto">
+                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-black/5 mb-8">
+                                <Heart className="w-8 h-8 text-black/10" />
                             </div>
-                            <h2 className="text-3xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Archive Empty</h2>
-                            <p className="text-black/40 text-sm font-medium leading-relaxed mb-12">No signatures have been curated yet. Explore the primary archive to begin your collection.</p>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Button asChild className="h-14 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest">
+                            <h2 className="text-2xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>Wishlist Empty</h2>
+                            <p className="text-black/40 text-sm font-medium leading-relaxed mb-10">Explore our collections and save items you love.</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button asChild className="h-12 rounded-full bg-black text-white text-[9px] font-black uppercase tracking-widest">
                                     <Link to="/shirts">Shop Shirts</Link>
                                 </Button>
-                                <Button asChild variant="outline" className="h-14 rounded-full border-black/10 text-[10px] font-black uppercase tracking-widest">
+                                <Button asChild variant="outline" className="h-12 rounded-full border-black/10 text-[9px] font-black uppercase tracking-widest">
                                     <Link to="/accessories">Accessories</Link>
                                 </Button>
                             </div>
@@ -238,7 +238,7 @@ export default function WishlistPage() {
                     ) : (
                         <motion.div
                             layout
-                            className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16"
+                            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12"
                         >
                             <AnimatePresence mode="popLayout">
                                 {items.map((item) => (

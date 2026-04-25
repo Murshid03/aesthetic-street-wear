@@ -56,7 +56,7 @@ function ProductCard({ product }: { product: Product }) {
         >
           <Heart className={`w-3.5 h-3.5 ${wished ? "fill-current" : ""}`} />
         </button>
-        <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-x-3 bottom-3 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
           <Button
             onClick={handleAddToCart}
             disabled={adding || product.stockQuantity <= 0}
@@ -124,74 +124,59 @@ export default function PantsPage() {
 
   return (
     <Layout>
-      {/* ── Editorial Header ────────────────────────────────────────── */}
-      <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5 overflow-hidden">
-        <div className="container mx-auto px-6 lg:px-12">
+      {/* Header */}
+      <section className="pt-16 sm:pt-24 pb-8 sm:pb-12 bg-white border-b border-black/5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="max-w-4xl text-center md:text-left">
-            <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
+            <nav className="flex items-center justify-center md:justify-start gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-              <span className="w-1 h-1 rounded-full bg-black/10" />
-              <span className="text-black/60">Archive</span>
               <span className="w-1 h-1 rounded-full bg-black/10" />
               <span className="text-primary italic">Utility Pants</span>
             </nav>
 
-            <div className="flex items-center gap-6 mb-8">
-              <div className="w-12 h-[2px] bg-primary" />
-              <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+              <div className="w-8 h-[2px] bg-primary" />
+              <span className="text-[9px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-[0.85] mb-10" style={{ fontFamily: "var(--font-display)" }}>
-              TECH <br /> <span className="text-primary italic">UTILITY</span>
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+              Tech <span className="text-primary italic">Utility</span>
             </h1>
-
-            <p className="max-w-2xl text-black/40 text-base md:text-lg font-medium leading-relaxed border-l-2 border-black/5 pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
-              Precision engineered for the urban landscape. Tactical silhouettes meets premium comfort, establishing a new standard for street-level utility.
-            </p>
           </div>
         </div>
       </section>
 
-      {/* ── Modern Controls ─────────────────────────────────────────── */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-black/5 sticky top-[56px] lg:top-[72px] z-30 py-3 lg:py-4">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 lg:gap-6">
-            <div className="flex items-center gap-4 lg:gap-6 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
-              <div className="flex items-center gap-2 shrink-0">
-                <SlidersHorizontal className="w-3 h-3 text-black/30" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Size:</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setSizeFilter("all")}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${sizeFilter === "all" ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
-                >
-                  All
-                </button>
-                {SIZE_OPTIONS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSizeFilter(s)}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${sizeFilter === s ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
+      {/* Filter Controls */}
+      <div className="bg-white/90 backdrop-blur-xl border-b border-black/5 sticky top-[56px] z-30 py-3">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-0.5">
+            <div className="flex items-center gap-2 shrink-0">
+              <SlidersHorizontal className="w-3 h-3 text-black/30" />
             </div>
-
-            <div className="flex items-center justify-between md:justify-end gap-6">
-              <div className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-black/20">
-                {pants.length} Artifacts Found
-              </div>
+            <button
+              onClick={() => setSizeFilter("all")}
+              className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === "all" ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
+            >
+              All
+            </button>
+            {SIZE_OPTIONS.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSizeFilter(s)}
+                className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === s ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
+              >
+                {s}
+              </button>
+            ))}
+            <div className="ml-auto shrink-0">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="h-10 w-44 rounded-full border-black/5 bg-black/5 text-[10px] font-black uppercase tracking-widest focus:ring-primary/20">
-                  <SelectValue placeholder="Sort Hierarchy" />
+                <SelectTrigger className="h-9 w-36 rounded-full border-black/5 bg-black/5 text-[9px] font-black uppercase tracking-widest focus:ring-primary/20">
+                  <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-black/5 shadow-2xl">
-                  <SelectItem value="newest" className="text-[10px] font-black uppercase tracking-widest">Newest Arrival</SelectItem>
-                  <SelectItem value="price-asc" className="text-[10px] font-black uppercase tracking-widest">Price Low → High</SelectItem>
-                  <SelectItem value="price-desc" className="text-[10px] font-black uppercase tracking-widest">Price High → Low</SelectItem>
+                  <SelectItem value="newest" className="text-[9px] font-black uppercase tracking-widest">Newest</SelectItem>
+                  <SelectItem value="price-asc" className="text-[9px] font-black uppercase tracking-widest">Price Low → High</SelectItem>
+                  <SelectItem value="price-desc" className="text-[9px] font-black uppercase tracking-widest">Price High → Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -199,15 +184,15 @@ export default function PantsPage() {
         </div>
       </div>
 
-      {/* ── Result Grid ─────────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto container-px">
+      {/* Product Grid */}
+      <section className="py-6 sm:py-10 bg-white pb-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
               {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : pants.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-x-8 lg:gap-y-16">
               {pants.map((p) => (
                 <ProductCard key={p._id} product={p} />
               ))}

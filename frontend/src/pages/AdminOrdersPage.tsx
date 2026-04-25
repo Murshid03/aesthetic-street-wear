@@ -39,8 +39,8 @@ import { AdminLayout, STATUS_META, STATUS_OPTIONS, formatDate } from "./AdminPag
 import { motion, AnimatePresence } from "motion/react";
 
 const FILTER_TABS = [
-  { label: "ALL", value: "all" },
-  ...STATUS_OPTIONS.map((s) => ({ label: s.toUpperCase(), value: s })),
+  { label: "All", value: "all" },
+  ...STATUS_OPTIONS.map((s) => ({ label: s, value: s })),
 ];
 
 function OrderDetailSheet({
@@ -70,20 +70,20 @@ function OrderDetailSheet({
   const isPending = order.status === "Pending";
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-white">
+    <div className="flex flex-col h-full bg-white">
       <div className="h-1 bg-primary w-full shrink-0" />
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="p-8 space-y-8 pb-32">
-          <SheetHeader className="text-left space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-[2px] bg-primary" />
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Overview</span>
+      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+        <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+          <SheetHeader className="text-left space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-[2px] bg-primary" />
+              <span className="text-[9px] font-black uppercase tracking-[0.35em] text-primary">Order Overview</span>
             </div>
-            <SheetTitle className="text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-              #{order._id?.slice(-8).toUpperCase()} <span className="text-primary italic">DETAILS</span>
+            <SheetTitle className="text-xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              #{order._id?.slice(-8).toUpperCase()} <span className="text-primary italic">Details</span>
             </SheetTitle>
-            <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-black/30">
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-black/30">
               <span>{formatDate(order.createdAt)}</span>
               <span className="w-1 h-1 rounded-full bg-black/10" />
               <span>{order.status}</span>
@@ -91,23 +91,23 @@ function OrderDetailSheet({
           </SheetHeader>
 
           {isPending && (
-            <div className="p-6 rounded-[1.5rem] bg-amber-500/5 border border-amber-500/10 space-y-4">
-              <div className="flex items-center gap-3 text-amber-600">
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Ready to Confirm?</span>
+            <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 space-y-3">
+              <div className="flex items-center gap-2 text-amber-600">
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Ready to Confirm?</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onSave(order._id!, "Confirmed", editNotes, editTrackingId)}
                   disabled={isSaving}
-                  className="h-12 bg-black text-white hover:bg-primary transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
+                  className="h-10 bg-black text-white hover:bg-primary transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
                 >
                   Confirm
                 </button>
                 <button
                   onClick={() => onSave(order._id!, "Cancelled", editNotes, editTrackingId)}
                   disabled={isSaving}
-                  className="h-12 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
+                  className="h-10 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
                 >
                   Cancel
                 </button>
@@ -115,45 +115,48 @@ function OrderDetailSheet({
             </div>
           )}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+          {/* Customer */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <UserIcon className="w-3 h-3 text-primary" />
               <span className="text-[9px] font-black uppercase tracking-widest">Customer</span>
             </div>
-            <div className="p-6 rounded-[1.5rem] bg-black/5 border border-black/5">
+            <div className="p-4 rounded-xl bg-black/5 border border-black/5">
               <p className="text-sm font-black uppercase tracking-tight text-black">{userName}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-black/20 mt-1">{order.deliveryAddress}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-black/30 mt-1">{order.deliveryAddress}</p>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+          {/* Order Items */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <Package className="w-3 h-3 text-primary" />
               <span className="text-[9px] font-black uppercase tracking-widest">Order Items</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-3 rounded-xl bg-black/5">
-                  <div className="w-10 h-14 rounded-lg overflow-hidden bg-muted">
+                <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl bg-black/5">
+                  <div className="w-9 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-black truncate">{item.name}</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-black truncate">{item.name}</p>
                     <p className="text-[8px] font-bold uppercase text-black/40 mt-0.5">{item.size} · {item.quantity}x</p>
                   </div>
-                  <p className="text-[11px] font-black text-black">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                  <p className="text-[10px] font-black text-black shrink-0">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
                 </div>
               ))}
             </div>
-            <div className="p-5 rounded-[1.5rem] bg-black text-white flex justify-between items-center">
+            <div className="p-3.5 rounded-2xl bg-black text-white flex justify-between items-center">
               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Total</span>
-              <span className="text-xl font-black italic">₹{total.toLocaleString("en-IN")}</span>
+              <span className="text-lg font-black italic">₹{total.toLocaleString("en-IN")}</span>
             </div>
           </div>
 
+          {/* Update Status */}
           {!isPending && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
                 <Activity className="w-3 h-3 text-primary" />
                 <span className="text-[9px] font-black uppercase tracking-widest text-primary">Update Status</span>
               </div>
@@ -164,9 +167,9 @@ function OrderDetailSheet({
                     <button
                       key={s}
                       onClick={() => setEditStatus(s)}
-                      className={`px-4 py-3 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all duration-300 ${active
+                      className={`px-3 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all duration-300 ${active
                         ? "bg-black text-white border-black"
-                        : "bg-white border-black/5 text-black/40 hover:border-black/10"
+                        : "bg-white border-black/8 text-black/40 hover:border-black/15"
                         }`}
                     >
                       {s}
@@ -175,9 +178,9 @@ function OrderDetailSheet({
                 })}
               </div>
 
-              <div className="space-y-6 pt-4 border-t border-black/5">
+              <div className="space-y-4 pt-3 border-t border-black/5">
                 {editStatus === "Shipped" && (
-                  <div className="p-5 bg-primary/5 rounded-[1.5rem] border border-primary/10 space-y-3">
+                  <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-2.5">
                     <span className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
                       <Truck className="w-3 h-3" /> Tracking Number
                     </span>
@@ -185,22 +188,22 @@ function OrderDetailSheet({
                       value={editTrackingId}
                       onChange={(e) => setEditTrackingId(e.target.value)}
                       placeholder="Enter Tracking ID..."
-                      className="h-12 px-5 bg-white rounded-xl border-black/5 focus:border-primary transition-all text-base font-bold"
+                      className="h-11 px-4 bg-white rounded-xl border-black/8 focus:border-primary transition-all text-sm font-bold"
                     />
-                    <p className="text-[8px] font-bold text-primary/40 italic">This will be sent to the customer instantly.</p>
+                    <p className="text-[8px] font-bold text-primary/40 italic">Sent to customer instantly.</p>
                   </div>
                 )}
 
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
                     <Star className="w-3 h-3 text-primary" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Admin Note (Visible to User)</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Admin Note</span>
                   </div>
                   <Textarea
                     value={editNotes}
                     onChange={(e) => setEditNotes(e.target.value)}
                     placeholder="Add notes for the customer..."
-                    className="min-h-[80px] p-4 bg-black/5 rounded-xl border-none text-base font-bold resize-none"
+                    className="min-h-[72px] p-3 bg-black/5 rounded-xl border-none text-sm font-bold resize-none"
                   />
                 </div>
               </div>
@@ -209,11 +212,12 @@ function OrderDetailSheet({
         </div>
       </div>
 
-      <div className="p-8 border-t border-black/5 bg-white flex gap-3 shrink-0">
+      {/* Sticky Action Footer */}
+      <div className="p-4 border-t border-black/5 bg-white flex gap-2 shrink-0 safe-bottom">
         <Button
           variant="outline"
           onClick={onClose}
-          className="h-12 rounded-full flex-1 border-black/10 text-[9px] font-black uppercase tracking-widest"
+          className="h-12 rounded-full flex-1 border-black/10 text-[9px] font-black uppercase tracking-widest touch-target"
         >
           Close
         </Button>
@@ -221,9 +225,9 @@ function OrderDetailSheet({
           <Button
             onClick={() => onSave(order._id!, editStatus, editNotes, editTrackingId)}
             disabled={isSaving}
-            className="h-12 rounded-full flex-[2] bg-black text-white hover:bg-primary transition-all duration-300 font-bold text-[9px] uppercase tracking-widest shadow-lg"
+            className="h-12 rounded-full flex-[2] bg-primary text-white hover:bg-black transition-all duration-300 font-bold text-[9px] uppercase tracking-widest shadow-lg touch-target"
           >
-            {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : "APPLY UPDATE"}
+            {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : "Apply Update"}
           </Button>
         )}
       </div>
@@ -239,41 +243,45 @@ function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onClick}
-      className="p-8 rounded-[2.5rem] bg-white border border-black/5 hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col md:flex-row items-center gap-10"
+      className="p-3.5 sm:p-5 rounded-2xl bg-white border border-black/5 hover:shadow-xl transition-all duration-400 group cursor-pointer"
     >
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color} group-hover:scale-110 transition-transform`}>
-        <meta.icon className="w-6 h-6" />
-      </div>
+      <div className="flex items-center gap-3">
+        {/* Status Icon */}
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color}`}>
+          <meta.icon className="w-4 h-4" />
+        </div>
 
-      <div className="flex-1 min-w-0 text-center md:text-left space-y-2">
-        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-          <span className="text-[8px] font-black uppercase tracking-widest text-black/20">#{order._id?.slice(-8).toUpperCase()}</span>
-          <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${meta.badge}`}>{order.status}</span>
-        </div>
-        <h3 className="text-xl font-black uppercase tracking-tight text-black truncate">{userName}</h3>
-        <div className="flex items-center justify-center md:justify-start gap-4">
-          <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black/40">
-            <Clock className="w-3 h-3" />
-            {formatDate(order.createdAt)}
+        {/* Info */}
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[7px] font-black uppercase tracking-widest text-black/25">#{order._id?.slice(-6).toUpperCase()}</span>
+            <span className={`text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${meta.badge}`}>{order.status}</span>
           </div>
-          <span className="w-1 h-1 rounded-full bg-black/10" />
-          <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black/40">
-            <Package className="w-3 h-3" />
-            {order.items.length} {order.items.length === 1 ? "Item" : "Items"}
+          <h3 className="text-sm font-black uppercase tracking-tight text-black truncate leading-tight">{userName}</h3>
+          <div className="flex items-center gap-2.5 text-[8px] font-bold uppercase tracking-wide text-black/30">
+            <div className="flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5" />
+              {formatDate(order.createdAt)}
+            </div>
+            <span>·</span>
+            <div className="flex items-center gap-1">
+              <Package className="w-2.5 h-2.5" />
+              {order.items.length} {order.items.length === 1 ? "Item" : "Items"}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-8 shrink-0">
-        <div className="text-center md:text-right">
-          <span className="text-[8px] font-black uppercase tracking-widest text-black/20 block mb-1">Order Amount</span>
-          <p className="text-2xl font-black text-black">₹{total.toLocaleString("en-IN")}</p>
-        </div>
-        <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center text-black/20 group-hover:bg-black group-hover:text-white transition-all">
-          <ChevronRight className="w-5 h-5" />
+        {/* Amount + Arrow */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="text-right">
+            <p className="text-base sm:text-lg font-black text-black">₹{total.toLocaleString("en-IN")}</p>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/20 group-hover:bg-black group-hover:text-white transition-all">
+            <ChevronRight className="w-4 h-4" />
+          </div>
         </div>
       </div>
     </motion.div>
@@ -300,7 +308,7 @@ function AdminOrdersContent() {
       api.put(`/orders/${id}/status`, { status, adminNotes: notes, trackingId: tracking }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
-      toast.success("Order status updated successfully");
+      toast.success("Order updated successfully");
       setSelectedOrder(null);
     },
     onError: () => toast.error("Failed to update order status"),
@@ -322,56 +330,58 @@ function AdminOrdersContent() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-40 gap-6">
-        <div className="w-12 h-12 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading orders...</p>
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-10 h-10 rounded-full border-4 border-black/5 border-t-primary animate-spin" />
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20">Loading orders...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-5 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-[2px] bg-primary" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Management</span>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-[2px] bg-primary" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Management</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ORDER <br /> <span className="text-primary italic text-3xl md:text-4xl">HISTORY</span></h1>
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+            Order <span className="text-primary italic">History</span>
+          </h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="flex flex-col text-right">
-            <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Active Orders</span>
-            <span className="text-xs font-black uppercase">{orders.length} total . {pendingCount} PENDING</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-black/20">Active Orders</span>
+            <span className="text-[10px] font-black uppercase">{orders.length} total · {pendingCount} Pending</span>
           </div>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        <div className="lg:col-span-12 xl:col-span-5 relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-black/20 group-focus-within:text-black transition-colors" />
+      {/* Search + Filter */}
+      <div className="space-y-3">
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-black/25 group-focus-within:text-black transition-colors" />
           <Input
-            placeholder="Search Order ID or Name..."
-            className="h-16 pl-14 pr-6 bg-black/5 rounded-3xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+            placeholder="Search by name or order ID..."
+            className="h-11 pl-10 pr-4 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="lg:col-span-12 xl:col-span-7 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setFilterTab(tab.value)}
-              className={`px-6 py-4 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border transition-all duration-500 relative ${filterTab === tab.value
-                ? "bg-black text-white border-black shadow-xl"
-                : "bg-white border-black/5 text-black/40 hover:border-black/20 hover:text-black"
+              className={`px-3.5 py-2 rounded-full text-[8px] font-black uppercase tracking-[0.15em] border transition-all duration-400 relative ${filterTab === tab.value
+                ? "bg-black text-white border-black shadow-md"
+                : "bg-white border-black/8 text-black/40 hover:border-black/20 hover:text-black"
                 }`}
             >
               {tab.label}
               {tab.value === "Pending" && pendingCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] flex items-center justify-center rounded-full animate-bounce">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-white text-[7px] flex items-center justify-center rounded-full animate-bounce">
                   {pendingCount}
                 </span>
               )}
@@ -380,14 +390,14 @@ function AdminOrdersContent() {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Order List */}
       {filtered.length === 0 ? (
-        <div className="py-40 text-center bg-black/5 rounded-[3rem]">
-          <Package className="w-12 h-12 text-black/10 mx-auto mb-8" />
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">No matching orders found.</p>
+        <div className="py-24 text-center bg-black/5 rounded-3xl">
+          <Package className="w-10 h-10 text-black/10 mx-auto mb-4" />
+          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20">No matching orders found.</p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-2.5">
           <AnimatePresence mode="popLayout">
             {filtered.map((order) => (
               <OrderCard
@@ -400,9 +410,9 @@ function AdminOrdersContent() {
         </div>
       )}
 
-      {/* Sheet */}
+      {/* Detail Sheet */}
       <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-xl h-full p-0 border-none shadow-2xl">
+        <SheetContent side="right" className="w-full sm:max-w-md h-full p-0 border-none shadow-2xl">
           {selectedOrder && (
             <OrderDetailSheet
               key={selectedOrder._id}

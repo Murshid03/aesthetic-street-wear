@@ -65,7 +65,8 @@ function RelatedProductCard({ product }: { product: Product }) {
         >
           <Heart className={`w-3 h-3 ${wished ? "fill-current" : ""}`} />
         </button>
-        <div className="absolute inset-x-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Always visible on mobile, hover-only on desktop */}
+        <div className="absolute inset-x-2 bottom-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
           <Button
             onClick={handleAddToCart}
             disabled={adding || product.stockQuantity <= 0}
@@ -160,9 +161,9 @@ export default function ProductPage() {
 
   return (
     <Layout>
-      <div className="bg-white min-h-screen pt-16 lg:pt-24 pb-24 lg:pb-20">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
+      <div className="bg-white min-h-screen pt-14 sm:pt-20 pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16">
             {/* ── Visual Context ─────────────────────────────────────────── */}
             <div className="lg:col-span-7 order-1">
               <nav className="flex items-center gap-2 lg:gap-3 text-[8px] lg:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
@@ -203,51 +204,51 @@ export default function ProductPage() {
             <div className="lg:col-span-5 flex flex-col pt-0 lg:pt-10 order-2">
               <div className="space-y-8 lg:space-y-12">
                 <div className="text-center lg:text-left">
-                  <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 lg:mb-6">
+                  <div className="flex items-center justify-center lg:justify-start gap-3 mb-3 lg:mb-5">
                     <div className="w-8 h-[2px] bg-primary" />
-                    <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Collection</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Core Collection</span>
                   </div>
-                  <h1 className="text-2xl lg:text-4xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tighter leading-tight mb-3" style={{ fontFamily: "var(--font-display)" }}>
                     {product.name}
                   </h1>
-                  <div className="flex items-baseline justify-center lg:justify-start gap-4">
-                    <span className="text-2xl lg:text-3xl font-black text-black">₹{product.price.toLocaleString("en-IN")}</span>
-                    <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-[0.2em] text-black/20">MSRP Inclusive Tax</span>
+                  <div className="flex items-baseline justify-center lg:justify-start gap-3">
+                    <span className="text-xl sm:text-2xl font-black text-black">₹{product.price.toLocaleString("en-IN")}</span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-black/20">Tax Incl.</span>
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <p className="text-black/40 text-base font-medium leading-relaxed border-l-2 border-black/5 pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
-                    {product.description || "Premium silhouettes engineered with raw urban intent. Every detail is a signature of modern excellence, designed to define the new standard."}
+                <div className="space-y-4">
+                  <p className="text-black/40 text-sm font-medium leading-relaxed border-l-2 border-black/5 pl-4 sm:pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
+                    {product.description || "Premium silhouettes engineered with raw urban intent. Every detail is a signature of modern excellence."}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-4 pt-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     {[
                       { icon: Shield, label: "Certified" },
                       { icon: Truck, label: "Express" },
                       { icon: RotateCcw, label: "Returnable" }
                     ].map((item, i) => (
-                      <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-black/5 hover:bg-black/10 transition-colors">
+                      <div key={i} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-black/5 hover:bg-black/10 transition-colors">
                         <item.icon className="w-3.5 h-3.5 text-black/40" />
-                        <span className="text-[8px] font-black uppercase tracking-widest text-black/60">{item.label}</span>
+                        <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-black/60">{item.label}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Fit Selection */}
-                <div className="space-y-6">
+                {/* Size Selection */}
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Select Size:</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/40">Select Size:</span>
                     <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Size Guide</button>
                   </div>
-                  <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
                     {product.sizes.map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
                         disabled={product.isSoldOut}
-                        className={`h-12 min-w-[3.5rem] px-5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 
+                        className={`h-10 sm:h-12 min-w-[3rem] px-4 sm:px-5 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all border-2 
                                     ${selectedSize === size
                             ? "border-black bg-black text-white shadow-xl scale-105"
                             : "border-black/5 bg-transparent text-black/40 hover:border-black/20"
@@ -259,20 +260,20 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                {/* Primary Action */}
-                <div className="space-y-6 pt-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-14 bg-black/5 rounded-full p-1 items-center shrink-0">
+                {/* Add to Cart */}
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 bg-black/5 rounded-full p-1 items-center shrink-0">
                       <button
                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                        className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="w-10 text-center text-[11px] font-black">{quantity}</span>
+                      <span className="w-8 text-center text-[11px] font-black">{quantity}</span>
                       <button
                         onClick={() => setQuantity(q => q + 1)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -280,16 +281,10 @@ export default function ProductPage() {
                     <Button
                       onClick={handleAddToCart}
                       disabled={product.isSoldOut || addingToCart}
-                      className="flex-1 h-16 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
+                      className="flex-1 h-12 sm:h-14 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[10px] uppercase tracking-[0.3em] shadow-xl"
                     >
-                      <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${addingToCart ? "-translate-y-16" : ""}`}>
-                        <ShoppingCart className="w-4 h-4" />
-                        {product.isSoldOut ? "Sold Out" : "Add to Cart"}
-                      </span>
-                      <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${addingToCart ? "translate-y-0" : "translate-y-16"}`}>
-                        <Package className="w-4 h-4 animate-bounce" />
-                        Adding...
-                      </span>
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {product.isSoldOut ? "Sold Out" : addingToCart ? "Adding..." : "Add to Cart"}
                     </Button>
                   </div>
                 </div>
@@ -303,18 +298,18 @@ export default function ProductPage() {
 
           {/* ── Sequence Context ────────────────────────────────────────── */}
           {related.length > 0 && (
-            <section className="mt-40">
-              <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <section className="mt-16 sm:mt-24">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4">
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-3">
                     <span className="w-8 h-[2px] bg-primary" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Related Products</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Related Products</p>
                   </div>
-                  <h2 className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>YOU MAY ALSO LIKE</h2>
+                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>You May Also Like</h2>
                 </div>
-                <Link to={categoryRoute} className="text-[10px] font-black uppercase tracking-[0.3em] pb-1 border-b-2 border-primary hover:text-black transition-colors">Explore Category</Link>
+                <Link to={categoryRoute} className="text-[9px] font-black uppercase tracking-[0.3em] pb-1 border-b-2 border-primary hover:text-black transition-colors">Explore Category</Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 {related.map((p) => (
                   <RelatedProductCard key={p._id} product={p} />
                 ))}

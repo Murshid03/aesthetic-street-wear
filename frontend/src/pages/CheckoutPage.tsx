@@ -83,25 +83,25 @@ function ConfirmationScreen({
 }: { orderRef: string; onReset: () => void }) {
   return (
     <Layout>
-      <div className="min-h-screen flex items-center justify-center px-4 py-20 bg-white">
+      <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-white">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-xl text-center"
+          className="w-full max-w-md text-center"
         >
-          <div className="p-12 md:p-16 rounded-[3rem] bg-black text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[120px] rounded-full" />
+          <div className="p-8 sm:p-12 rounded-3xl bg-black text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 blur-[100px] rounded-full" />
 
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring" }}
-              className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-10 mx-auto border-2 border-primary/30"
+              className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-6 mx-auto border-2 border-primary/30"
             >
-              <CheckCircle2 className="w-10 h-10 text-primary" />
+              <CheckCircle2 className="w-8 h-8 text-primary" />
             </motion.div>
 
-            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter mb-3" style={{ fontFamily: "var(--font-display)" }}>
               ORDER <br /> <span className="text-primary italic">CONFIRMED</span>
             </h1>
 
@@ -109,16 +109,15 @@ function ConfirmationScreen({
               Your order has been successfully placed. Please complete the WhatsApp verification to finalize your shipment.
             </p>
 
-            <div className="bg-white/5 rounded-3xl p-8 mb-12 border border-white/5 backdrop-blur-sm">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">Order ID</p>
-              <p className="text-3xl font-black text-primary tracking-[0.2em]">#{orderRef.slice(-8).toUpperCase()}</p>
-              <div className="w-12 h-1 bg-primary/20 mx-auto mt-6 rounded-full" />
+            <div className="bg-white/5 rounded-2xl p-5 mb-8 border border-white/5">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Order ID</p>
+              <p className="text-2xl font-black text-primary tracking-[0.2em]">#{orderRef.slice(-8).toUpperCase()}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button
                 asChild
-                className="h-16 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all font-black text-[10px] uppercase tracking-[0.3em] shadow-xl"
+                className="h-12 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all font-black text-[9px] uppercase tracking-[0.3em] shadow-xl"
               >
                 <Link to="/account">
                   Track Order
@@ -126,7 +125,7 @@ function ConfirmationScreen({
               </Button>
               <Button
                 variant="outline"
-                className="h-16 rounded-full border-white/10 text-white hover:bg-white hover:text-black transition-all font-black text-[10px] uppercase tracking-[0.3em]"
+                className="h-12 rounded-full border-white/10 text-white hover:bg-white hover:text-black transition-all font-black text-[9px] uppercase tracking-[0.3em]"
                 onClick={onReset}
               >
                 Continue Shopping
@@ -266,60 +265,60 @@ export default function CheckoutPage() {
   return (
     <ProtectedRoute redirectTo="/login">
       <Layout>
-        <div className="bg-white min-h-screen pt-16 lg:pt-24 pb-32 lg:pb-20">
-          <div className="container mx-auto px-6 lg:px-12">
-            {/* ── Editorial Header ────────────────────────────────────────── */}
-            <div className="mb-12 lg:mb-16">
-              <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
-                <Link to="/cart" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <ArrowLeft className="w-3 h-3" /> Cart
+        <div className="bg-white min-h-screen pt-14 sm:pt-20 pb-28 sm:pb-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+            {/* Header */}
+            <div className="mb-6 sm:mb-10">
+              <nav className="flex items-center gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
+                <Link to="/cart" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <ArrowLeft className="w-2.5 h-2.5" /> Cart
                 </Link>
                 <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <span className="text-primary italic">Checkout</span>
               </nav>
-              <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-tight text-center md:text-left" style={{ fontFamily: "var(--font-display)" }}>
-                CHECKOUT <br /> <span className="text-primary italic text-2xl lg:text-4xl">DETAILS</span>
+              <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+                Checkout <span className="text-primary italic">Details</span>
               </h1>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
-              {/* ── Config Side ──────────────────────────────────────────────── */}
-              <div className="lg:col-span-12 xl:col-span-7 space-y-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+              {/* Form Side */}
+              <div className="lg:col-span-12 xl:col-span-7 space-y-8">
                 {/* Customer details */}
-                <div className="space-y-10 group">
-                  <div className="flex items-center gap-4 px-4 lg:px-0">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black text-white flex items-center justify-center text-[9px] lg:text-[11px] font-black shadow-lg">01</div>
-                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">SHIPPING INFO</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-[9px] font-black shadow-md">01</div>
+                    <h2 className="text-sm sm:text-base font-black uppercase tracking-widest">Shipping Info</h2>
                   </div>
-                  <div className="grid gap-6 lg:gap-8 p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Full Name</Label>
+                  <div className="grid gap-4 p-4 sm:p-6 rounded-2xl bg-black/5 border border-black/5">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Full Name</Label>
                       <Input
                         placeholder="e.g. John Doe"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
-                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
+                        className="h-12 px-4 bg-white rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
                       />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Delivery Address</Label>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Delivery Address</Label>
                       <Input
                         placeholder="House No, Street, City, State, PIN"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
+                        className="h-12 px-4 bg-white rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Order items */}
-                <div className="space-y-10 group">
-                  <div className="flex items-center gap-4 px-4 lg:px-0">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black text-white flex items-center justify-center text-[9px] lg:text-[11px] font-black shadow-lg">02</div>
-                    <h2 className="text-lg lg:text-xl font-black uppercase tracking-widest">ORDER SUMMARY</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-[9px] font-black shadow-md">02</div>
+                    <h2 className="text-sm sm:text-base font-black uppercase tracking-widest">Order Summary</h2>
                   </div>
-                  <div className="p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-black/5 border border-black/5 transition-all group-hover:bg-white group-hover:shadow-2xl group-hover:border-transparent divide-y divide-black/5">
+                  <div className="p-4 sm:p-6 rounded-2xl bg-black/5 border border-black/5 divide-y divide-black/5">
                     {items.map((item) => (
                       <SizeRow
                         key={`${item.productId}-${item.size}`}
@@ -331,59 +330,56 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* ── Summary Side ────────────────────────────────────────────── */}
+              {/* Summary Side */}
               <div className="lg:col-span-12 xl:col-span-5">
-                <div className="sticky top-32 p-7 sm:p-10 rounded-[3rem] bg-black text-white shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[130px] rounded-full" />
-                  <div className="relative z-10 space-y-10">
+                <div className="sticky top-24 p-5 sm:p-7 rounded-3xl bg-black text-white shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 blur-[100px] rounded-full" />
+                  <div className="relative z-10 space-y-6">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-black uppercase tracking-widest">SUMMARY</h2>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-white/30 italic">CASH ON DELIVERY</span>
+                      <h2 className="text-base font-black uppercase tracking-widest">Summary</h2>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-white/30 italic">Cash on Delivery</span>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                       {items.map((item) => (
-                        <div key={`${item.productId}-${item.size}`} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <span className="truncate max-w-[200px]">{item.product.name} [{item.size}] × {item.quantity}</span>
-                          <span className="text-white">₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</span>
+                        <div key={`${item.productId}-${item.size}`} className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/40">
+                          <span className="truncate max-w-[160px]">{item.product.name} [{item.size}] ×{item.quantity}</span>
+                          <span className="text-white shrink-0 ml-2">₹{(item.product.price * item.quantity).toLocaleString("en-IN")}</span>
                         </div>
                       ))}
                     </div>
 
                     <Separator className="bg-white/10" />
 
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/30">
                         <span>Shipping</span>
-                        <span className="text-primary italic">Standard / Free</span>
+                        <span className="text-primary italic">Free</span>
                       </div>
-                      <div className="flex justify-between items-end pt-4">
-                        <span className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">TOTAL AMOUNT</span>
-                        <span className="text-4xl font-black text-white">₹{total.toLocaleString("en-IN")}</span>
+                      <div className="flex justify-between items-end">
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">Total</span>
+                        <span className="text-2xl sm:text-3xl font-black text-white">₹{total.toLocaleString("en-IN")}</span>
                       </div>
                     </div>
 
                     <Button
                       onClick={handlePlaceOrder}
                       disabled={orderMutation.isPending}
-                      className="w-full h-16 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.3em] shadow-xl group overflow-hidden relative"
+                      className="w-full h-12 sm:h-14 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[10px] uppercase tracking-[0.3em] shadow-xl"
                     >
-                      <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${orderMutation.isPending ? "-translate-y-16" : ""}`}>
-                        PLACE ORDER
-                        <ChevronRight className="w-4 h-4" />
-                      </span>
-                      <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${orderMutation.isPending ? "translate-y-0" : "translate-y-16"}`}>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Placing Order...
-                      </span>
+                      {orderMutation.isPending ? (
+                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Placing Order...</>
+                      ) : (
+                        <>Place Order <ChevronRight className="w-4 h-4 ml-2" /></>
+                      )}
                     </Button>
 
-                    <div className="pt-8 border-t border-white/5 grid grid-cols-2 gap-4">
+                    <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
                       {[
                         { icon: ShieldCheck, label: "Secure" },
-                        { icon: Truck, label: "Shipping" }
+                        { icon: Truck, label: "Free Shipping" }
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-3 opacity-20">
+                        <div key={i} className="flex items-center gap-2 opacity-20">
                           <item.icon className="w-3.5 h-3.5" />
                           <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
                         </div>
