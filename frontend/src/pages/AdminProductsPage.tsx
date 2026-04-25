@@ -226,7 +226,7 @@ function AdminProductsContent() {
             <div className="w-12 h-[2px] bg-primary" />
             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Management</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>PRODUCT <br /> <span className="text-primary italic text-4xl md:text-6xl">INVENTORY</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>PRODUCT <br /> <span className="text-primary italic text-3xl md:text-4xl">INVENTORY</span></h1>
         </div>
         <Button
           onClick={openCreate}
@@ -374,7 +374,7 @@ function AdminProductsContent() {
                   <div className="text-[9px] font-black uppercase tracking-widest text-black/20 text-center">OR</div>
                   <Input
                     placeholder="Image URL"
-                    className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+                    className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                     value={selectedFile ? "" : (form.image ?? "")}
                     onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))}
                   />
@@ -407,7 +407,7 @@ function AdminProductsContent() {
               <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Product Name</Label>
               <Input
                 placeholder="Product Title"
-                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                 value={form.name ?? ""}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
               />
@@ -418,7 +418,7 @@ function AdminProductsContent() {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Price (₹)</Label>
                 <Input
                   type="number"
-                  className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                  className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                   value={form.price === undefined ? "" : form.price}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -430,7 +430,7 @@ function AdminProductsContent() {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Stock Quantity</Label>
                 <Input
                   type="number"
-                  className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                  className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                   value={form.stockQuantity === undefined ? "" : form.stockQuantity}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -449,7 +449,7 @@ function AdminProductsContent() {
               <Label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Description</Label>
               <Textarea
                 placeholder="Product description and details..."
-                className="min-h-[150px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
+                className="min-h-[150px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-base font-bold resize-none"
                 value={form.description ?? ""}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               />

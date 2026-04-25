@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema(
             default: 'Pending',
         },
         adminNotes: { type: String, default: '' },
+        trackingId: { type: String, default: '' },
         paymentMethod: { type: String, default: 'WhatsApp COD' },
     },
     { timestamps: true }

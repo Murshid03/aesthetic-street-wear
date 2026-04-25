@@ -155,10 +155,10 @@ export default function CartPage() {
             <div className="max-w-xl text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-4 lg:mb-6">
                 <div className="w-8 lg:w-12 h-[2px] bg-primary" />
-                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Selection</span>
+                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Cart</span>
               </div>
-              <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
-                ACTIVE <br /> <span className="text-primary italic">CART</span>
+              <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
+                MY <br /> <span className="text-primary italic">CART</span>
               </h1>
             </div>
 
@@ -261,7 +261,7 @@ export default function CartPage() {
                       {[
                         { icon: ShieldCheck, label: "Secure" },
                         { icon: Truck, label: "Fast" },
-                        { icon: Package, label: "Mint" }
+                        { icon: Package, label: "Packed" }
                       ].map((item, i) => (
                         <div key={i} className="flex flex-col items-center gap-2 opacity-20">
                           <item.icon className="w-3.5 h-3.5" />

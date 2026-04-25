@@ -117,7 +117,7 @@ export default function ProductPage() {
             <div className="absolute inset-0 rounded-full border-4 border-black/5" />
             <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Accessing Archive Object...</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Loading product...</p>
         </div>
       </Layout>
     );
@@ -127,10 +127,10 @@ export default function ProductPage() {
     return (
       <Layout>
         <div className="container mx-auto container-px py-40 text-center">
-          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Fragment Missing</h1>
-          <p className="text-black/40 mb-10 max-w-sm mx-auto">The requested archive fragment could not be located in our current configuration.</p>
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Product Not Found</h1>
+          <p className="text-black/40 mb-10 max-w-sm mx-auto">The product you are looking for does not exist in our collection.</p>
           <Button asChild className="h-12 px-10 rounded-full bg-black">
-            <Link to="/">Return to Hub</Link>
+            <Link to="/">Back to Home</Link>
           </Button>
         </div>
       </Layout>
@@ -205,9 +205,9 @@ export default function ProductPage() {
                 <div className="text-center lg:text-left">
                   <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 lg:mb-6">
                     <div className="w-8 h-[2px] bg-primary" />
-                    <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Signature Collection . 26</span>
+                    <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Collection</span>
                   </div>
-                  <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                  <h1 className="text-2xl lg:text-4xl font-black uppercase tracking-tighter leading-[0.9] mb-4" style={{ fontFamily: "var(--font-display)" }}>
                     {product.name}
                   </h1>
                   <div className="flex items-baseline justify-center lg:justify-start gap-4">
@@ -218,7 +218,7 @@ export default function ProductPage() {
 
                 <div className="space-y-6">
                   <p className="text-black/40 text-base font-medium leading-relaxed border-l-2 border-black/5 pl-8" style={{ fontFamily: "var(--font-secondary)" }}>
-                    {product.description || "Architectural silhouette engineered with raw urban intent. Every fragment is a signature of modern excellence, designed to define the new standard."}
+                    {product.description || "Premium silhouettes engineered with raw urban intent. Every detail is a signature of modern excellence, designed to define the new standard."}
                   </p>
 
                   <div className="grid grid-cols-3 gap-4 pt-4">
@@ -238,8 +238,8 @@ export default function ProductPage() {
                 {/* Fit Selection */}
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Architectural Fit:</span>
-                    <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Sizing Grid</button>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Select Size:</span>
+                    <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Size Guide</button>
                   </div>
                   <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
                     {product.sizes.map((size) => (
@@ -284,18 +284,18 @@ export default function ProductPage() {
                     >
                       <span className={`flex items-center justify-center gap-3 transition-transform duration-500 ${addingToCart ? "-translate-y-16" : ""}`}>
                         <ShoppingCart className="w-4 h-4" />
-                        {product.isSoldOut ? "Project Expired" : "Add to Loadout"}
+                        {product.isSoldOut ? "Sold Out" : "Add to Cart"}
                       </span>
                       <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-500 ${addingToCart ? "translate-y-0" : "translate-y-16"}`}>
                         <Package className="w-4 h-4 animate-bounce" />
-                        Processing...
+                        Adding...
                       </span>
                     </Button>
                   </div>
                 </div>
 
                 <div className="pt-8 border-t border-black/5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">Batch ID: {String(product._id).slice(-8).toUpperCase()}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">Item Code: {String(product._id).slice(-8).toUpperCase()}</p>
                 </div>
               </div>
             </div>
@@ -308,9 +308,9 @@ export default function ProductPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <span className="w-8 h-[2px] bg-primary" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Contextual Pieces</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Related Products</p>
                   </div>
-                  <h2 className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ARCHIVE PAIRINGS</h2>
+                  <h2 className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>YOU MAY ALSO LIKE</h2>
                 </div>
                 <Link to={categoryRoute} className="text-[10px] font-black uppercase tracking-[0.3em] pb-1 border-b-2 border-primary hover:text-black transition-colors">Explore Category</Link>
               </div>

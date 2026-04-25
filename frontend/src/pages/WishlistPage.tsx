@@ -43,7 +43,7 @@ function SizePickerDialog({
                 <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
                 <DialogHeader className="mb-6">
                     <DialogTitle className="text-xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-                        Select Fitment
+                        Select Size
                     </DialogTitle>
                 </DialogHeader>
 
@@ -60,7 +60,7 @@ function SizePickerDialog({
                 </div>
 
                 <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Architectural Grid:</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Choose Size:</p>
                     <div className="flex flex-wrap gap-2">
                         {item.product.sizes.map((size) => (
                             <button
@@ -87,7 +87,7 @@ function SizePickerDialog({
                         disabled={!selected}
                         onClick={handleConfirm}
                     >
-                        Confirm Loadout
+                        Add to Cart
                     </Button>
                 </div>
             </DialogContent>
@@ -151,7 +151,7 @@ function WishlistCard({
                     className="w-full h-11 rounded-full bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[9px] uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                     <ShoppingCart className="w-3 h-3" />
-                    Transfer to Cart
+                    Move to Cart
                 </Button>
             </div>
         </motion.div>
@@ -168,7 +168,7 @@ export default function WishlistPage() {
         if (item.product.sizes.length === 1) {
             addToCart(item.product, item.product.sizes[0]);
             removeFromWishlist(item.productId);
-            toast.success("Segment Transferred", { description: `${item.product.name} added to loadout.` });
+            toast.success("Item Added", { description: `${item.product.name} added to cart.` });
             return;
         }
         setPendingItem(item);
@@ -179,7 +179,7 @@ export default function WishlistPage() {
         if (!pendingItem) return;
         addToCart(pendingItem.product, size);
         removeFromWishlist(pendingItem.productId);
-        toast.success("Fitment Specified", { description: `${pendingItem.product.name} (${size}) added to loadout.` });
+        toast.success("Size Selected", { description: `${pendingItem.product.name} (${size}) added to cart.` });
         setPendingItem(null);
         setDialogOpen(false);
     };
@@ -190,18 +190,18 @@ export default function WishlistPage() {
             <section className="pt-20 lg:pt-32 pb-12 lg:pb-20 bg-white border-b border-black/5">
                 <div className="container mx-auto px-6 lg:px-12">
                     <nav className="flex items-center justify-center md:justify-start gap-2 lg:gap-3 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 whitespace-nowrap overflow-x-auto no-scrollbar">
-                        <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
+                        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                         <ChevronRight className="w-2.5 h-2.5" />
-                        <span className="text-primary italic">Saved Project</span>
+                        <span className="text-primary italic">My Wishlist</span>
                     </nav>
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
                         <div className="max-w-xl text-center md:text-left">
                             <div className="flex items-center justify-center md:justify-start gap-3 mb-4 lg:mb-6">
                                 <div className="w-8 lg:w-12 h-[2px] bg-primary" />
-                                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Personal Curation</span>
+                                <span className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.5em] text-primary">Your Wishlist</span>
                             </div>
-                            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
+                            <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.85]" style={{ fontFamily: "var(--font-display)" }}>
                                 MY <br /> <span className="text-primary italic">WISHLIST</span>
                             </h1>
                         </div>

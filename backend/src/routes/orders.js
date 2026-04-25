@@ -70,7 +70,7 @@ router.get('/:id', protect, async (req, res) => {
 // PUT /api/orders/:id/status — Admin: update status + notes
 router.put('/:id/status', protect, adminOnly, async (req, res) => {
     try {
-        const { status, adminNotes } = req.body;
+        const { status, adminNotes, trackingId } = req.body;
         const validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ error: 'Invalid status value' });
@@ -78,21 +78,62 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
 
         const order = await Order.findByIdAndUpdate(
             req.params.id,
-            { status, adminNotes, updatedAt: new Date() },
+            { status, adminNotes, trackingId, updatedAt: new Date() },
             { new: true }
         ).populate('user', 'name email');
 
         if (!order) return res.status(404).json({ error: 'Order not found' });
 
-        // Generate human-friendly message
-        const statusMsg = `Your order #${order._id.toString().slice(-8).toUpperCase()} has been ${status.toLowerCase()}.`;
-        const fullMsg = statusMsg + (adminNotes ? `\n\nAdmin Note: ${adminNotes}` : "") + `\n\nThank you for shopping with us!`;
+        // Generate clear and professional status messages
+        let personalizedMsg = '';
+        switch (status) {
+            case 'Confirmed':
+                personalizedMsg = `Your order has been confirmed! We are now preparing your items for shipment and will notify you once they are on the way.`;
+                break;
+            case 'Shipped':
+                personalizedMsg = `Great news! Your order has been shipped and is on its way to you.\n\n${trackingId ? `📦 Tracking Number: ${trackingId}` : 'You will receive another update with tracking information shortly.'}`;
+                break;
+            case 'Delivered':
+                personalizedMsg = `Your order has been delivered! We hope you are happy with your new clothes. If you have any feedback, please feel free to reply to this email or tag us on social media!`;
+                break;
+            case 'Cancelled':
+                personalizedMsg = `Your order has been cancelled. ${adminNotes ? `Reason for cancellation: ${adminNotes}` : 'If you have any questions regarding this cancellation, please contact our support team.'}`;
+                break;
+            default:
+                personalizedMsg = `The status of your order has been updated to: ${status}.`;
+        }
+
+        const itemSummary = order.items.map(item =>
+            `- ${item.name} (${item.size}) x ${item.quantity} - ₹${(item.price * item.quantity).toLocaleString('en-IN')}`
+        ).join('\n');
+
+        const fullMsg = `Hi ${order.user.name || 'Valued Customer'},
+
+${personalizedMsg}
+
+Order Details:
+Order ID: #${order._id.toString().slice(-8).toUpperCase()}
+Status: ${status}
+
+Items Purchased:
+${itemSummary}
+
+Order Summary:
+Total Amount: ₹${order.totalAmount.toLocaleString('en-IN')}
+Shipping Address: ${order.deliveryAddress || 'N/A'}
+
+${(status !== 'Shipped' && status !== 'Cancelled' && adminNotes) ? `Note from Store: ${adminNotes}\n` : ""}
+
+Thank you for shopping with us!
+- Aesthetic Street Wear Team
+`;
 
         // CREATE NOTIFICATION for user (App notification)
+        const appNotificationMsg = `Your order #${order._id.toString().slice(-8).toUpperCase()} has been ${status.toLowerCase()}.`;
         await Notification.create({
             user: order.user._id,
             title: `📦 Order ${status}`,
-            message: statusMsg + (adminNotes ? ` Note: ${adminNotes}` : ''),
+            message: appNotificationMsg + (adminNotes ? ` Note: ${adminNotes}` : ''),
             type: 'order_status',
             relatedId: order._id.toString()
         });
@@ -103,12 +144,11 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
                 await sendEmail({
                     email: order.user.email,
                     subject: `Update on your Order #${order._id.toString().slice(-8).toUpperCase()}`,
-                    message: `Hi ${order.user.name || 'Value Customer'},\n\n${fullMsg}`
+                    message: fullMsg
                 });
                 console.log(`📧 Status email sent to ${order.user.email}`);
             } catch (emailErr) {
                 console.error('❌ Failed to send status email:', emailErr);
-                // We don't fail the entire request if email fails
             }
         }
 

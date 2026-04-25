@@ -60,6 +60,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   adminNotes: string;
+  trackingId?: string;
   paymentMethod: string;
 }
 

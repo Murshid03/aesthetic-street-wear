@@ -50,118 +50,123 @@ function OrderDetailSheet({
   isSaving,
 }: {
   order: Order;
-  onSave: (id: string, status: OrderStatus, notes: string) => void;
+  onSave: (id: string, status: OrderStatus, notes: string, tracking?: string) => void;
   onClose: () => void;
   isSaving: boolean;
 }) {
   const [editStatus, setEditStatus] = useState<OrderStatus>(order.status);
   const [editNotes, setEditNotes] = useState(order.adminNotes || "");
-  const total = order.items.reduce((s, i) => s + (i.price || 0) * (i.quantity || 0), 0);
-  const userName = order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Customer" : "Customer");
+  const [editTrackingId, setEditTrackingId] = useState(order.trackingId || "");
+  const total = useMemo(() =>
+    order.items.reduce((s, i) => s + (i.price || 0) * (i.quantity || 0), 0),
+    [order.items]
+  );
+
+  const userName = useMemo(() =>
+    order.customerName || (typeof order.user === "object" ? (order.user as any).name || "Customer" : "Customer"),
+    [order.customerName, order.user]
+  );
 
   const isPending = order.status === "Pending";
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="h-2 bg-primary w-full" />
+    <div className="flex flex-col h-screen max-h-screen bg-white">
+      <div className="h-1 bg-primary w-full shrink-0" />
 
-      <ScrollArea className="flex-1">
-        <div className="p-10 space-y-12">
-          <SheetHeader className="text-left space-y-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="p-8 space-y-8 pb-32">
+          <SheetHeader className="text-left space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-[2px] bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Overview</span>
+              <div className="w-5 h-[2px] bg-primary" />
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Overview</span>
             </div>
-            <SheetTitle className="text-4xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
-              #{order._id?.slice(-8).toUpperCase()} <br /> <span className="text-primary italic">DETAILS</span>
+            <SheetTitle className="text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+              #{order._id?.slice(-8).toUpperCase()} <span className="text-primary italic">DETAILS</span>
             </SheetTitle>
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-black/30">
-              <span>Created: {formatDate(order.createdAt)}</span>
+            <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-black/30">
+              <span>{formatDate(order.createdAt)}</span>
               <span className="w-1 h-1 rounded-full bg-black/10" />
-              <span>Status: {order.status}</span>
+              <span>{order.status}</span>
             </div>
           </SheetHeader>
 
           {isPending && (
-            <div className="p-8 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 space-y-6">
+            <div className="p-6 rounded-[1.5rem] bg-amber-500/5 border border-amber-500/10 space-y-4">
               <div className="flex items-center gap-3 text-amber-600">
-                <MessageCircle className="w-5 h-5" />
-                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Confirm via WhatsApp</span>
+                <MessageCircle className="w-4 h-4" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Ready to Confirm?</span>
               </div>
-              <p className="text-sm font-medium text-amber-800/60 leading-relaxed italic">
-                Please verify this order with the customer before confirming.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => onSave(order._id!, "Confirmed", editNotes)}
+                  onClick={() => onSave(order._id!, "Confirmed", editNotes, editTrackingId)}
                   disabled={isSaving}
-                  className="h-14 bg-black text-white hover:bg-primary transition-all text-[10px] font-black uppercase tracking-widest rounded-full flex items-center justify-center gap-2"
+                  className="h-12 bg-black text-white hover:bg-primary transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
                 >
-                  Confirm Order
+                  Confirm
                 </button>
                 <button
-                  onClick={() => onSave(order._id!, "Cancelled", editNotes)}
+                  onClick={() => onSave(order._id!, "Cancelled", editNotes, editTrackingId)}
                   disabled={isSaving}
-                  className="h-14 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest rounded-full flex items-center justify-center gap-2"
+                  className="h-12 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-full"
                 >
-                  Cancel Order
+                  Cancel
                 </button>
               </div>
             </div>
           )}
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <UserIcon className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Customer Details</span>
+              <UserIcon className="w-3 h-3 text-primary" />
+              <span className="text-[9px] font-black uppercase tracking-widest">Customer</span>
             </div>
-            <div className="p-8 rounded-[2rem] bg-black/5 border border-black/5 space-y-2">
-              <p className="text-lg font-black uppercase tracking-tight text-black">{userName}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-black/20">{order.deliveryAddress}</p>
+            <div className="p-6 rounded-[1.5rem] bg-black/5 border border-black/5">
+              <p className="text-sm font-black uppercase tracking-tight text-black">{userName}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-black/20 mt-1">{order.deliveryAddress}</p>
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Package className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Items</span>
+              <Package className="w-3 h-3 text-primary" />
+              <span className="text-[9px] font-black uppercase tracking-widest">Order Items</span>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-6 p-4 rounded-[1.5rem] bg-black/5 group">
-                  <div className="w-14 h-18 rounded-xl overflow-hidden bg-muted group-hover:shadow-lg transition-all duration-500">
+                <div key={idx} className="flex items-center gap-4 p-3 rounded-xl bg-black/5">
+                  <div className="w-10 h-14 rounded-lg overflow-hidden bg-muted">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-black mb-1 truncate">{item.name}</p>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-black/30">Size: {item.size} · Qty: {item.quantity}</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-black truncate">{item.name}</p>
+                    <p className="text-[8px] font-bold uppercase text-black/40 mt-0.5">{item.size} · {item.quantity}x</p>
                   </div>
-                  <p className="text-sm font-black text-black">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                  <p className="text-[11px] font-black text-black">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
                 </div>
               ))}
             </div>
-            <div className="p-8 rounded-[2rem] bg-black text-white flex justify-between items-center">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Order Total</span>
-              <span className="text-3xl font-black italic">₹{total.toLocaleString("en-IN")}</span>
+            <div className="p-5 rounded-[1.5rem] bg-black text-white flex justify-between items-center">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Total</span>
+              <span className="text-xl font-black italic">₹{total.toLocaleString("en-IN")}</span>
             </div>
           </div>
 
           {!isPending && (
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <Activity className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Order Status</span>
+                <Activity className="w-3 h-3 text-primary" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Update Status</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 {STATUS_OPTIONS.filter(s => s !== "Pending").map((s) => {
                   const active = editStatus === s;
                   return (
                     <button
                       key={s}
                       onClick={() => setEditStatus(s)}
-                      className={`px-6 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest border transition-all duration-500 ${active
-                        ? "bg-black text-white border-black shadow-xl scale-[1.02]"
-                        : "bg-white border-black/5 text-black/40 hover:border-black/20 hover:text-black"
+                      className={`px-4 py-3 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all duration-300 ${active
+                        ? "bg-black text-white border-black"
+                        : "bg-white border-black/5 text-black/40 hover:border-black/10"
                         }`}
                     >
                       {s}
@@ -169,39 +174,56 @@ function OrderDetailSheet({
                   );
                 })}
               </div>
+
+              <div className="space-y-6 pt-4 border-t border-black/5">
+                {editStatus === "Shipped" && (
+                  <div className="p-5 bg-primary/5 rounded-[1.5rem] border border-primary/10 space-y-3">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                      <Truck className="w-3 h-3" /> Tracking Number
+                    </span>
+                    <Input
+                      value={editTrackingId}
+                      onChange={(e) => setEditTrackingId(e.target.value)}
+                      placeholder="Enter Tracking ID..."
+                      className="h-12 px-5 bg-white rounded-xl border-black/5 focus:border-primary transition-all text-base font-bold"
+                    />
+                    <p className="text-[8px] font-bold text-primary/40 italic">This will be sent to the customer instantly.</p>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Star className="w-3 h-3 text-primary" />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Admin Note (Visible to User)</span>
+                  </div>
+                  <Textarea
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    placeholder="Add notes for the customer..."
+                    className="min-h-[80px] p-4 bg-black/5 rounded-xl border-none text-base font-bold resize-none"
+                  />
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Star className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Admin Notes</span>
-            </div>
-            <Textarea
-              value={editNotes}
-              onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Add internal notes about this order..."
-              className="min-h-[150px] p-6 bg-black/5 rounded-[2rem] border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
-            />
-          </div>
         </div>
-      </ScrollArea>
+      </div>
 
-      <div className="p-10 border-t border-black/5 bg-white flex gap-4">
+      <div className="p-8 border-t border-black/5 bg-white flex gap-3 shrink-0">
         <Button
           variant="outline"
           onClick={onClose}
-          className="h-16 rounded-full flex-1 border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
+          className="h-12 rounded-full flex-1 border-black/10 text-[9px] font-black uppercase tracking-widest"
         >
-          Discard
+          Close
         </Button>
         {!isPending && (
           <Button
-            onClick={() => onSave(order._id!, editStatus, editNotes)}
+            onClick={() => onSave(order._id!, editStatus, editNotes, editTrackingId)}
             disabled={isSaving}
-            className="h-16 rounded-full flex-[2] bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[11px] uppercase tracking-[0.4em] shadow-xl"
+            className="h-12 rounded-full flex-[2] bg-black text-white hover:bg-primary transition-all duration-300 font-bold text-[9px] uppercase tracking-widest shadow-lg"
           >
-            {isSaving ? <Loader2 className="animate-spin" /> : "APPLY CHANGES"}
+            {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : "APPLY UPDATE"}
           </Button>
         )}
       </div>
@@ -274,8 +296,8 @@ function AdminOrdersContent() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status, notes }: { id: string; status: OrderStatus; notes: string }) =>
-      api.put(`/orders/${id}/status`, { status, adminNotes: notes }),
+    mutationFn: ({ id, status, notes, tracking }: { id: string; status: OrderStatus; notes: string; tracking?: string }) =>
+      api.put(`/orders/${id}/status`, { status, adminNotes: notes, trackingId: tracking }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
       toast.success("Order status updated successfully");
@@ -316,7 +338,7 @@ function AdminOrdersContent() {
             <div className="w-12 h-[2px] bg-primary" />
             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Management</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ORDER <br /> <span className="text-primary italic text-4xl md:text-6xl">HISTORY</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ORDER <br /> <span className="text-primary italic text-3xl md:text-4xl">HISTORY</span></h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex flex-col text-right">
@@ -380,12 +402,12 @@ function AdminOrdersContent() {
 
       {/* Sheet */}
       <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none shadow-2xl">
+        <SheetContent side="right" className="w-full sm:max-w-xl h-full p-0 border-none shadow-2xl">
           {selectedOrder && (
             <OrderDetailSheet
               key={selectedOrder._id}
               order={selectedOrder}
-              onSave={(id, status, notes) => updateMutation.mutate({ id, status, notes })}
+              onSave={(id, status, notes, tracking) => updateMutation.mutate({ id, status, notes, tracking })}
               onClose={() => setSelectedOrder(null)}
               isSaving={updateMutation.isPending}
             />

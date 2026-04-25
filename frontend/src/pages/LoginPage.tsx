@@ -129,13 +129,13 @@ export default function LoginPage() {
       </div>
 
       {/* ── Form Side ──────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col p-6 sm:p-20 relative bg-white min-h-screen">
+      <div className="flex-1 flex flex-col p-6 sm:p-20 relative bg-white min-h-screen overflow-x-hidden">
         <div className="flex items-center justify-between mb-12 lg:mb-20">
           <Link to="/" className="group flex items-center gap-3">
             <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
               <ArrowLeft className="w-4 h-4" />
             </div>
-            <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-black/30 group-hover:text-black transition-colors">Return</span>
+            <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-black/30 group-hover:text-black transition-colors">Back</span>
           </Link>
 
           <div className="text-right">
@@ -159,7 +159,7 @@ export default function LoginPage() {
                   <div className="w-8 h-[2px] bg-primary" />
                   <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Secure Login</span>
                 </div>
-                <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
+                <h1 className="text-2xl lg:text-4xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
                   {config.title}
                 </h1>
                 <p className="text-black/40 text-[11px] lg:text-sm font-medium leading-relaxed max-w-sm mx-auto md:mx-0" style={{ fontFamily: "var(--font-secondary)" }}>
@@ -186,7 +186,7 @@ export default function LoginPage() {
                       placeholder="e.g. John Doe"
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-base font-bold border-2 border-transparent focus:border-black transition-all outline-none"
                     />
                   </div>
                 )}
@@ -200,7 +200,7 @@ export default function LoginPage() {
                       placeholder="your@email.com"
                       value={form.email}
                       onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                      className="w-full h-14 px-6 bg-black/5 rounded-2xl text-base font-bold border-2 border-transparent focus:border-black transition-all outline-none"
                     />
                   </div>
                 )}
@@ -220,7 +220,7 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         value={form.password}
                         onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-base font-bold border-2 border-transparent focus:border-black transition-all outline-none"
                       />
                       <button
                         type="button"
@@ -242,7 +242,7 @@ export default function LoginPage() {
                       placeholder="000 000"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                      className="w-full h-20 px-4 bg-black/5 rounded-2xl text-center text-4xl font-black tracking-[0.5em] focus:border-black border-2 border-transparent transition-all outline-none"
+                      className="w-full h-20 px-4 bg-black/5 rounded-2xl text-center text-2xl sm:text-4xl font-black tracking-[0.5em] focus:border-black border-2 border-transparent transition-all outline-none"
                     />
                   </div>
                 )}
@@ -256,7 +256,7 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-xs font-bold border-2 border-transparent focus:border-black transition-all outline-none"
+                        className="w-full h-14 pl-6 pr-14 bg-black/5 rounded-2xl text-base font-bold border-2 border-transparent focus:border-black transition-all outline-none"
                       />
                       <button
                         type="button"

@@ -101,7 +101,7 @@ function ConfirmationScreen({
               <CheckCircle2 className="w-10 h-10 text-primary" />
             </motion.div>
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4" style={{ fontFamily: "var(--font-display)" }}>
               ORDER <br /> <span className="text-primary italic">CONFIRMED</span>
             </h1>
 
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
         `   Name: ${customerName}`,
         `   Address: ${deliveryAddress}`,
         ``,
-        `🛒 *My Order Elements:*`,
+        `🛒 *Items to be Ordered:*`,
         `─────────────────────`,
         ...lineItems,
         `─────────────────────`,
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
       clearCart();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Protocol Failure.");
+      toast.error(error.response?.data?.message || "Order could not be placed.");
     }
   });
 
@@ -275,10 +275,10 @@ export default function CheckoutPage() {
                   <ArrowLeft className="w-3 h-3" /> Cart
                 </Link>
                 <ChevronRight className="w-2.5 h-2.5 shrink-0" />
-                <span className="text-primary italic">Checkout Protocol</span>
+                <span className="text-primary italic">Checkout</span>
               </nav>
-              <h1 className="text-4xl lg:text-7xl font-black uppercase tracking-tighter leading-tight text-center md:text-left" style={{ fontFamily: "var(--font-display)" }}>
-                CHECKOUT <br /> <span className="text-primary italic text-3xl lg:text-6xl">DETAILS</span>
+              <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-tight text-center md:text-left" style={{ fontFamily: "var(--font-display)" }}>
+                CHECKOUT <br /> <span className="text-primary italic text-2xl lg:text-4xl">DETAILS</span>
               </h1>
             </div>
 
@@ -298,7 +298,7 @@ export default function CheckoutPage() {
                         placeholder="e.g. John Doe"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
-                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                       />
                     </div>
                     <div className="space-y-3">
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                         placeholder="House No, Street, City, State, PIN"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs font-bold outline-none"
+                        className="h-14 px-6 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-base font-bold outline-none"
                       />
                     </div>
                   </div>
@@ -380,8 +380,8 @@ export default function CheckoutPage() {
 
                     <div className="pt-8 border-t border-white/5 grid grid-cols-2 gap-4">
                       {[
-                        { icon: ShieldCheck, label: "Encrypted" },
-                        { icon: Truck, label: "Logistic" }
+                        { icon: ShieldCheck, label: "Secure" },
+                        { icon: Truck, label: "Shipping" }
                       ].map((item, i) => (
                         <div key={i} className="flex items-center gap-3 opacity-20">
                           <item.icon className="w-3.5 h-3.5" />

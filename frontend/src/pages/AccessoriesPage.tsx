@@ -136,7 +136,7 @@ export default function AccessoriesPage() {
               <div className="md:hidden w-8 h-[2px] bg-primary" />
             </div>
 
-            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-6 lg:mb-10" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.85] mb-6 lg:mb-10" style={{ fontFamily: "var(--font-display)" }}>
               ESSENTIAL <br /> <span className="text-primary italic">FRAGMENTS</span>
             </h1>
 

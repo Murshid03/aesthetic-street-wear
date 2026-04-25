@@ -176,7 +176,7 @@ function AdminDashboardContent() {
             <div className="w-12 h-[2px] bg-primary" />
             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Overview</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ADMIN <br /> <span className="text-primary italic">DASHBOARD</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>ADMIN <br /> <span className="text-primary italic">DASHBOARD</span></h1>
         </div>
         <div className="hidden xl:flex items-center gap-8 text-right">
           <div className="flex flex-col">

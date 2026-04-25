@@ -141,7 +141,7 @@ export default function PantsPage() {
               <span className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Category . Collection</span>
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-10" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-[0.85] mb-10" style={{ fontFamily: "var(--font-display)" }}>
               TECH <br /> <span className="text-primary italic">UTILITY</span>
             </h1>
 
