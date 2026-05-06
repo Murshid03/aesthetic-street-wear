@@ -6,6 +6,7 @@ export interface Product {
   _id: string; // MongoDB ID
   id?: string; // Compatibility
   name: string;
+  productCode: string;
   category: Category;
   description: string;
   price: number;
@@ -71,6 +72,9 @@ export interface SiteSettings {
   bannerMessage: string;
   email: string;
   address?: string;
+  heroImage1?: string;
+  heroImage2?: string;
+  heroImage3?: string;
 }
 
 export type Settings = SiteSettings;

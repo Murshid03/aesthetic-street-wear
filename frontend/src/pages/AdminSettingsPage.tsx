@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { SiteSettings } from "@/types";
 import {
+  Image as ImageIcon,
   Info,
   Megaphone,
   MessageCircle,
@@ -17,10 +18,11 @@ import {
   Loader2,
   ShieldCheck,
   Zap,
-  ChevronRight
+  ChevronRight,
+  Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminPage";
 
@@ -85,6 +87,35 @@ function AdminSettingsContent() {
     },
     onError: () => toast.error("Failed to save settings"),
   });
+
+  const uploadImageMutation = useMutation({
+    mutationFn: async ({ field, file }: { field: keyof SiteSettings; file: File }) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("field", field);
+      const { data } = await api.post("/settings/hero-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["site_settings"] });
+      setLocalSettings((prev) => prev ? { ...prev, [variables.field]: data.url } : prev);
+      toast.success("Image uploaded successfully");
+    },
+    onError: () => toast.error("Failed to upload image"),
+  });
+
+  const handleImageUpload = (field: keyof SiteSettings, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be less than 5MB");
+        return;
+      }
+      uploadImageMutation.mutate({ field, file });
+    }
+  };
 
   const updateField = (field: keyof SiteSettings, value: string) => {
     if (!localSettings) return;
@@ -202,6 +233,56 @@ function AdminSettingsContent() {
                 {localSettings.bannerMessage || "No banner message set"}
               </div>
             </div>
+          </div>
+        </SettingBox>
+
+        {/* Hero Images */}
+        <SettingBox
+          icon={ImageIcon}
+          title="Hero Images"
+          description="Upload 3 high-quality images for the rotating hero section on the homepage."
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((num) => {
+              const fieldName = `heroImage${num}` as keyof SiteSettings;
+              const imgUrl = localSettings[fieldName];
+              return (
+                <div key={num} className="space-y-3">
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Slide {num}</Label>
+                  <label className="relative flex flex-col items-center justify-center aspect-[3/4] bg-black/5 rounded-2xl border-2 border-dashed border-black/10 hover:border-black/30 hover:bg-black/10 transition-all cursor-pointer overflow-hidden group">
+                    {imgUrl ? (
+                      <>
+                        <img src={imgUrl as string} alt={`Hero ${num}`} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="text-white text-[9px] font-black uppercase tracking-widest bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm shadow-xl flex items-center gap-2">
+                            <Upload className="w-3 h-3" /> Replace
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-4 text-center">
+                        <Upload className="w-6 h-6 text-black/20 mb-2 group-hover:text-primary transition-colors" />
+                        <p className="text-[9px] font-black uppercase tracking-widest text-black/40 group-hover:text-primary transition-colors leading-tight">
+                          Upload<br />Image
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(fieldName, e)}
+                    />
+                  </label>
+                  {uploadImageMutation.isPending && uploadImageMutation.variables?.field === fieldName && (
+                    <div className="flex items-center gap-2 text-primary justify-center">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Uploading</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </SettingBox>
       </div>

@@ -11,8 +11,12 @@ const settingsSchema = new mongoose.Schema(
         instagram: { type: String, default: '' },
         facebook: { type: String, default: '' },
         twitter: { type: String, default: '' },
+        heroImage1: { type: String, default: '' },
+        heroImage2: { type: String, default: '' },
+        heroImage3: { type: String, default: '' },
     },
     { timestamps: true }
 );
 
 export default mongoose.model('Settings', settingsSchema);
+

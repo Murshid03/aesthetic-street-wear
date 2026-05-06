@@ -47,9 +47,10 @@ import {
   AlertCircle,
   RefreshCw,
   Box,
-  Layers
+  Layers,
+  X,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminPage";
 import { motion, AnimatePresence } from "motion/react";
@@ -94,6 +95,8 @@ function SizeSelector({
   );
 }
 
+
+
 function AdminProductsContent() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<Product | null>(null);
@@ -107,7 +110,7 @@ function AdminProductsContent() {
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ["admin_products"],
     queryFn: async () => {
-      const { data } = await api.get("/products");
+      const { data } = await api.get("/products", { params: { all: "true" } });
       return data;
     },
   });
@@ -168,7 +171,8 @@ function AdminProductsContent() {
       stockQuantity: 10,
       price: undefined,
       image: "",
-      description: ""
+      description: "",
+      productCode: ""
     });
     setSelectedFile(null);
     setIsOpen(true);
@@ -183,7 +187,7 @@ function AdminProductsContent() {
 
   const handleSave = () => {
     if (!form.name?.trim() || !form.description?.trim() || form.price === undefined || form.price < 0) {
-      toast.error("Please enter a name and description");
+      toast.error("Please enter a name, description and valid price");
       return;
     }
 
@@ -192,13 +196,16 @@ function AdminProductsContent() {
       const value = (form as any)[key];
       if (key === "sizes") {
         formData.append(key, JSON.stringify(value));
+      } else if (key === "colorVariants") {
+        // Skip — handled separately below
       } else if (key === "image" && selectedFile) {
-        // Skip
+        // Skip — handled separately below
       } else if (value !== undefined) {
         formData.append(key, value);
       }
     });
 
+    // Main image file
     if (selectedFile) formData.append("image", selectedFile);
 
     if (editing) {
@@ -221,12 +228,12 @@ function AdminProductsContent() {
     <div className="space-y-5 sm:space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-[2px] bg-primary" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Management</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
             Product <span className="text-primary italic">Inventory</span>
           </h1>
         </div>
@@ -235,7 +242,7 @@ function AdminProductsContent() {
           className="h-10 px-4 rounded-full bg-black text-white hover:bg-primary transition-all font-black text-[9px] uppercase tracking-[0.3em] shadow-lg shrink-0"
         >
           <Plus className="w-3.5 h-3.5 mr-1.5" />
-          Add
+          <span className="hidden xs:inline">Add</span>
         </Button>
       </div>
 
@@ -255,7 +262,7 @@ function AdminProductsContent() {
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
-              className={`px-3.5 py-2 rounded-full text-[8px] font-black uppercase tracking-[0.15em] border transition-all duration-400 ${activeTab === cat
+              className={`px-3 py-2 rounded-full text-[8px] font-black uppercase tracking-[0.15em] border transition-all duration-400 ${activeTab === cat
                 ? "bg-black text-white border-black shadow-md"
                 : "bg-white border-black/8 text-black/40 hover:border-black/20 hover:text-black"
                 }`}
@@ -300,35 +307,35 @@ function AdminProductsContent() {
                     <h3 className="text-sm font-black uppercase tracking-tight text-black truncate leading-tight">{p.name}</h3>
                     <div className="flex items-center gap-3 text-[8px] font-bold text-black/40">
                       <span className="font-black text-black">₹{p.price.toLocaleString("en-IN")}</span>
+                      {p.productCode && <span className="font-black text-primary">{p.productCode}</span>}
                       <span className={`${p.stockQuantity <= 5 ? "text-rose-500 font-black" : ""}`}>Stock: {p.stockQuantity}</span>
                     </div>
                   </div>
-
                   {/* Actions */}
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => openEdit(p)}
-                      className="w-9 h-9 rounded-xl bg-black/5 hover:bg-black hover:text-white transition-all"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/5 hover:bg-black hover:text-white transition-all"
                     >
-                      <Pencil className="w-3.5 h-3.5" />
+                      <Pencil className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => toggleSoldOutMutation.mutate(p._id!)}
-                      className={`w-9 h-9 rounded-xl transition-all ${p.isSoldOut ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white" : "bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white"}`}
+                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl transition-all ${p.isSoldOut ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white" : "bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white"}`}
                     >
-                      {p.isSoldOut ? <RefreshCw className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                      {p.isSoldOut ? <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <AlertCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setDeleteId(p._id!)}
-                      className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
                   </div>
                 </div>
@@ -342,29 +349,30 @@ function AdminProductsContent() {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="sm:max-w-md w-full flex flex-col p-0 bg-white border-l border-black/5 shadow-2xl overflow-hidden">
           {/* Sheet Header */}
-          <SheetHeader className="px-5 pt-5 pb-4 text-left border-b border-black/5 shrink-0">
+          <SheetHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 sm:pb-4 text-left border-b border-black/5 shrink-0">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-6 h-[2px] bg-primary" />
               <span className="text-[9px] font-black uppercase tracking-[0.35em] text-primary">Product Details</span>
             </div>
-            <SheetTitle className="text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+            <SheetTitle className="text-xl sm:text-2xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
               {editing ? "Edit" : "Add"} <span className="text-primary italic">Product</span>
             </SheetTitle>
           </SheetHeader>
 
           {/* Scrollable Form */}
           <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
-            <div className="px-5 py-4 space-y-5">
+            <div className="px-4 sm:px-5 py-4 space-y-5">
               {/* Image */}
               <div className="space-y-2">
-                <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Product Image</Label>
-                <div className="flex gap-4">
-                  <div className="w-24 h-32 rounded-2xl bg-black/5 overflow-hidden border border-black/5 shrink-0">
+                <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Main Product Image</Label>
+                <div className="flex gap-3 sm:gap-4">
+                  <div className="w-20 sm:w-24 h-28 sm:h-32 rounded-2xl bg-black/5 overflow-hidden border border-black/5 shrink-0">
                     {form.image ? <img src={form.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 text-black/10" /></div>}
                   </div>
-                  <div className="flex-1 space-y-3">
+                  <div className="flex-1 space-y-2 sm:space-y-3 min-w-0">
                     <Input
                       type="file"
+                      accept="image/*"
                       className="h-9 text-[8px] font-black uppercase pt-1.5 cursor-pointer rounded-xl border-black/8 bg-black/5"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
@@ -374,7 +382,7 @@ function AdminProductsContent() {
                     <div className="text-[8px] font-black uppercase tracking-widest text-black/20 text-center">OR</div>
                     <Input
                       placeholder="Image URL"
-                      className="h-11 px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                      className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold outline-none"
                       value={selectedFile ? "" : (form.image ?? "")}
                       onChange={(e) => setForm(f => ({ ...f, image: e.target.value }))}
                     />
@@ -383,11 +391,11 @@ function AdminProductsContent() {
               </div>
 
               {/* Category + Visibility */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Category</Label>
                   <Select value={form.category} onValueChange={(v) => setForm(f => ({ ...f, category: v as Category }))}>
-                    <SelectTrigger className="h-11 px-4 bg-black/5 rounded-xl text-xs font-bold border-none">
+                    <SelectTrigger className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl text-xs font-bold border-none">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-none shadow-2xl">
@@ -397,31 +405,42 @@ function AdminProductsContent() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Visibility</Label>
-                  <div className="flex items-center h-11 px-4 bg-black/5 rounded-xl justify-between">
+                  <div className="flex items-center h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl justify-between">
                     <span className="text-[9px] font-black uppercase tracking-widest">{form.isActive ? "Active" : "Hidden"}</span>
                     <Switch checked={form.isActive} onCheckedChange={(v) => setForm(f => ({ ...f, isActive: v }))} />
                   </div>
                 </div>
               </div>
 
-              {/* Name */}
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Product Name</Label>
-                <Input
-                  placeholder="Product Title"
-                  className="h-11 px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
-                  value={form.name ?? ""}
-                  onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-                />
+              {/* Name + Product Code */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Product Name</Label>
+                  <Input
+                    placeholder="Product Title"
+                    className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold outline-none"
+                    value={form.name ?? ""}
+                    onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Product Code</Label>
+                  <Input
+                    placeholder="e.g. SH-001"
+                    className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold outline-none uppercase"
+                    value={form.productCode ?? ""}
+                    onChange={(e) => setForm(f => ({ ...f, productCode: e.target.value.toUpperCase() }))}
+                  />
+                </div>
               </div>
 
               {/* Price + Stock */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Price (₹)</Label>
                   <Input
                     type="number"
-                    className="h-11 px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                    className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold outline-none"
                     value={form.price === undefined ? "" : form.price}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -433,7 +452,7 @@ function AdminProductsContent() {
                   <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Stock</Label>
                   <Input
                     type="number"
-                    className="h-11 px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-sm font-bold outline-none"
+                    className="h-10 sm:h-11 px-3 sm:px-4 bg-black/5 rounded-xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold outline-none"
                     value={form.stockQuantity === undefined ? "" : form.stockQuantity}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -449,12 +468,13 @@ function AdminProductsContent() {
                 <SizeSelector selected={form.sizes ?? []} onChange={(s) => setForm(f => ({ ...f, sizes: s }))} />
               </div>
 
+
               {/* Description */}
               <div className="space-y-2">
                 <Label className="text-[9px] font-black uppercase tracking-widest text-black/40">Description</Label>
                 <Textarea
                   placeholder="Product description and details..."
-                  className="min-h-[100px] p-4 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-sm font-bold resize-none"
+                  className="min-h-[80px] sm:min-h-[100px] p-3 sm:p-4 bg-black/5 rounded-2xl border-2 border-transparent focus:border-black transition-all text-xs sm:text-sm font-bold resize-none"
                   value={form.description ?? ""}
                   onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
                 />
@@ -462,10 +482,10 @@ function AdminProductsContent() {
             </div>
           </div>
 
-          {/* Sticky Action Footer - always visible */}
-          <div className="px-5 py-4 border-t border-black/5 bg-white shrink-0 safe-bottom">
+          {/* Sticky Action Footer - always visible above bottom nav */}
+          <div className="px-4 sm:px-5 py-3 sm:py-4 border-t border-black/5 bg-white shrink-0 safe-bottom">
             <Button
-              className="w-full h-14 rounded-full bg-primary text-white hover:bg-black transition-all duration-400 font-bold text-[11px] uppercase tracking-[0.35em] shadow-xl touch-target"
+              className="w-full h-12 sm:h-14 rounded-full bg-primary text-white hover:bg-black transition-all duration-400 font-bold text-[10px] sm:text-[11px] uppercase tracking-[0.35em] shadow-xl touch-target"
               onClick={handleSave}
               disabled={createMutation.isPending || updateMutation.isPending}
             >
@@ -480,7 +500,7 @@ function AdminProductsContent() {
 
       {/* Delete Confirm Dialog */}
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent className="rounded-3xl border-none bg-white p-8 shadow-2xl max-w-sm">
+        <AlertDialogContent className="rounded-3xl border-none bg-white p-6 sm:p-8 shadow-2xl max-w-sm mx-4">
           <div className="w-14 h-14 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-5">
             <Trash2 className="w-6 h-6 text-rose-500" />
           </div>

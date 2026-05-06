@@ -19,10 +19,11 @@ import {
   Package,
   Shield,
   Truck,
-  RotateCcw
+  RotateCcw,
+  Palette
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 const CATEGORY_ROUTE: Record<Category, string> = {
@@ -93,6 +94,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
 
+
   const { data: product, isLoading, isError } = useQuery<Product>({
     queryKey: ["product", id],
     queryFn: async () => {
@@ -109,6 +111,12 @@ export default function ProductPage() {
     },
     enabled: !!product,
   });
+
+  // Reset selected when product changes
+  useEffect(() => {
+    setSelectedSize("");
+    setQuantity(1);
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -144,17 +152,19 @@ export default function ProductPage() {
     (p) => p.category === product.category && p._id !== product._id,
   ).slice(0, 4);
 
+
+
   const handleAddToCart = () => {
     if (!selectedSize) {
-      toast.error("Please select an architectural fit (size)");
+      toast.error("Please select a size");
       return;
     }
     setAddingToCart(true);
     addToCart(product, selectedSize, quantity);
     setTimeout(() => {
       setAddingToCart(false);
-      toast.success("Segment Authenticated", {
-        description: `Added "${product.name}" [${selectedSize}] to your loadout.`
+      toast.success("Added to Cart", {
+        description: `"${product.name}" [${selectedSize}] added to your cart.`
       });
     }, 800);
   };
@@ -166,8 +176,8 @@ export default function ProductPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16">
             {/* ── Visual Context ─────────────────────────────────────────── */}
             <div className="lg:col-span-7 order-1">
-              <nav className="flex items-center gap-2 lg:gap-3 text-[8px] lg:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-6 lg:mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
-                <Link to="/" className="hover:text-primary transition-colors">Hub</Link>
+              <nav className="flex items-center gap-2 lg:gap-3 text-[8px] lg:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 sm:mb-6 lg:mb-8 overflow-x-auto no-scrollbar whitespace-nowrap">
+                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <Link to={categoryRoute} className="hover:text-primary transition-colors">{product.category}</Link>
                 <ChevronRight className="w-2.5 h-2.5 shrink-0" />
@@ -175,34 +185,38 @@ export default function ProductPage() {
               </nav>
 
               <div className="relative group">
-                <div className="aspect-[3/4] md:aspect-[4/5] rounded-[2rem] overflow-hidden bg-muted shadow-2xl">
-                  <motion.img
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1 }}
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="aspect-[3/4] md:aspect-[4/5] rounded-2xl sm:rounded-[2rem] overflow-hidden bg-muted shadow-xl sm:shadow-2xl">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={product.image}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </AnimatePresence>
                 </div>
                 <button
                   onClick={() => wished ? removeFromWishlist(product._id!) : addToWishlist(product)}
-                  className={`absolute top-4 right-4 lg:top-8 lg:right-8 w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl backdrop-blur-md
+                  className={`absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-8 lg:right-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl backdrop-blur-md
                      ${wished ? "bg-primary text-white scale-110" : "bg-white/80 text-black hover:bg-white"}`}
                 >
-                  <Heart className={`w-5 h-5 lg:w-6 lg:h-6 ${wished ? "fill-current" : ""}`} />
+                  <Heart className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${wished ? "fill-current" : ""}`} />
                 </button>
                 {product.isSoldOut && (
-                  <div className="absolute top-8 left-8">
-                    <div className="bg-black text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">Non-Exist Project</div>
+                  <div className="absolute top-4 left-4 sm:top-8 sm:left-8">
+                    <div className="bg-black text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">Sold Out</div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* ── Architectural Specs ────────────────────────────────────── */}
+            {/* ── Product Details ────────────────────────────────────── */}
             <div className="lg:col-span-5 flex flex-col pt-0 lg:pt-10 order-2">
-              <div className="space-y-8 lg:space-y-12">
+              <div className="space-y-6 sm:space-y-8 lg:space-y-12">
                 <div className="text-center lg:text-left">
                   <div className="flex items-center justify-center lg:justify-start gap-3 mb-3 lg:mb-5">
                     <div className="w-8 h-[2px] bg-primary" />
@@ -228,8 +242,8 @@ export default function ProductPage() {
                       { icon: Truck, label: "Express" },
                       { icon: RotateCcw, label: "Returnable" }
                     ].map((item, i) => (
-                      <div key={i} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-black/5 hover:bg-black/10 transition-colors">
-                        <item.icon className="w-3.5 h-3.5 text-black/40" />
+                      <div key={i} className="flex flex-col items-center gap-1.5 p-2.5 sm:p-3 rounded-xl bg-black/5 hover:bg-black/10 transition-colors">
+                        <item.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black/40" />
                         <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-black/60">{item.label}</span>
                       </div>
                     ))}
@@ -237,7 +251,7 @@ export default function ProductPage() {
                 </div>
 
                 {/* Size Selection */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/40">Select Size:</span>
                     <button className="text-[8px] font-black uppercase tracking-widest border-b border-black/10 hover:border-black transition-colors">Size Guide</button>
@@ -248,7 +262,7 @@ export default function ProductPage() {
                         key={size}
                         onClick={() => setSelectedSize(size)}
                         disabled={product.isSoldOut}
-                        className={`h-10 sm:h-12 min-w-[3rem] px-4 sm:px-5 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all border-2 
+                        className={`h-10 sm:h-12 min-w-[2.5rem] sm:min-w-[3rem] px-3 sm:px-5 rounded-xl text-[9px] sm:text-[11px] font-black uppercase tracking-widest transition-all border-2 
                                     ${selectedSize === size
                             ? "border-black bg-black text-white shadow-xl scale-105"
                             : "border-black/5 bg-transparent text-black/40 hover:border-black/20"
@@ -262,54 +276,56 @@ export default function ProductPage() {
 
                 {/* Add to Cart */}
                 <div className="space-y-4 pt-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 bg-black/5 rounded-full p-1 items-center shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex h-10 sm:h-12 bg-black/5 rounded-full p-0.5 sm:p-1 items-center shrink-0">
                       <button
                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
                       >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
-                      <span className="w-8 text-center text-[11px] font-black">{quantity}</span>
+                      <span className="w-6 sm:w-8 text-center text-[10px] sm:text-[11px] font-black">{quantity}</span>
                       <button
                         onClick={() => setQuantity(q => q + 1)}
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:bg-white hover:shadow-sm transition-all text-black/40"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
                     </div>
                     <Button
                       onClick={handleAddToCart}
                       disabled={product.isSoldOut || addingToCart}
-                      className="flex-1 h-12 sm:h-14 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[10px] uppercase tracking-[0.3em] shadow-xl"
+                      className="flex-1 h-11 sm:h-14 rounded-full bg-primary text-white hover:bg-black transition-all duration-500 font-bold text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em] shadow-xl"
                     >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                       {product.isSoldOut ? "Sold Out" : addingToCart ? "Adding..." : "Add to Cart"}
                     </Button>
                   </div>
                 </div>
 
-                <div className="pt-8 border-t border-black/5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">Item Code: {String(product._id).slice(-8).toUpperCase()}</p>
+                <div className="pt-6 sm:pt-8 border-t border-black/5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
+                    Product Code: {product.productCode || String(product._id).slice(-8).toUpperCase()}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── Sequence Context ────────────────────────────────────────── */}
+          {/* ── Related Products ────────────────────────────────────────── */}
           {related.length > 0 && (
-            <section className="mt-16 sm:mt-24">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4">
+            <section className="mt-12 sm:mt-16 lg:mt-24">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 lg:mb-12 gap-3 sm:gap-4">
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <span className="w-8 h-[2px] bg-primary" />
                     <p className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Related Products</p>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>You May Also Like</h2>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>You May Also Like</h2>
                 </div>
                 <Link to={categoryRoute} className="text-[9px] font-black uppercase tracking-[0.3em] pb-1 border-b-2 border-primary hover:text-black transition-colors">Explore Category</Link>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
                 {related.map((p) => (
                   <RelatedProductCard key={p._id} product={p} />
                 ))}

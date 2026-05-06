@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
-import type { Product } from "@/types";
+import type { Product, SiteSettings } from "@/types";
 
 const TRUST_BADGES = [
   { icon: Shield, label: "Secure Payment", desc: "100% Secure Transaction" },
@@ -98,7 +98,36 @@ function SkeletonCard() {
   );
 }
 
+const DEFAULT_HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1200&q=90",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=90",
+  "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1200&q=90"
+];
+
 export default function HomePage() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const { data: settings } = useQuery<SiteSettings>({
+    queryKey: ["site_settings"],
+    queryFn: async () => {
+      const { data } = await api.get("/settings");
+      return data;
+    },
+  });
+
+  const heroImages = [
+    settings?.heroImage1 || DEFAULT_HERO_IMAGES[0],
+    settings?.heroImage2 || DEFAULT_HERO_IMAGES[1],
+    settings?.heroImage3 || DEFAULT_HERO_IMAGES[2],
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
+
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: async () => {
@@ -115,22 +144,59 @@ export default function HomePage() {
   return (
     <Layout>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative pt-16 lg:pt-24 pb-12 lg:pb-20 overflow-hidden bg-white min-h-[70vh] lg:min-h-[80vh] flex items-center" aria-label="Hero">
+      <section className="relative pt-6 lg:pt-24 pb-12 lg:pb-20 overflow-hidden bg-white min-h-[70vh] lg:min-h-[80vh] flex items-start lg:items-center" aria-label="Hero">
         <div className="container mx-auto px-6 md:px-12 lg:px-24">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            {/* Visual Side - Show first on mobile for engagement */}
+          <div className="relative flex flex-col lg:flex-row items-center gap-6 lg:gap-16">
+
+            {/* Title Block - Mobile Only (Appears before image) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+              className="flex lg:hidden flex-col items-center text-center w-full px-4 mx-auto order-1"
+            >
+              <div className="flex items-center justify-center gap-3 mb-2 w-full">
+                <div className="w-5 h-[2px] bg-primary" />
+                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">
+                  Vol . 01 // DROP 26
+                </span>
+                <div className="w-5 h-[2px] bg-primary" />
+              </div>
+
+              <h1 className="text-[1.75rem] sm:text-3xl font-black uppercase tracking-tighter leading-[1.05] text-black w-full text-center" style={{ fontFamily: "var(--font-display)" }}>
+                AESTHETIC <br />
+                <span className="text-primary italic">STREET</span>WEAR
+              </h1>
+            </motion.div>
+
+            {/* Visual Side */}
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
-              className="w-full lg:w-[45%] order-1 lg:order-2"
+              className="w-full lg:w-[45%] order-2 lg:order-2"
             >
-              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-muted max-w-[280px] sm:max-w-md lg:max-w-[380px] xl:max-w-md mx-auto lg:ml-auto lg:mr-0">
-                <img
-                  src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1200&q=90"
-                  alt="Aesthetic street wear focus"
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-muted max-w-[280px] sm:max-w-md lg:max-w-[380px] xl:max-w-md mx-auto lg:ml-auto lg:mr-0 flex">
+                {heroImages.map((src, index) => (
+                  <img
+                    key={index}
+                    src={src}
+                    alt={`Aesthetic street wear ${index + 1}`}
+                    className="w-full h-full object-cover shrink-0 transition-transform duration-1000 ease-in-out"
+                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                  />
+                ))}
+
+                {/* Slider indicators */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {heroImages.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "w-4 bg-primary" : "w-1.5 bg-white/50"
+                        }`}
+                    />
+                  ))}
+                </div>
               </div>
             </motion.div>
 
@@ -139,34 +205,39 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-              className="w-full lg:w-[55%] flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 lg:pr-10"
+              className="w-full lg:w-[55%] flex flex-col items-center lg:items-start text-center lg:text-left order-3 lg:order-1 lg:pr-10 mt-4 lg:mt-0"
             >
-              <div className="flex items-center gap-4 mb-4 lg:mb-6">
-                <div className="w-8 h-[2px] bg-primary" />
-                <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.4em] text-primary">Vol . 01 // DROP 26</span>
-                <div className="hidden lg:block w-8 h-[2px] bg-primary" />
+              {/* Title Block - Desktop Only */}
+              <div className="hidden lg:flex flex-col items-start w-full mb-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-8 h-[2px] bg-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">
+                    Vol . 01 // DROP 26
+                  </span>
+                  <div className="hidden lg:block w-8 h-[2px] bg-primary" />
+                </div>
+
+                <h1 className="text-[clamp(2.5rem,4vw,3.5rem)] xl:text-6xl font-black uppercase tracking-tighter leading-[1] text-black mb-0" style={{ fontFamily: "var(--font-display)" }}>
+                  AESTHETIC <br />
+                  <span className="text-primary italic">STREET</span>WEAR
+                </h1>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[clamp(2.5rem,4vw,3.5rem)] xl:text-6xl font-black uppercase tracking-tighter leading-[1.1] lg:leading-[1] mb-6 lg:mb-8" style={{ fontFamily: "var(--font-display)" }}>
-                AESTHETIC <br />
-                <span className="text-primary italic">STREET</span>WEAR
-              </h1>
+
               <p className="max-w-md text-black/40 text-sm md:text-lg font-medium leading-relaxed mb-8 lg:mb-10 lg:border-l lg:border-black/10 lg:pl-6" style={{ fontFamily: "var(--font-secondary)" }}>
                 Architectural silhouettes fused with raw urban energy. Defining the new standard of premium apparel.
               </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 lg:gap-6 w-full lg:w-auto">
+
+              <div className="flex items-center gap-4 w-full sm:w-auto">
                 <Button
                   asChild
                   size="lg"
-                  className="h-14 w-full sm:w-auto px-10 rounded-full bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[10px] lg:text-[11px] uppercase tracking-widest"
+                  className="group relative h-14 w-full sm:w-auto px-10 rounded-full bg-black text-white hover:bg-primary transition-all duration-500 font-bold text-[10px] lg:text-[11px] uppercase tracking-widest overflow-hidden"
                 >
-                  <Link to="/shirts">Explore Collection</Link>
+                  <Link to="/shirts" className="flex items-center justify-center gap-3">
+                    <span>Explore Collection</span>
+                    <ArrowRight className="w-4 h-4 ml-2 mt-[1px] group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </Button>
-                <Link to="/wishlist" className="flex items-center gap-3 group px-4 py-2">
-                  <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-full border border-black/5 flex items-center justify-center transition-all group-hover:bg-primary group-hover:text-white">
-                    <Heart className="w-4 h-4" />
-                  </div>
-                  <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 group-hover:text-black">Wishlist</span>
-                </Link>
               </div>
             </motion.div>
           </div>

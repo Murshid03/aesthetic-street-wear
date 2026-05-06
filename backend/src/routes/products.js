@@ -35,9 +35,6 @@ router.get('/:id', async (req, res) => {
 // POST /api/products — Admin only
 router.post('/', protect, adminOnly, upload.single('image'), async (req, res) => {
     try {
-        console.log('--- Product POST request ---');
-        console.log('Body:', req.body);
-        console.log('File:', req.file);
         const productData = { ...req.body };
 
         // Handle sizes if sent as a string (common in multipart/form-data)
@@ -49,8 +46,9 @@ router.post('/', protect, adminOnly, upload.single('image'), async (req, res) =>
             }
         }
 
+        // Handle image
         if (req.file) {
-            productData.image = req.file.location;
+            productData.image = `/uploads/${req.file.filename}`;
         }
 
         // Explicit Type Conversion for FormData strings
@@ -79,8 +77,9 @@ router.put('/:id', protect, adminOnly, upload.single('image'), async (req, res) 
             }
         }
 
+        // Handle image
         if (req.file) {
-            productData.image = req.file.location;
+            productData.image = `/uploads/${req.file.filename}`;
         }
 
         // Explicit Type Conversion for FormData strings
