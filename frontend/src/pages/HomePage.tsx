@@ -321,7 +321,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
                 <div className="absolute inset-0 p-4 lg:p-8 flex flex-col justify-end">
                   <p className="text-[8px] lg:text-[9px] font-black uppercase tracking-[0.4em] text-primary mb-1 lg:mb-2">0{i + 1}</p>
-                  <h3 className="text-lg lg:text-2xl font-black italic uppercase tracking-tighter text-white leading-none mb-2 lg:mb-4 group-hover:translate-x-2 transition-transform duration-500">{cat.label}</h3>
+                  <h3 className="text-[10px] min-[375px]:text-[11px] sm:text-sm md:text-base lg:text-2xl font-black italic uppercase tracking-tighter text-white leading-none mb-2 lg:mb-4 group-hover:translate-x-1 sm:group-hover:translate-x-2 transition-transform duration-500 whitespace-nowrap">{cat.label}</h3>
                   <div className="hidden lg:block w-0 h-px bg-white/40 group-hover:w-full transition-all duration-700" />
                 </div>
               </Link>
@@ -375,13 +375,13 @@ export default function HomePage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] lg:w-[400px] lg:h-[400px] bg-primary/20 blur-[120px] rounded-full opacity-40" />
 
             <div className="relative z-10 space-y-6 lg:space-y-8">
-              <div className="flex items-center justify-center gap-3">
-                <span className="w-8 h-[1px] bg-white/20" />
-                <span className="text-[8px] lg:text-[9px] font-black uppercase tracking-[0.4em] text-primary">Member Gateway</span>
-                <span className="w-8 h-[1px] bg-white/20" />
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
+                <span className="w-4 sm:w-8 h-[1px] bg-white/20" />
+                <span className="text-[8px] lg:text-[9px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-primary text-center">Member Gateway</span>
+                <span className="w-4 sm:w-8 h-[1px] bg-white/20" />
               </div>
 
-              <h2 className="text-3xl lg:text-5xl font-black tracking-tight uppercase leading-none" style={{ fontFamily: "var(--font-display)" }}>
+              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight uppercase leading-[1.1] sm:leading-none break-words" style={{ fontFamily: "var(--font-display)" }}>
                 ELEVATE YOUR <br /> <span className="text-white/20">EXPERIENCE</span>
               </h2>
 
