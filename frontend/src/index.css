@@ -6,9 +6,11 @@
 
 @layer base {
   :root {
-    --font-display: "Syne", sans-serif;
+    --font-brand-primary: "Syne", sans-serif;
+    --font-brand-secondary: "Space Mono", monospace;
+    --font-display: "Outfit", sans-serif;
     --font-secondary: "Inter", sans-serif;
-    --font-accent: "Space Mono", monospace;
+    --font-accent: "Inter", sans-serif;
     --font-body: "Inter", sans-serif;
     --radius: 0.75rem;
 
@@ -60,7 +62,7 @@
   }
 
   body {
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-body);
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;

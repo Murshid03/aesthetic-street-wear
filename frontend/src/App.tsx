@@ -22,6 +22,7 @@ const NewArrivalsPage = lazy(() => import("@/pages/NewArrivalsPage"));
 const ProductPage = lazy(() => import("@/pages/ProductPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const WishlistPage = lazy(() => import("@/pages/WishlistPage"));
+const SearchPage = lazy(() => import("@/pages/SearchPage"));
 const AccountPage = lazy(() => import("@/pages/AccountPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const AdminProductsPage = lazy(() => import("@/pages/AdminProductsPage"));
@@ -141,6 +142,16 @@ const wishlistRoute = createRoute({
   ),
 });
 
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/search",
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <SearchPage />
+    </Suspense>
+  ),
+});
+
 const accountRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/account",
@@ -231,6 +242,7 @@ const routeTree = rootRoute.addChildren([
   productRoute,
   cartRoute,
   wishlistRoute,
+  searchRoute,
   accountRoute,
   adminRoute,
   adminProductsRoute,

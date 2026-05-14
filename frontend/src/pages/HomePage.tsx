@@ -163,7 +163,7 @@ export default function HomePage() {
                 <div className="w-5 h-[2px] bg-primary" />
               </div>
 
-              <h1 className="text-[1.75rem] sm:text-3xl font-black uppercase tracking-tighter leading-[1.05] text-black w-full text-center" style={{ fontFamily: "var(--font-display)" }}>
+              <h1 className="text-[1.75rem] sm:text-3xl font-black uppercase tracking-tighter leading-[1.05] text-black w-full text-center" style={{ fontFamily: "var(--font-brand-primary)" }}>
                 AESTHETIC <br />
                 <span className="text-primary italic">STREET</span>WEAR
               </h1>
@@ -217,7 +217,7 @@ export default function HomePage() {
                   <div className="hidden lg:block w-8 h-[2px] bg-primary" />
                 </div>
 
-                <h1 className="text-[clamp(2.5rem,4vw,3.5rem)] xl:text-6xl font-black uppercase tracking-tighter leading-[1] text-black mb-0" style={{ fontFamily: "var(--font-display)" }}>
+                <h1 className="text-[clamp(2.5rem,4vw,3.5rem)] xl:text-6xl font-black uppercase tracking-tighter leading-[1] text-black mb-0" style={{ fontFamily: "var(--font-brand-primary)" }}>
                   AESTHETIC <br />
                   <span className="text-primary italic">STREET</span>WEAR
                 </h1>

@@ -24,7 +24,7 @@ export function Footer() {
     <footer className="bg-[#050505] text-white overflow-hidden relative" data-ocid="footer">
       {/* Decorative large text background */}
       <div className="absolute -bottom-10 -right-20 pointer-events-none select-none opacity-[0.02]">
-        <h2 className="text-[18vw] font-black italic tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
+        <h2 className="text-[18vw] font-black italic tracking-tighter leading-none" style={{ fontFamily: "var(--font-brand-primary)" }}>
           AESTHETIC
         </h2>
       </div>
@@ -38,7 +38,7 @@ export function Footer() {
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-[360deg]">
                 <span className="text-white font-black text-xl italic">A</span>
               </div>
-              <span className="text-xl font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>
+              <span className="text-xl font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-brand-primary)" }}>
                 Aesthetic
               </span>
             </Link>
@@ -121,7 +121,7 @@ export function Footer() {
             <Link to="/" className="hover:text-white transition-colors">Terms</Link>
           </div>
           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10">
-            © {year} AESTHETIC REVOLUTION.
+            © {year} AESTHETIC STREETWEAR.
           </p>
         </div>
       </div>

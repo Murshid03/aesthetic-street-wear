@@ -88,7 +88,7 @@ export function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate({ to: "/", search: { q: searchQuery.trim() } });
+      navigate({ to: "/search", search: { q: searchQuery.trim() } });
       setSearchOpen(false);
       setSearchQuery("");
     }
@@ -127,13 +127,13 @@ export function Header() {
                 <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 bg-primary rounded-full border-2 border-white shadow-lg" />
               </div>
               <div className="hidden sm:block leading-none">
-                <span className="block text-xs lg:text-base font-black text-black tracking-tighter uppercase italic" style={{ fontFamily: "var(--font-display)" }}>
+                <span className="block text-xs lg:text-base font-black text-black tracking-tighter uppercase italic" style={{ fontFamily: "var(--font-brand-primary)" }}>
                   Aesthetic
                 </span>
                 <div className="flex items-center gap-1.5 mt-0.5 lg:mt-1">
                   <div className="w-4 lg:w-5 h-[1.5px] bg-primary rounded-full" />
-                  <span className="block text-[7px] lg:text-[8px] font-black text-black/30 tracking-[0.4em] uppercase" style={{ fontFamily: "var(--font-accent)" }}>
-                    Fragments
+                  <span className="block text-[7px] lg:text-[8px] font-black text-black/30 tracking-[0.4em] uppercase" style={{ fontFamily: "var(--font-brand-secondary)" }}>
+                    Streetwear
                   </span>
                 </div>
               </div>
@@ -327,7 +327,7 @@ export function Header() {
                 <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
                   <span className="text-white font-black text-sm italic">A</span>
                 </div>
-                <span className="text-base font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-display)" }}>Aesthetic</span>
+                <span className="text-base font-black uppercase italic tracking-tighter" style={{ fontFamily: "var(--font-brand-primary)" }}>Aesthetic</span>
               </Link>
               <button
                 type="button"
