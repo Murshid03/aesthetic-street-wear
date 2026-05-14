@@ -187,7 +187,7 @@ export default function WishlistPage() {
     return (
         <Layout>
             {/* Header */}
-            <section className="pt-16 sm:pt-24 pb-8 sm:pb-12 bg-white border-b border-black/5">
+            <section className="pt-8 sm:pt-12 pb-6 sm:pb-8 bg-white border-b border-black/5">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-12">
                     <nav className="flex items-center gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>

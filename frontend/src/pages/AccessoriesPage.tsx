@@ -119,7 +119,7 @@ export default function AccessoriesPage() {
   return (
     <Layout>
       {/* Header */}
-      <section className="pt-16 sm:pt-24 pb-8 sm:pb-12 bg-white border-b border-black/5">
+      <section className="pt-8 sm:pt-12 pb-6 sm:pb-8 bg-white border-b border-black/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="max-w-4xl text-center md:text-left">
             <nav className="flex items-center justify-center md:justify-start gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
@@ -141,21 +141,21 @@ export default function AccessoriesPage() {
       </section>
 
       {/* Sort Controls */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-black/5 sticky top-[56px] z-30 py-3">
+      <div className="bg-white/90 backdrop-blur-xl border-b border-black/5 sticky top-[56px] z-30 py-2.5 sm:py-3">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-3 h-3 text-black/30" />
+            <div className="flex items-center gap-2 shrink-0 mr-1">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-black/30" />
               <span className="text-[9px] font-black uppercase tracking-widest text-black/40 hidden sm:block">Sort:</span>
             </div>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="h-9 w-36 rounded-full border-black/5 bg-black/5 text-[9px] font-black uppercase tracking-widest focus:ring-primary/20">
+              <SelectTrigger className="h-9 w-28 sm:w-36 rounded-full border-black/5 bg-black/5 text-[9px] font-black uppercase tracking-widest focus:ring-primary/20">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl border-black/5 shadow-2xl">
+              <SelectContent className="rounded-2xl border-black/[0.06] shadow-2xl">
                 <SelectItem value="newest" className="text-[9px] font-black uppercase tracking-widest">Newest</SelectItem>
-                <SelectItem value="price-asc" className="text-[9px] font-black uppercase tracking-widest">Price Low → High</SelectItem>
-                <SelectItem value="price-desc" className="text-[9px] font-black uppercase tracking-widest">Price High → Low</SelectItem>
+                <SelectItem value="price-asc" className="text-[9px] font-black uppercase tracking-widest">Price Low-High</SelectItem>
+                <SelectItem value="price-desc" className="text-[9px] font-black uppercase tracking-widest">Price High-Low</SelectItem>
               </SelectContent>
             </Select>
           </div>

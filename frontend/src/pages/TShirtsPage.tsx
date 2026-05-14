@@ -125,7 +125,7 @@ export default function TShirtsPage() {
   return (
     <Layout>
       {/* Header */}
-      <section className="pt-16 sm:pt-24 pb-8 sm:pb-12 bg-white border-b border-black/5">
+      <section className="pt-8 sm:pt-12 pb-6 sm:pb-8 bg-white border-b border-black/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="max-w-4xl text-center md:text-left">
             <nav className="flex items-center justify-center md:justify-start gap-2 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4 whitespace-nowrap overflow-x-auto no-scrollbar">
@@ -147,36 +147,41 @@ export default function TShirtsPage() {
       </section>
 
       {/* Filter Controls */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-black/5 sticky top-[56px] z-30 py-3">
+      <div className="bg-white/90 backdrop-blur-xl border-b border-black/5 sticky top-[56px] z-30 py-2.5 sm:py-3">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-0.5">
-            <div className="flex items-center gap-2 shrink-0">
-              <SlidersHorizontal className="w-3 h-3 text-black/30" />
-            </div>
-            <button
-              onClick={() => setSizeFilter("all")}
-              className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === "all" ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
-            >
-              All
-            </button>
-            {SIZE_OPTIONS.map((s) => (
+          <div className="flex items-center justify-between w-full gap-4">
+            {/* Left: Scrollable filter zone */}
+            <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+              <div className="flex items-center gap-2 shrink-0 mr-1">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-black/30" />
+              </div>
               <button
-                key={s}
-                onClick={() => setSizeFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === s ? "bg-black text-white border-black" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
+                onClick={() => setSizeFilter("all")}
+                className={`px-3.5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === "all" ? "bg-black text-white border-black shadow-md shadow-black/5" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
               >
-                {s}
+                All
               </button>
-            ))}
-            <div className="ml-auto shrink-0">
+              {SIZE_OPTIONS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSizeFilter(s)}
+                  className={`px-3.5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 ${sizeFilter === s ? "bg-black text-white border-black shadow-md shadow-black/5" : "bg-transparent text-black/40 border-black/5 hover:border-black/20"}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            {/* Right: Statically pinned sorter */}
+            <div className="shrink-0 border-l border-black/[0.03] pl-3.5">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="h-9 w-36 rounded-full border-black/5 bg-black/5 text-[9px] font-black uppercase tracking-widest focus:ring-primary/20">
+                <SelectTrigger className="h-9 w-28 sm:w-36 rounded-full border-black/5 bg-black/5 text-[9px] font-black uppercase tracking-widest focus:ring-primary/20">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl border-black/5 shadow-2xl">
+                <SelectContent className="rounded-2xl border-black/[0.06] shadow-2xl">
                   <SelectItem value="newest" className="text-[9px] font-black uppercase tracking-widest">Newest</SelectItem>
-                  <SelectItem value="price-asc" className="text-[9px] font-black uppercase tracking-widest">Price Low → High</SelectItem>
-                  <SelectItem value="price-desc" className="text-[9px] font-black uppercase tracking-widest">Price High → Low</SelectItem>
+                  <SelectItem value="price-asc" className="text-[9px] font-black uppercase tracking-widest">Price Low-High</SelectItem>
+                  <SelectItem value="price-desc" className="text-[9px] font-black uppercase tracking-widest">Price High-Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>

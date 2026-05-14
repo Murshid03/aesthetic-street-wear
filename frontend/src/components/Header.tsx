@@ -448,27 +448,27 @@ export function Header() {
       {/* Search Overlay */}
       {searchOpen && (
         <div
-          className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-md flex items-start justify-center pt-24 px-4 animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-md flex items-start justify-center pt-16 sm:pt-24 px-4 animate-fade-in"
           onClick={(e) => { if (e.target === e.currentTarget) setSearchOpen(false); }}
         >
-          <div className="w-full max-w-xl bg-white rounded-[3rem] p-8 shadow-2xl animate-scale-in border border-black/5">
-            <form onSubmit={handleSearch} className="flex items-center gap-6">
-              <Search className="w-6 h-6 text-primary shrink-0" />
+          <div className="w-full max-w-xl bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-8 shadow-2xl animate-scale-in border border-black/5">
+            <form onSubmit={handleSearch} className="flex items-center gap-3 sm:gap-6">
+              <Search className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
               <input
                 ref={searchRef}
                 type="search"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-xl font-black text-black placeholder:text-black/10 outline-none"
+                className="flex-1 bg-transparent text-sm sm:text-base md:text-xl font-black text-black placeholder:text-black/10 outline-none tracking-tight"
                 style={{ fontFamily: "var(--font-display)" }}
               />
               <button
                 type="button"
                 onClick={() => setSearchOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-black/5 text-black"
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-black/5 text-black hover:bg-black hover:text-white transition-all shrink-0"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </form>
           </div>
