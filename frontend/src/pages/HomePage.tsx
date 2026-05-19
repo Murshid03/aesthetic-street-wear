@@ -371,7 +371,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Final CTA (Compact Focused) ────────────────────────── */}
-      <section className="py-10 lg:py-16 bg-white">
+      <section className="pt-10 pb-16 lg:py-16 bg-white">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="relative rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-[#0a0a0a] text-white p-8 lg:p-20 text-center shadow-[0_40px_80px_rgba(0,0,0,0.3)]">
             <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#6d28d9_1px,transparent_1px)] bg-[size:32px_32px]" />
@@ -392,16 +392,16 @@ export default function HomePage() {
                 Create an account for early drop access and personalized curation.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 lg:gap-5 pt-4">
+              <div className="flex flex-row items-center justify-center gap-3 sm:gap-5 pt-4 w-full max-w-md mx-auto">
                 <Button
                   asChild
-                  className="h-12 lg:h-14 w-full sm:w-auto px-10 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[9px] lg:text-[10px] uppercase tracking-widest shadow-xl"
+                  className="h-12 lg:h-14 flex-1 sm:w-auto px-4 sm:px-10 rounded-full bg-primary text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[9px] lg:text-[10px] uppercase tracking-widest shadow-xl"
                 >
                   <Link to="/login">Register Now</Link>
                 </Button>
                 <Button
                   asChild
-                  className="h-12 lg:h-14 w-full sm:w-auto px-10 rounded-full border border-white/10 bg-transparent text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[9px] lg:text-[10px] uppercase tracking-widest"
+                  className="h-12 lg:h-14 flex-1 sm:w-auto px-4 sm:px-10 rounded-full border border-white/10 bg-transparent text-white hover:bg-white hover:text-black transition-all duration-500 font-bold text-[9px] lg:text-[10px] uppercase tracking-widest"
                 >
                   <Link to="/shirts">Shop Now</Link>
                 </Button>
