@@ -1,22 +1,16 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
-// Ensure uploads directory exists
-const uploadDir = 'uploads';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    },
+// Configure Cloudinary from env vars
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// Use memory storage — no disk writes (required for Vercel serverless)
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -27,7 +21,33 @@ const fileFilter = (req, file, cb) => {
 };
 
 export const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
+
+/**
+ * Upload a buffer to Cloudinary and return the secure URL.
+ * Call this after multer has processed the file (req.file.buffer).
+ */
+export const uploadToCloudinary = (buffer, folder = 'aesthetic-streetwear') => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: 'image',
+                transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+            },
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result.secure_url);
+            }
+        );
+
+        // Pipe the buffer into the upload stream
+        const readable = new Readable();
+        readable.push(buffer);
+        readable.push(null);
+        readable.pipe(uploadStream);
+    });
+};

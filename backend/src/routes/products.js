@@ -1,7 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { upload } from '../middleware/upload.js';
+import { upload, uploadToCloudinary } from '../middleware/upload.js';
 import Notification from '../models/Notification.js';
 import RestockRequest from '../models/RestockRequest.js';
 
@@ -46,9 +46,9 @@ router.post('/', protect, adminOnly, upload.single('image'), async (req, res) =>
             }
         }
 
-        // Handle image
+        // Handle image — upload file to Cloudinary, or use URL from body
         if (req.file) {
-            productData.image = `/uploads/${req.file.filename}`;
+            productData.image = await uploadToCloudinary(req.file.buffer);
         }
 
         // Explicit Type Conversion for FormData strings
@@ -77,9 +77,9 @@ router.put('/:id', protect, adminOnly, upload.single('image'), async (req, res) 
             }
         }
 
-        // Handle image
+        // Handle image — upload file to Cloudinary, or use URL from body
         if (req.file) {
-            productData.image = `/uploads/${req.file.filename}`;
+            productData.image = await uploadToCloudinary(req.file.buffer);
         }
 
         // Explicit Type Conversion for FormData strings
