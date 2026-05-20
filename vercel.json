@@ -12,7 +12,7 @@
       "src": "backend/src/index.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["backend/src/**"]
+        "includeFiles": ["backend/src/**", "backend/package.json"]
       }
     }
   ],

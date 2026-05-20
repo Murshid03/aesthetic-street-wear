@@ -5,33 +5,42 @@ export const connectDB = async () => {
         return;
     }
 
-    try {
-        const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/Aesthetic_db';
+    const uri = process.env.MONGO_URI;
 
-        try {
-            const conn = await mongoose.connect(uri, {
-                serverSelectionTimeoutMS: 5000,
-                dbName: 'Aesthetic_db'
-            });
-            console.log(`✅ MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
-        } catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('⚠️ Local MongoDB not found, starting In-Memory MongoDB for development...');
+    // In production, MONGO_URI must be set as an environment variable in Vercel
+    if (!uri) {
+        const msg = process.env.NODE_ENV === 'production'
+            ? 'MONGO_URI environment variable is not set. Please add it in your Vercel project settings under Settings → Environment Variables.'
+            : 'MONGO_URI is not set. Check your .env file.';
+        console.error('❌', msg);
+        throw new Error(msg);
+    }
+
+    try {
+        const conn = await mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 8000,
+            dbName: 'Aesthetic_db'
+        });
+        console.log(`✅ MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
+    } catch (err) {
+        // In development only, try falling back to an in-memory DB
+        if (process.env.NODE_ENV !== 'production') {
+            try {
+                console.log('⚠️ Could not connect to MongoDB, trying in-memory fallback...');
                 const { MongoMemoryServer } = await import('mongodb-memory-server');
                 const mongod = await MongoMemoryServer.create();
-                const memoryUri = mongod.getUri();
-                const conn = await mongoose.connect(memoryUri, { dbName: 'Aesthetic_db' });
+                const memUri = mongod.getUri();
+                const conn = await mongoose.connect(memUri, { dbName: 'Aesthetic_db' });
+                process.env.MONGO_URI = memUri;
                 console.log(`✅ In-Memory MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
-
-                // Set the URI in process.env so it can be reused or logged
-                process.env.MONGO_URI = memoryUri;
-            } else {
-                throw err;
+                return;
+            } catch (memErr) {
+                console.error('❌ In-memory MongoDB also failed:', memErr.message);
             }
         }
-    } catch (error) {
-        console.error('❌ MongoDB connection failed:', error.message);
-        throw error;
+        console.error('❌ MongoDB connection failed:', err.message);
+        throw err;
     }
 };
+
 
