@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
-import api from "@/lib/api";
+import api, { getErrorMessage } from "@/lib/api";
 import { useNavigate, Link, useSearch } from "@tanstack/react-router";
 import { Lock, Mail, User, LogIn, ArrowLeft, Shield, Loader2, Eye, EyeOff, ChevronRight, Package } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -52,8 +52,7 @@ export default function LoginPage() {
         toast.success("Account created successfully!");
       }
     } catch (err: any) {
-      const message = err.response?.data?.error || err.message || "Authentication failed";
-      toast.error(message);
+      toast.error(getErrorMessage(err, "Authentication failed"));
     }
   };
 
@@ -66,7 +65,7 @@ export default function LoginPage() {
       setMode("otp");
       toast.success("OTP sent to your email");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to send code");
+      toast.error(getErrorMessage(err, "Failed to send code"));
     } finally {
       setResetLoading(false);
     }
@@ -81,7 +80,7 @@ export default function LoginPage() {
       setMode("reset");
       toast.success("OTP verified");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Invalid OTP");
+      toast.error(getErrorMessage(err, "Invalid OTP"));
     } finally {
       setResetLoading(false);
     }
@@ -96,7 +95,7 @@ export default function LoginPage() {
       setMode("login");
       toast.success("Password reset successfully");
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to reset password");
+      toast.error(getErrorMessage(err, "Failed to reset password"));
     } finally {
       setResetLoading(false);
     }
