@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 export const connectDB = async () => {
+    if (mongoose.connection.readyState >= 1) {
+        return;
+    }
+
     try {
         const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/Aesthetic_db';
 
@@ -27,6 +31,7 @@ export const connectDB = async () => {
         }
     } catch (error) {
         console.error('❌ MongoDB connection failed:', error.message);
-        process.exit(1);
+        throw error;
     }
 };
+

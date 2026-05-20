@@ -15,41 +15,50 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB & Seed if empty
-const startServer = async () => {
-    await connectDB();
+// Database connection & initialization middleware for Serverless Environments
+let isDBConfigured = false;
 
-    // Check if seeding is needed
-    // Check if seeding is needed
-    const productCount = await Product.countDocuments();
-    if (productCount === 0) {
-        console.log('📦 Products missing, seeding initial catalog...');
-        await seedDB(false);
-    } else {
-        // Ensure admin and settings still exist if products are already present
-        const User = (await import('./models/User.js')).default;
-        const Settings = (await import('./models/Settings.js')).default;
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
 
-        const admin = await User.findOne({ role: 'admin' });
-        if (!admin) {
-            await User.create({
-                name: 'Admin',
-                email: 'admin@aesthetic.com',
-                password: 'admin123',
-                role: 'admin'
-            });
-            console.log('✅ Admin user restored: admin@aesthetic.com');
+        // Seed & configure DB once per cold-start
+        if (!isDBConfigured) {
+            isDBConfigured = true; // Set instantly to prevent concurrent requests from double seeding
+            const productCount = await Product.countDocuments();
+            if (productCount === 0) {
+                console.log('📦 Products missing, seeding initial catalog...');
+                await seedDB(false);
+            } else {
+                // Ensure admin and settings still exist if products are already present
+                const User = (await import('./models/User.js')).default;
+                const Settings = (await import('./models/Settings.js')).default;
+
+                const admin = await User.findOne({ role: 'admin' });
+                if (!admin) {
+                    await User.create({
+                        name: 'Admin',
+                        email: 'admin@aesthetic.com',
+                        password: 'admin123',
+                        role: 'admin'
+                    });
+                    console.log('✅ Admin user restored: admin@aesthetic.com');
+                }
+
+                const settings = await Settings.findOne();
+                if (!settings) {
+                    await Settings.create({});
+                    console.log('✅ Default settings restored');
+                }
+            }
         }
-
-        const settings = await Settings.findOne();
-        if (!settings) {
-            await Settings.create({});
-            console.log('✅ Default settings restored');
-        }
+        next();
+    } catch (err) {
+        console.error('Database connection / initialization failed:', err);
+        res.status(500).json({ error: 'Database connection failed', message: err.message });
     }
-};
+});
 
-startServer();
 
 // Middleware
 app.use(cors({
