@@ -92,6 +92,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
-});
+// Conditionally listen if not running on Vercel serverless
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+    });
+}
+
+// Export app for Vercel Serverless Functions
+export default app;
+
