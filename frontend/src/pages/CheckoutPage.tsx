@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import api from "@/lib/api";
+import api, { getErrorMessage } from "@/lib/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Select,
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
       clearCart();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Order could not be placed.");
+      toast.error(getErrorMessage(error, "Order could not be placed."));
     }
   });
 

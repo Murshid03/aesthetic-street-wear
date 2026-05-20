@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import api from "@/lib/api";
+import api, { getErrorMessage } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
@@ -122,7 +122,7 @@ function AdminProductsContent() {
       toast.success("Product added successfully");
       setIsOpen(false);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to add product"),
+    onError: (err: any) => toast.error(getErrorMessage(err, "Failed to add product")),
   });
 
   const updateMutation = useMutation({
@@ -132,7 +132,7 @@ function AdminProductsContent() {
       toast.success("Product updated successfully");
       setIsOpen(false);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to update product"),
+    onError: (err: any) => toast.error(getErrorMessage(err, "Failed to update product")),
   });
 
   const deleteMutation = useMutation({
@@ -142,7 +142,7 @@ function AdminProductsContent() {
       toast.success("Product deleted successfully");
       setDeleteId(null);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || "Failed to delete product"),
+    onError: (err: any) => toast.error(getErrorMessage(err, "Failed to delete product")),
   });
 
   const toggleSoldOutMutation = useMutation({

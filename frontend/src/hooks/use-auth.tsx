@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import api from "@/lib/api";
+import api, { getErrorMessage } from "@/lib/api";
 
 const AUTH_API = "/auth";
 
@@ -52,7 +52,7 @@ export const useAuth = create<AuthState>((set) => ({
       localStorage.setItem("asw_user", JSON.stringify(data));
       set({ user: data, isAuthenticated: true, isLoading: false });
     } catch (err: any) {
-      set({ error: err.response?.data?.error || "Login failed", isLoading: false });
+      set({ error: getErrorMessage(err, "Login failed"), isLoading: false });
       throw err;
     }
   },
@@ -64,7 +64,7 @@ export const useAuth = create<AuthState>((set) => ({
       localStorage.setItem("asw_user", JSON.stringify(data));
       set({ user: data, isAuthenticated: true, isLoading: false });
     } catch (err: any) {
-      set({ error: err.response?.data?.error || "Registration failed", isLoading: false });
+      set({ error: getErrorMessage(err, "Registration failed"), isLoading: false });
       throw err;
     }
   },
