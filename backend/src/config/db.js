@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 
 export const connectDB = async () => {
     if (mongoose.connection.readyState >= 1) {
@@ -18,6 +17,7 @@ export const connectDB = async () => {
         } catch (err) {
             if (process.env.NODE_ENV === 'development') {
                 console.log('⚠️ Local MongoDB not found, starting In-Memory MongoDB for development...');
+                const { MongoMemoryServer } = await import('mongodb-memory-server');
                 const mongod = await MongoMemoryServer.create();
                 const memoryUri = mongod.getUri();
                 const conn = await mongoose.connect(memoryUri, { dbName: 'Aesthetic_db' });
