@@ -52,6 +52,10 @@ function SizePickerDialog({
                         src={item.product.image}
                         alt={item.product.name}
                         className="w-20 h-24 rounded-xl object-cover shadow-sm shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
+                        }}
                     />
                     <div className="min-w-0">
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-black mb-1 truncate">{item.product.name}</h4>
@@ -121,6 +125,10 @@ function WishlistCard({
                         src={item.product.image}
                         alt={item.product.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
+                        }}
                     />
                 </Link>
                 <button

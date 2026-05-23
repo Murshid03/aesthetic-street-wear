@@ -76,6 +76,10 @@ function CartItemRow({
           src={item.product.image}
           alt={item.product.name}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500";
+          }}
         />
       </Link>
 
