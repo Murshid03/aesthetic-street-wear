@@ -1,7 +1,7 @@
 import express from 'express';
 import Settings from '../models/Settings.js';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { upload } from '../middleware/upload.js';
+import { upload, uploadToCloudinary } from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -45,7 +45,8 @@ router.post('/hero-image', protect, adminOnly, upload.single('image'), async (re
             return res.status(400).json({ error: 'Invalid image field' });
         }
 
-        const imageUrl = `/uploads/${req.file.filename}`;
+        // Upload to Cloudinary (memory storage — no local disk writes, works on Vercel)
+        const imageUrl = await uploadToCloudinary(req.file.buffer, 'aesthetic-streetwear/hero');
 
         let settings = await Settings.findOne();
         if (!settings) settings = await Settings.create({});

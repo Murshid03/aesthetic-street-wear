@@ -104,6 +104,16 @@ const DEFAULT_HERO_IMAGES = [
   "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1200&q=90"
 ];
 
+// Only treat the setting as valid if it is a real http/https URL (e.g. Cloudinary CDN).
+// Guards against old broken local paths like "/uploads/undefined" that were saved
+// when the settings route incorrectly used req.file.filename with memoryStorage.
+function validImageUrl(url: string | undefined, fallback: string): string {
+  if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+    return url;
+  }
+  return fallback;
+}
+
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -116,9 +126,9 @@ export default function HomePage() {
   });
 
   const heroImages = [
-    settings?.heroImage1 || DEFAULT_HERO_IMAGES[0],
-    settings?.heroImage2 || DEFAULT_HERO_IMAGES[1],
-    settings?.heroImage3 || DEFAULT_HERO_IMAGES[2],
+    validImageUrl(settings?.heroImage1, DEFAULT_HERO_IMAGES[0]),
+    validImageUrl(settings?.heroImage2, DEFAULT_HERO_IMAGES[1]),
+    validImageUrl(settings?.heroImage3, DEFAULT_HERO_IMAGES[2]),
   ];
 
   useEffect(() => {
